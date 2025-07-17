@@ -1,0 +1,50 @@
+/**
+ * Global CSS styles for the entire application
+ * This file contains styles that apply to all pages and components
+ */
+
+/* Hide scrollbars globally while maintaining scroll functionality */
+::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* For Firefox */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* For Internet Explorer and Edge */
+body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ensure scrolling still works */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Smooth scrolling for the entire application */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Remove any default scrollbar styling */
+body, html, #app {
+  overflow-x: hidden;
+}
+
+/* Ensure content is still scrollable vertically */
+body {
+  overflow-y: auto;
+}
