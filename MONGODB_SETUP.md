@@ -1,11 +1,11 @@
 # MongoDB Integration Setup
 
-Dự án TrackDo đã được cấu hình để tích hợp với MongoDB. Dưới đây là hướng dẫn thiết lập:
+The TrackDo project has been configured to integrate with MongoDB. Below is the setup guide:
 
-## 🔧 Cấu hình môi trường
+## 🔧 Environment Configuration
 
-### 1. File `.env`
-Đảm bảo file `.env` trong thư mục gốc có các biến sau:
+### 1. `.env` File
+Ensure the `.env` file in the root directory contains the following variables:
 
 ```env
 # API Configuration
@@ -23,19 +23,19 @@ JWT_EXPIRES_IN=7d
 NODE_ENV=development
 ```
 
-### 2. Cài đặt dependencies
+### 2. Install Dependencies
 ```bash
 npm install
 ```
 
-## 🗄️ Cấu trúc dữ liệu MongoDB
+## 🗄️ MongoDB Data Structure
 
 ### Collections:
-- **projects**: Lưu trữ thông tin dự án
-- **tasks**: Lưu trữ thông tin công việc
-- **events**: Lưu trữ thông tin sự kiện/lịch
+- **projects**: Store project information
+- **tasks**: Store task information
+- **events**: Store event/calendar information
 
-### Schema mẫu:
+### Sample Schemas:
 
 #### Projects Collection:
 ```javascript
@@ -114,59 +114,85 @@ npm install
 
 ## 🚀 Backend API Requirements
 
-Ứng dụng cần một backend API với các endpoints sau:
+The application requires a backend API with the following endpoints:
 
 ### Projects API:
-- `GET /api/projects` - Lấy danh sách dự án
-- `POST /api/projects` - Tạo dự án mới
-- `PUT /api/projects/:id` - Cập nhật dự án
-- `DELETE /api/projects/:id` - Xóa dự án
+- `GET /api/projects` - Get list of projects
+- `POST /api/projects` - Create new project
+- `PUT /api/projects/:id` - Update project
+- `DELETE /api/projects/:id` - Delete project
 
 ### Tasks API:
-- `GET /api/tasks` - Lấy danh sách công việc
-- `POST /api/tasks` - Tạo công việc mới
-- `PUT /api/tasks/:id` - Cập nhật công việc
-- `DELETE /api/tasks/:id` - Xóa công việc
+- `GET /api/tasks` - Get list of tasks
+- `POST /api/tasks` - Create new task
+- `PUT /api/tasks/:id` - Update task
+- `DELETE /api/tasks/:id` - Delete task
 
 ### Events API:
-- `GET /api/events` - Lấy danh sách sự kiện
-- `POST /api/events` - Tạo sự kiện mới
-- `PUT /api/events/:id` - Cập nhật sự kiện
-- `DELETE /api/events/:id` - Xóa sự kiện
+- `GET /api/events` - Get list of events
+- `POST /api/events` - Create new event
+- `PUT /api/events/:id` - Update event
+- `DELETE /api/events/:id` - Delete event
 
 ### Health Check:
-- `GET /api/health` - Kiểm tra trạng thái API
+- `GET /api/health` - Check API status
 
 ## 🛠️ Development
 
-### Chạy ứng dụng:
+### Run the application:
 ```bash
 npm run dev
 ```
 
-### Kiểm tra kết nối MongoDB:
-Mở Developer Console trong trình duyệt để xem logs kết nối.
+### Check MongoDB connection:
+Open Developer Console in the browser to view connection logs.
 
 ## 📝 Notes
 
-1. **CORS**: Đảm bảo backend API cho phép CORS từ frontend
-2. **Authentication**: JWT tokens được lưu trong localStorage
-3. **Error Handling**: Tất cả lỗi API đều được xử lý và ghi log
-4. **Performance**: Dữ liệu được cache trong Pinia stores
+1. **CORS**: Ensure backend API allows CORS from frontend
+2. **Authentication**: JWT tokens are stored in localStorage
+3. **Error Handling**: All API errors are handled and logged
+4. **Performance**: Data is cached in Pinia stores
 
 ## 🔧 Troubleshooting
 
-### Lỗi kết nối MongoDB:
-1. Kiểm tra MongoDB server đang chạy
-2. Xác nhận MONGODB_URI trong .env
-3. Kiểm tra network connectivity
+### MongoDB Connection Issues:
+1. Check if MongoDB server is running
+2. Verify MONGODB_URI in .env file
+3. Check network connectivity
 
-### Lỗi API:
-1. Xác nhận backend server đang chạy trên port 3000
-2. Kiểm tra VITE_API_BASE_URL trong .env
-3. Xem Network tab trong Developer Tools
+### API Errors:
+1. Confirm backend server is running on port 3000
+2. Check VITE_API_BASE_URL in .env file
+3. View Network tab in Developer Tools
 
-### Dữ liệu không hiển thị:
-1. Mở Console để xem error logs
-2. Kiểm tra stores có được khởi tạo đúng không
-3. Verify API responses trong Network tab
+### Data Not Displaying:
+1. Open Console to view error logs
+2. Check if stores are properly initialized
+3. Verify API responses in Network tab
+
+## 🔗 Related Documentation
+
+For complete setup and usage instructions, please refer to the main [README.md](./README.md) file.
+
+## 📊 Database Management
+
+### Recommended Tools:
+- **MongoDB Compass**: GUI for MongoDB management
+- **Studio 3T**: Advanced MongoDB IDE
+- **Robo 3T**: Lightweight MongoDB GUI
+
+### Backup & Restore:
+```bash
+# Backup database
+mongodump --db trackdo --out ./backup
+
+# Restore database
+mongorestore --db trackdo ./backup/trackdo
+```
+
+### Performance Optimization:
+- Create indexes on frequently queried fields
+- Use aggregation pipelines for complex queries
+- Implement proper pagination for large datasets
+- Monitor query performance with MongoDB profiler
