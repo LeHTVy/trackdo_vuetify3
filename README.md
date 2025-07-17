@@ -64,12 +64,12 @@ TrackDo is a modern, full-stack task management application that helps you organ
 <table>
   <tr>
     <td align="center">
-      <img src="public/hero.gif" alt="Dashboard" width="400">
+      <img src="public/dashboard.png" alt="Dashboard" width="400">
       <br>
       <strong>📊 Dashboard Overview</strong>
     </td>
     <td align="center">
-      <img src="public/hero.svg" alt="Project Management" width="400">
+      <img src="public/prject.png" alt="Project Management" width="400">
       <br>
       <strong>📋 Project Management</strong>
     </td>
@@ -485,17 +485,8 @@ We welcome contributions to TrackDo! Here's how you can help:
 **TrackDo** is open source software licensed under the [MIT License](LICENSE).
 
 ```
-Copyright (c) 2024 TrackDo Team
+Copyright (c) 2025 VyLH
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
 ```
 
 <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="MIT License">
@@ -518,6 +509,6 @@ copies or substantial portions of the Software.
 
 ---
 
-<sub>Built with ❤️ by the TrackDo Team</sub>
+<sub>Built with ❤️ by Vy</sub>
 
 </div>
