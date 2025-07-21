@@ -69,9 +69,9 @@ TrackDo is a modern, full-stack task management application that helps you organ
       <strong>📊 Dashboard Overview</strong>
     </td>
     <td align="center">
-      <img src="public/prject.png" alt="Project Management" width="400">
+      <img src="public/homedarkmode.png" alt="Dashboard Overview with Dark Mode on" width="400">
       <br>
-      <strong>📋 Project Management</strong>
+      <strong>📊 Dashboard Overview with Dark Mode on</strong>
     </td>
   </tr>
 </table>

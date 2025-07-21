@@ -1,5 +1,24 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+// Import utility functions
+import {
+  isValidDate,
+  safeCreateDate,
+  formatEventTime,
+  formatEventDate,
+  isEventToday,
+  isEventUpcoming,
+  getEventsByDate
+} from '@/utils/dateUtils.js'
+import {
+  getEventTypeColor,
+  getEventPriorityColor,
+  getEventStatusColor,
+  getEventDisplayColor,
+  formatEventForDisplay,
+  sortEventsByDateTime,
+  groupEventsByDate
+} from '@/utils/eventUtils.js'
 
 export const useEventsStore = defineStore('events', () => {
   const events = ref([])
@@ -18,29 +37,26 @@ export const useEventsStore = defineStore('events', () => {
   const totalEvents = computed(() => events.value.length)
 
   const upcomingEvents = computed(() => {
-    const today = new Date()
-    return events.value.filter(event => {
-      const eventDate = new Date(event.startDate)
-      return eventDate >= today
-    }).sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+    return sortEventsByDateTime(
+      events.value.filter(event => isEventUpcoming(event))
+    )
   })
 
   const todayEvents = computed(() => {
-    const today = new Date().toISOString().split('T')[0]
-    return events.value.filter(event => {
-      const eventDate = new Date(event.startDate).toISOString().split('T')[0]
-      return eventDate === today
-    })
+    return events.value.filter(event => isEventToday(event))
   })
 
   const thisWeekEvents = computed(() => {
     const today = new Date()
-    const weekStart = new Date(today.setDate(today.getDate() - today.getDay()))
-    const weekEnd = new Date(today.setDate(today.getDate() - today.getDay() + 6))
+    const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay())
+    const weekEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 6)
 
     return events.value.filter(event => {
-      const eventDate = new Date(event.startDate)
-      return eventDate >= weekStart && eventDate <= weekEnd
+      if (!isValidDate(event.start)) {
+        return false
+      }
+      const eventDate = safeCreateDate(event.start)
+      return eventDate && eventDate >= weekStart && eventDate <= weekEnd
     })
   })
 
@@ -118,12 +134,24 @@ export const useEventsStore = defineStore('events', () => {
   })
 
   const calendarEvents = computed(() => {
-    return events.value.map(event => ({
-      ...event,
-      start: new Date(event.startDate),
-      end: new Date(event.endDate),
-      color: getTypeColor(event.type),
-    }))
+    return events.value.filter(event => {
+      return isValidDate(event.start) && isValidDate(event.end)
+    }).map(event => {
+      const startDate = safeCreateDate(event.start)
+      const endDate = safeCreateDate(event.end)
+
+      if (!startDate || !endDate) {
+        console.warn('Invalid date in event:', event)
+        return null
+      }
+
+      return {
+        ...event,
+        start: startDate,
+        end: endDate,
+        color: getEventTypeColor(event.type),
+      }
+    }).filter(Boolean) // Remove null entries
   })
 
   const initializeStore = async () => {
@@ -303,12 +331,8 @@ export const useEventsStore = defineStore('events', () => {
     return events.value.find(event => event.id === eventId)
   }
 
-  const getEventsByDate = date => {
-    const targetDate = new Date(date).toISOString().split('T')[0]
-    return events.value.filter(event => {
-      const eventDate = new Date(event.startDate).toISOString().split('T')[0]
-      return eventDate === targetDate
-    })
+  const getEventsByDateLocal = date => {
+    return getEventsByDate(events.value, date)
   }
 
   const getEventsByProject = projectId => {
@@ -320,24 +344,50 @@ export const useEventsStore = defineStore('events', () => {
   }
 
   const getConflictingEvents = (startDate, endDate, excludeEventId = null) => {
+    if (!isValidDate(startDate) || !isValidDate(endDate)) {
+      return []
+    }
+
+    const newStart = safeCreateDate(startDate)
+    const newEnd = safeCreateDate(endDate)
+    if (!newStart || !newEnd) {
+      return []
+    }
+
     return events.value.filter(event => {
       if (excludeEventId && event.id === excludeEventId) {
         return false
       }
 
-      const eventStart = new Date(event.startDate)
-      const eventEnd = new Date(event.endDate)
-      const newStart = new Date(startDate)
-      const newEnd = new Date(endDate)
+      if (!isValidDate(event.start) || !isValidDate(event.end)) {
+        return false
+      }
+
+      const eventStart = safeCreateDate(event.start)
+      const eventEnd = safeCreateDate(event.end)
+
+      if (!eventStart || !eventEnd) {
+        return false
+      }
 
       return (newStart < eventEnd && newEnd > eventStart)
     })
   }
 
   const generateRecurringEvents = (baseEvent, recurrenceRule) => {
+    if (!isValidDate(baseEvent.start) || !isValidDate(baseEvent.end)) {
+      console.warn('Invalid dates in base event for recurring generation')
+      return []
+    }
+
     const recurringEvents = []
-    const startDate = new Date(baseEvent.startDate)
-    const endDate = new Date(baseEvent.endDate)
+    const startDate = safeCreateDate(baseEvent.start)
+    const endDate = safeCreateDate(baseEvent.end)
+
+    if (!startDate || !endDate) {
+      return []
+    }
+
     const duration = endDate.getTime() - startDate.getTime()
     const currentDate = new Date(startDate)
     let count = 0
@@ -348,8 +398,8 @@ export const useEventsStore = defineStore('events', () => {
         const newEvent = {
           ...baseEvent,
           id: `${baseEvent.id}_${count}`,
-          startDate: currentDate.toISOString(),
-          endDate: new Date(currentDate.getTime() + duration).toISOString(),
+          start: currentDate.toISOString(),
+          end: new Date(currentDate.getTime() + duration).toISOString(),
           isRecurring: true,
           parentEventId: baseEvent.id,
         }
@@ -379,84 +429,6 @@ export const useEventsStore = defineStore('events', () => {
     }
 
     return recurringEvents
-  }
-
-  const getTypeColor = type => {
-    switch (type) {
-      case 'meeting': {
-        return '#1976D2'
-      }
-      case 'work': {
-        return '#388E3C'
-      }
-      case 'social': {
-        return '#E91E63'
-      }
-      case 'milestone': {
-        return '#FF5722'
-      }
-      case 'deadline': {
-        return '#F44336'
-      }
-      default: {
-        return '#9E9E9E'
-      }
-    }
-  }
-
-  const getPriorityColor = priority => {
-    switch (priority) {
-      case 'High': {
-        return 'error'
-      }
-      case 'Medium': {
-        return 'warning'
-      }
-      case 'Low': {
-        return 'success'
-      }
-      default: {
-        return 'primary'
-      }
-    }
-  }
-
-  const getStatusColor = status => {
-    switch (status) {
-      case 'confirmed': {
-        return 'success'
-      }
-      case 'tentative': {
-        return 'warning'
-      }
-      case 'cancelled': {
-        return 'error'
-      }
-      default: {
-        return 'grey'
-      }
-    }
-  }
-
-  const formatEventTime = event => {
-    if (event.allDay) {
-      return 'All Day'
-    }
-
-    const start = new Date(event.start)
-    const end = new Date(event.end)
-
-    return `${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-  }
-
-  const isEventToday = event => {
-    const today = new Date().toISOString().split('T')[0]
-    return event.start.split('T')[0] === today
-  }
-
-  const isEventUpcoming = event => {
-    const now = new Date()
-    return new Date(event.start) > now
   }
 
   return {
@@ -492,16 +464,20 @@ export const useEventsStore = defineStore('events', () => {
     setFilter,
     clearFilters,
     getEventById,
-    getEventsByDate,
+    getEventsByDate: getEventsByDateLocal,
     getEventsByProject,
     getEventsByType,
     getConflictingEvents,
     generateRecurringEvents,
 
-    getTypeColor,
-    getPriorityColor,
-    getStatusColor,
+    // Expose utility functions for components
+    getEventTypeColor,
+    getEventPriorityColor,
+    getEventStatusColor,
+    getEventDisplayColor,
     formatEventTime,
+    formatEventDate,
+    formatEventForDisplay,
     isEventToday,
     isEventUpcoming,
   }

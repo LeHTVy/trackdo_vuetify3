@@ -325,10 +325,23 @@
     { title: 'Indigo', value: '#3F51B5' },
   ]
 
-  // Helper function to create local date from date string
   const createLocalDate = dateStr => {
-    const [year, month, day] = dateStr.split('-').map(Number)
-    return new Date(year, month - 1, day) // month is 0-indexed
+    if (!dateStr || typeof dateStr !== 'string') {
+      console.warn('Invalid dateStr provided to createLocalDate:', dateStr)
+      return new Date()
+    }
+
+    try {
+      const [year, month, day] = dateStr.split('-').map(Number)
+      if (!year || !month || !day || isNaN(year) || isNaN(month) || isNaN(day)) {
+        console.warn('Invalid date format in createLocalDate:', dateStr)
+        return new Date() // Return current date as fallback
+      }
+      return new Date(year, month - 1, day) // month is 0-indexed
+    } catch (error) {
+      console.error('Error parsing date in createLocalDate:', dateStr, error)
+      return new Date() // Return current date as fallback
+    }
   }
 
   // Helper function to format day object to date string consistently
@@ -352,14 +365,31 @@
 
   // Computed properties
   const calendarAttributes = computed(() => {
-    return events.value.map(event => ({
-      key: event.id,
-      dates: createLocalDate(event.date),
-      dot: {
-        color: event.color,
-        class: 'custom-dot',
-      },
-    }))
+    return events.value
+      .filter(event => {
+        // Only include events with valid dates
+        if (!event || !event.date) {
+          console.warn('Event missing date property:', event)
+          return false
+        }
+        return true
+      })
+      .map(event => {
+        try {
+          return {
+            key: event.id,
+            dates: createLocalDate(event.date),
+            dot: {
+              color: event.color || '#2196F3',
+              class: 'custom-dot',
+            },
+          }
+        } catch (error) {
+          console.error('Error creating calendar attribute for event:', event, error)
+          return null
+        }
+      })
+      .filter(attr => attr !== null) // Remove any failed mappings
   })
 
   const upcomingEvents = computed(() => {
@@ -367,11 +397,29 @@
     today.setHours(0, 0, 0, 0) // Reset time to start of day
     return events.value
       .filter(event => {
-        const eventDate = createLocalDate(event.date)
-        eventDate.setHours(0, 0, 0, 0)
-        return eventDate >= today
+        // Check if event and event.date exist
+        if (!event || !event.date) {
+          console.warn('Event missing date property:', event)
+          return false
+        }
+
+        try {
+          const eventDate = createLocalDate(event.date)
+          eventDate.setHours(0, 0, 0, 0)
+          return eventDate >= today
+        } catch (error) {
+          console.error('Error processing event date:', event.date, error)
+          return false
+        }
       })
-      .sort((a, b) => createLocalDate(a.date) - createLocalDate(b.date))
+      .sort((a, b) => {
+        try {
+          return createLocalDate(a.date) - createLocalDate(b.date)
+        } catch (error) {
+          console.error('Error sorting events:', error)
+          return 0
+        }
+      })
       .slice(0, 5)
   })
 
@@ -459,27 +507,45 @@
   }
 
   const formatEventTime = event => {
-    const date = createLocalDate(event.date)
-    const dateStr = date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-    })
-
-    if (event.time) {
-      return `${dateStr} at ${event.time}`
+    if (!event || !event.date) {
+      return 'Invalid date'
     }
-    return dateStr
+
+    try {
+      const date = createLocalDate(event.date)
+      const dateStr = date.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+      })
+
+      if (event.time) {
+        return `${dateStr} at ${event.time}`
+      }
+      return dateStr
+    } catch (error) {
+      console.error('Error formatting event time:', event, error)
+      return 'Invalid date'
+    }
   }
 
   const formatDate = dateStr => {
-    const date = createLocalDate(dateStr)
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+    if (!dateStr) {
+      return 'Invalid date'
+    }
+
+    try {
+      const date = createLocalDate(dateStr)
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    } catch (error) {
+      console.error('Error formatting date:', dateStr, error)
+      return 'Invalid date'
+    }
   }
 
   onMounted(async () => {

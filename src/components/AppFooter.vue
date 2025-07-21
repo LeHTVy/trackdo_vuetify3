@@ -106,7 +106,7 @@
         <v-col class="text-center" cols="12">
           <p class="text-caption text-medium-emphasis mb-0">
             Made with <v-icon class="mx-1" color="error" size="16">mdi-heart</v-icon>
-            using Vue.js & Vuetify
+            using Vue.js & Vuetify By VyLeHoang
           </p>
         </v-col>
       </v-row>

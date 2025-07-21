@@ -1,106 +1,117 @@
 <template>
-  <div>
-    <!-- Today's Events -->
-    <v-card class="events-card mb-4" elevation="3">
-      <v-card-title class="text-h6 font-weight-bold text-primary">
-        <v-icon class="mr-2">mdi-calendar-today</v-icon>
-        Today's Events
-      </v-card-title>
-      <v-card-text>
-        <v-list v-if="todayEvents.length > 0">
-          <v-list-item
-            v-for="event in todayEvents"
-            :key="event.id"
-            class="event-item"
-          >
-            <template #prepend>
-              <v-avatar
-                :color="event.color"
-                size="12"
-              />
-            </template>
+  <div class="events-list-container">
+    <!-- Header -->
+    <div class="events-header">
+      <v-icon size="16" color="primary" class="mr-2">mdi-calendar-check</v-icon>
+      <h4 class="events-title">Events</h4>
+    </div>
 
-            <v-list-item-title class="font-weight-medium">
-              {{ event.title }}
-            </v-list-item-title>
+    <!-- Tabs -->
+    <v-tabs
+      v-model="activeTab"
+      class="events-tabs"
+      density="compact"
+      color="primary"
+      slider-color="primary"
+    >
+      <v-tab value="today" class="tab-item">
+        <v-icon size="14" class="mr-1">mdi-calendar-today</v-icon>
+        Today
+      </v-tab>
+      <v-tab value="upcoming" class="tab-item">
+        <v-icon size="14" class="mr-1">mdi-calendar-clock</v-icon>
+        Upcoming
+      </v-tab>
+    </v-tabs>
 
-            <v-list-item-subtitle>
-              <v-icon class="mr-1" size="14">mdi-clock-outline</v-icon>
-              {{ event.time || 'All day' }}
-            </v-list-item-subtitle>
-
-            <template #append>
-              <v-btn
-                icon
-                size="small"
-                variant="text"
-                @click="$emit('edit-event', event)"
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <v-window v-model="activeTab" class="events-window">
+        <!-- Today's Events -->
+        <v-window-item value="today" class="window-item">
+          <div class="events-content">
+            <v-list v-if="todayEvents.length > 0" density="compact" class="events-list">
+              <v-list-item
+                v-for="event in todayEvents.slice(0, 4)"
+                :key="event.id"
+                class="event-item"
+                density="compact"
               >
-                <v-icon size="16">mdi-pencil</v-icon>
-              </v-btn>
-            </template>
-          </v-list-item>
-        </v-list>
+                <template v-slot:prepend>
+                  <v-icon size="12" :color="getEventColor(event)" class="event-icon">
+                    {{ getEventIcon(event) }}
+                  </v-icon>
+                </template>
 
-        <div v-else class="text-center py-4">
-          <v-icon color="grey-lighten-1" size="48">mdi-calendar-blank</v-icon>
-          <p class="text-body-2 text-medium-emphasis mt-2">No events today</p>
-        </div>
-      </v-card-text>
-    </v-card>
+                <v-list-item-title class="event-title">
+                  {{ event.title }}
+                </v-list-item-title>
 
-    <!-- Upcoming Events -->
-    <v-card class="events-card" elevation="3">
-      <v-card-title class="text-h6 font-weight-bold text-primary">
-        <v-icon class="mr-2">mdi-calendar-clock</v-icon>
-        Upcoming Events
-      </v-card-title>
-      <v-card-text>
-        <v-list v-if="upcomingEvents.length > 0">
-          <v-list-item
-            v-for="event in upcomingEvents.slice(0, 5)"
-            :key="event.id"
-            class="event-item"
-          >
-            <template #prepend>
-              <v-avatar
-                :color="event.color"
-                size="12"
-              />
-            </template>
+                <v-list-item-subtitle class="event-time">
+                  {{ formatEventTimeDisplay(event) }}
+                </v-list-item-subtitle>
+              </v-list-item>
 
-            <v-list-item-title class="font-weight-medium">
-              {{ event.title }}
-            </v-list-item-title>
+              <div v-if="todayEvents.length > 4" class="more-events">
+                +{{ todayEvents.length - 4 }} more events
+              </div>
+            </v-list>
 
-            <v-list-item-subtitle>
-              {{ formatEventDate(event.date) }}
-            </v-list-item-subtitle>
+            <div v-else class="no-events">
+              <v-icon size="32" color="grey-lighten-1" class="mb-2">mdi-calendar-blank</v-icon>
+              <p class="no-events-text">No events today</p>
+            </div>
+          </div>
+        </v-window-item>
 
-            <template #append>
-              <v-btn
-                icon
-                size="small"
-                variant="text"
-                @click="$emit('edit-event', event)"
+        <!-- Upcoming Events -->
+        <v-window-item value="upcoming" class="window-item">
+          <div class="events-content">
+            <v-list v-if="upcomingEvents.length > 0" density="compact" class="events-list">
+              <v-list-item
+                v-for="event in upcomingEvents.slice(0, 5)"
+                :key="event.id"
+                class="event-item"
+                density="compact"
               >
-                <v-icon size="16">mdi-pencil</v-icon>
-              </v-btn>
-            </template>
-          </v-list-item>
-        </v-list>
+                <template v-slot:prepend>
+                  <v-icon size="12" :color="getEventColor(event)" class="event-icon">
+                    {{ getEventIcon(event) }}
+                  </v-icon>
+                </template>
 
-        <div v-else class="text-center py-4">
-          <v-icon color="grey-lighten-1" size="48">mdi-calendar-plus</v-icon>
-          <p class="text-body-2 text-medium-emphasis mt-2">No upcoming events</p>
-        </div>
-      </v-card-text>
-    </v-card>
+                <v-list-item-title class="event-title">
+                  {{ event.title }}
+                </v-list-item-title>
+
+                <v-list-item-subtitle class="event-time">
+                  {{ formatEventDateDisplay(event) }}
+                </v-list-item-subtitle>
+              </v-list-item>
+
+              <div v-if="upcomingEvents.length > 5" class="more-events">
+                +{{ upcomingEvents.length - 5 }} more events
+              </div>
+            </v-list>
+
+            <div v-else class="no-events">
+              <v-icon size="32" color="grey-lighten-1" class="mb-2">mdi-calendar-plus</v-icon>
+              <p class="no-events-text">No upcoming events</p>
+            </div>
+          </div>
+        </v-window-item>
+      </v-window>
+    </div>
   </div>
 </template>
 
+
 <script setup>
-  defineProps({
+  import { ref, computed } from 'vue'
+  import { formatEventTime, formatEventDate } from '@/utils/dateUtils.js'
+  import { getEventDisplayColor, getEventTypeIcon } from '@/utils/eventUtils.js'
+
+  const props = defineProps({
     todayEvents: {
       type: Array,
       default: () => [],
@@ -113,34 +124,156 @@
 
   defineEmits(['edit-event'])
 
-  const formatEventDate = dateStr => {
-    const date = new Date(dateStr)
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    })
+  const activeTab = ref('today')
+
+  // Use utility functions instead of local duplicates
+  const formatEventTimeDisplay = (event) => {
+    return formatEventTime(event)
   }
+
+  const formatEventDateDisplay = (event) => {
+    return formatEventDate(event)
+  }
+
+  const getEventColor = (event) => {
+    return getEventDisplayColor(event)
+  }
+
+  const getEventIcon = (event) => {
+    return getEventTypeIcon(event.type)
+  }
+
+  const hasEvents = computed(() => {
+    return props.todayEvents.length > 0 || props.upcomingEvents.length > 0
+  })
 </script>
 
 <style scoped>
-.events-card {
-  border-radius: 16px;
-  background: rgb(255 255 255 / 95%);
-  backdrop-filter: blur(10px);
+.events-list-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+.events-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  margin-bottom: 8px;
+}
+
+.events-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+  color: rgb(var(--v-theme-on-surface));
+}
+
+.events-tabs {
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+
+.tab-item {
+  text-transform: none;
+  font-size: 0.75rem;
+  min-height: 32px;
+  padding: 0 8px;
+}
+
+.tab-content {
+  flex: 1;
+  min-height: 0;
+}
+
+.events-window {
+  height: 100%;
+}
+
+.window-item {
+  height: 100%;
+}
+
+.events-content {
+  height: 100%;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.events-list {
+  padding: 0;
 }
 
 .event-item {
+  padding: 6px 8px;
+  margin-bottom: 4px;
   border-radius: 8px;
-  margin: 4px 0;
+  background: rgba(var(--v-theme-surface), 0.8);
+  border: 1px solid rgba(var(--v-theme-outline), 0.2);
   transition: all 0.2s ease;
 }
 
 .event-item:hover {
-  background: rgb(25 118 210 / 5%);
+  background: rgba(var(--v-theme-primary), 0.1);
+  transform: translateY(-1px);
 }
 
-/* Dark theme adjustments */
-.v-theme--dark .events-card {
-  background: rgb(45 55 72 / 95%);
+.event-icon {
+  margin-right: 8px;
+}
+
+.event-title {
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.event-time {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  line-height: 1.1;
+}
+
+.more-events {
+  text-align: center;
+  padding: 8px;
+  font-size: 0.7rem;
+  color: rgb(var(--v-theme-primary));
+  font-weight: 500;
+}
+
+.no-events {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  text-align: center;
+}
+
+.no-events-text {
+  font-size: 0.8rem;
+  color: rgb(var(--v-theme-on-surface-variant));
+  margin: 0;
+}
+
+/* Scrollbar styling */
+.events-content::-webkit-scrollbar {
+  width: 3px;
+}
+
+.events-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.events-content::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-outline), 0.3);
+  border-radius: 2px;
+}
+
+.events-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--v-theme-outline), 0.5);
 }
 </style>
