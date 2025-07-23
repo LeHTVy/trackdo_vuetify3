@@ -13,12 +13,20 @@ dotenv.config({ path: join(__dirname, '..', '.env') })
 
 const app = express()
 const PORT = process.env.PORT || 3000
+const HOST = process.env.HOST || '0.0.0.0'
 
 // Middleware
 app.use(helmet())
 app.use(morgan('combined'))
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://192.168.1.71:5173',
+    /^http:\/\/192\.168\.\d+\.\d+:5173$/,
+    /^http:\/\/0\.0\.0\.0:5173$/,
+    /^http:\/\/192\.168\.\d+\.\d+:3000$/
+  ],
   credentials: true
 }))
 app.use(express.json())
@@ -39,7 +47,7 @@ const connectDB = async () => {
 const ProjectSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: String,
-  status: { type: String, enum: ['Active', 'Completed', 'On Hold'], default: 'Active' },
+  status: { type: String, enum: ['Active', 'Completed', 'On Hold', 'Cancelled'], default: 'Active' },
   progress: { type: Number, default: 0 },
   dueDate: Date,
   teamSize: Number,
@@ -298,9 +306,14 @@ app.use((error, req, res, next) => {
 // Start server
 const startServer = async () => {
   await connectDB()
-  app.listen(PORT, () => {
-    console.log(`🚀 TrackDo API Server running on http://localhost:${PORT}`)
-    console.log(`📊 Health check: http://localhost:${PORT}/api/health`)
+  app.listen(PORT, HOST, () => {
+    console.log(`🚀 TrackDo API Server running on http://${HOST}:${PORT}`)
+    if (HOST === '0.0.0.0') {
+      console.log(`🌐 LAN Access available on your network IP:${PORT}`)
+      console.log(`📊 Health check: http://[YOUR_IP]:${PORT}/api/health`)
+    } else {
+      console.log(`📊 Health check: http://${HOST}:${PORT}/api/health`)
+    }
   })
 }
 

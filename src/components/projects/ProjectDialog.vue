@@ -102,6 +102,8 @@
 </template>
 
 <script setup>
+  import { ref, computed, watch } from 'vue'
+
   const props = defineProps({
     showDialog: {
       type: Boolean,
@@ -125,19 +127,25 @@
   const formData = ref({
     name: '',
     description: '',
-    status: 'active',
+    status: 'Active',
     progress: 0,
     startDate: '',
     endDate: '',
     budget: null,
   })
 
-  const statusOptions = [
-    { title: 'Active', value: 'active' },
-    { title: 'Completed', value: 'completed' },
-    { title: 'On Hold', value: 'on-hold' },
-    { title: 'Cancelled', value: 'cancelled' },
-  ]
+  const statusOptions = computed(() => {
+    const baseOptions = [
+      { title: 'Active', value: 'Active' },
+      { title: 'Completed', value: 'Completed' },
+      { title: 'On Hold', value: 'On Hold' }
+    ]
+    if (props.editingProject) {
+      baseOptions.push({ title: 'Cancelled', value: 'Cancelled' })
+    }
+
+    return baseOptions
+  })
 
   watch(() => props.showDialog, newVal => {
     if (newVal) {
@@ -158,7 +166,7 @@
       formData.value = {
         name: '',
         description: '',
-        status: 'active',
+        status: 'Active',
         progress: 0,
         startDate: '',
         endDate: '',
@@ -194,5 +202,65 @@
 </script>
 
 <style scoped>
-/* No additional styles needed */
+/* Dialog styling */
+.v-dialog .v-card {
+  border-radius: 12px;
+}
+
+.v-dialog .v-card-title {
+  background: rgba(var(--v-theme-primary), 0.1);
+  border-radius: 12px 12px 0 0;
+  padding: 20px 24px;
+  font-weight: 600;
+}
+
+.v-dialog .v-card-text {
+  padding: 24px;
+}
+
+.v-dialog .v-card-actions {
+  padding: 16px 24px 24px;
+}
+
+/* Form styling */
+.v-form .v-text-field,
+.v-form .v-textarea,
+.v-form .v-select {
+  margin-bottom: 8px;
+}
+
+/* Dark mode enhancements */
+.v-theme--dark .v-dialog .v-card {
+  background: rgba(var(--v-theme-surface), 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.v-theme--dark .v-dialog .v-card-title {
+  background: rgba(var(--v-theme-primary), 0.15);
+  color: rgb(var(--v-theme-on-surface));
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .v-dialog {
+    margin: 16px;
+  }
+
+  .v-dialog .v-card {
+    margin: 0;
+  }
+
+  .v-dialog .v-card-title {
+    padding: 16px;
+    font-size: 1.1rem;
+  }
+
+  .v-dialog .v-card-text {
+    padding: 16px;
+  }
+
+  .v-dialog .v-card-actions {
+    padding: 12px 16px 16px;
+  }
+}
 </style>

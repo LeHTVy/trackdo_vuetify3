@@ -1,5 +1,5 @@
 <template>
-  <div class="home-container">
+  <div class="home-container app-background">
     <!-- Hero Section -->
     <HeroSection />
 
@@ -28,19 +28,19 @@
   import HeroSection from '@/components/HeroSection.vue'
   import QuickStatsSection from '@/components/QuickStatsSection.vue'
   import StickyNote from '@/components/StickyNote.vue'
-  import { useEventsStore } from '@/stores/events'
+  //import { useEventsStore } from '@/stores/events'
   import { useProjectsStore } from '@/stores/projects'
   import { useTasksStore } from '@/stores/tasks'
 
   const tasksStore = useTasksStore()
   const projectsStore = useProjectsStore()
-  const eventsStore = useEventsStore()
+  //const eventsStore = useEventsStore()
 
   onMounted(async () => {
     await Promise.all([
       tasksStore.fetchTasks(),
       projectsStore.fetchProjects(),
-      eventsStore.fetchEvents(),
+      //eventsStore.fetchEvents(),
     ])
   })
 </script>
@@ -48,7 +48,6 @@
 <style scoped>
 .home-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #F8F9FA 0%, #E3F2FD 50%, #FFF8E1 100%);
 }
 
 .features-with-note-section {
@@ -68,11 +67,6 @@
 
 .features-col {
   padding-left: 2rem;
-}
-
-/* Dark theme adjustments */
-.v-theme--dark .home-container {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 50%, #2a2a2a 100%);
 }
 
 /* Responsive adjustments */

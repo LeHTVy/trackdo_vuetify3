@@ -128,6 +128,114 @@ export const useProjectsStore = defineStore('projects', () => {
     return milestones.sort((a, b) => new Date(a.date) - new Date(b.date))
   })
 
+  const recentActivities = computed(() => {
+    const activities = []
+    const sortedProjects = [...projects.value].sort((a, b) => {
+      const dateA = new Date(a.updatedAt || a.createdAt || a.startDate || 0)
+      const dateB = new Date(b.updatedAt || b.createdAt || b.startDate || 0)
+      return dateB - dateA
+    })
+    const recentProjects = sortedProjects.slice(0, 5)
+    recentProjects.forEach(project => {
+      const projectDate = new Date(project.updatedAt || project.createdAt || project.startDate)
+      const timeAgo = getTimeAgo(projectDate)
+
+      if (project.status === 'Completed') {
+        activities.push({
+          id: `completed-${project.id}`,
+          text: `Project "${project.name}" has been completed`,
+          time: timeAgo,
+          icon: 'mdi-check-circle',
+          color: 'success'
+        })
+      } else if (project.status === 'Active') {
+        if (project.progress > 80) {
+          activities.push({
+            id: `near-completion-${project.id}`,
+            text: `Project "${project.name}" is ${project.progress}% complete`,
+            time: timeAgo,
+            icon: 'mdi-progress-check',
+            color: 'info'
+          })
+        } else if (project.progress > 0) {
+          activities.push({
+            id: `progress-${project.id}`,
+            text: `Project "${project.name}" progress updated to ${project.progress}%`,
+            time: timeAgo,
+            icon: 'mdi-chart-line',
+            color: 'primary'
+          })
+        } else {
+          activities.push({
+            id: `started-${project.id}`,
+            text: `Project "${project.name}" has been started`,
+            time: timeAgo,
+            icon: 'mdi-play-circle',
+            color: 'success'
+          })
+        }
+      } else if (project.status === 'On Hold') {
+        activities.push({
+          id: `hold-${project.id}`,
+          text: `Project "${project.name}" has been put on hold`,
+          time: timeAgo,
+          icon: 'mdi-pause-circle',
+          color: 'warning'
+        })
+      } else if (project.status === 'Planning') {
+        activities.push({
+          id: `planning-${project.id}`,
+          text: `Project "${project.name}" is in planning phase`,
+          time: timeAgo,
+          icon: 'mdi-clipboard-text',
+          color: 'info'
+        })
+      } else {
+        activities.push({
+          id: `created-${project.id}`,
+          text: `Project "${project.name}" was created`,
+          time: timeAgo,
+          icon: 'mdi-plus-circle',
+          color: 'primary'
+        })
+      }
+    })
+
+    // Nếu không có activities nào, hiển thị "no activity"
+    if (activities.length === 0) {
+      activities.push({
+        id: 'no-activity',
+        text: 'No recent activity',
+        time: '',
+        icon: 'mdi-clock-outline',
+        color: 'grey'
+      })
+    }
+
+    return activities
+  })
+
+  // Helper function để tính thời gian "time ago"
+  const getTimeAgo = (date) => {
+    const now = new Date()
+    const diffInMs = now - date
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60))
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+
+    if (diffInMinutes < 1) {
+      return 'Just now'
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`
+    } else if (diffInDays < 7) {
+      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`
+    } else {
+      return date.toLocaleDateString()
+    }
+  }
+
   const fetchProjects = async () => {
     loading.value = true
     error.value = null
@@ -403,6 +511,7 @@ export const useProjectsStore = defineStore('projects', () => {
     allTags,
     allTeamMembers,
     upcomingMilestones,
+    recentActivities,
 
     initializeStore,
     fetchProjects,

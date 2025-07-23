@@ -5,12 +5,15 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
+    "dev:lan": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "backend:dev": "cd backend && npm run dev",
+    "backend:dev:lan": "cd backend && npm run dev:lan",
     "backend:install": "cd backend && npm install",
     "dev:full": "concurrently \"npm run backend:dev\" \"npm run dev\"",
+    "dev:full:lan": "concurrently \"npm run backend:dev:lan\" \"npm run dev:lan\"",
     "install:all": "npm install && npm run backend:install"
   },
   "dependencies": {

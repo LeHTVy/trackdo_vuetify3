@@ -59,7 +59,10 @@ export default defineConfig({
       'unplugin-vue-router/data-loaders/basic',
     ],
   },
-  define: { 'process.env': {} },
+  define: { 
+    'process.env': {},
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('src', import.meta.url)),
@@ -75,6 +78,7 @@ export default defineConfig({
     ],
   },
   server: {
+    host: '192.168.1.73', 
     port: 5173,
   },
   css: {
@@ -85,6 +89,12 @@ export default defineConfig({
       scss: {
         api: 'modern-compiler',
       },
+    },
+  },
+  // Add external CSS
+  build: {
+    rollupOptions: {
+      external: [],
     },
   },
 })

@@ -1,98 +1,91 @@
 <template>
-  <v-app-bar
-    app
-    color="transparent"
-    elevation="0"
-    height="150"
-    class="calendar-header"
-  >
-    <div class="header-content">
-      <v-app-bar-nav-icon
-        class="nav-icon"
-        color="primary"
-        @click="$emit('toggle-drawer')"
-      />
-
-      <v-toolbar-title class="text-h5 font-weight-bold text-primary mt-6">
-        <v-icon class="mr-2" size="28">mdi-calendar-multiple</v-icon>
-        Calendar
-      </v-toolbar-title>
-
-      <v-spacer />
-
-      <!-- Add Event Button -->
-      <v-btn
-        class="add-event-btn mt-6"
-        color="primary"
-        prepend-icon="mdi-plus"
-        rounded="lg"
-        variant="elevated"
-        @click="$emit('add-event')"
-      >
-        Add Event
-      </v-btn>
-    </div>
-  </v-app-bar>
+  <v-card class="calendar-header mb-4" elevation="2">
+    <v-card-text class="pa-4">
+      <v-row align="center" justify="center">
+        <v-col cols="12">
+          <div class="d-flex align-center justify-center">
+            <v-icon
+              icon="mdi-calendar-month"
+              size="32"
+              :color="$vuetify.theme.current.colors.primary"
+              class="mr-3"
+            ></v-icon>
+            <div class="text-center">
+              <h2 class="text-h4 font-weight-bold title-text">
+                {{ currentMonthYear }}
+              </h2>
+              <p class="text-subtitle-1 subtitle-text mb-0">
+                {{ todayFormatted }}
+              </p>
+            </div>
+          </div>
+        </v-col>
+      </v-row>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script setup>
-defineEmits(['toggle-drawer', 'add-event'])
+import { computed } from 'vue'
+
+const props = defineProps({
+  currentDate: {
+    type: Date,
+    default: () => new Date()
+  }
+})
+
+const getCurrentDateInfo = () => {
+  const date = props.currentDate
+  return {
+    year: date.getFullYear(),
+    month: date.getMonth(),
+    monthName: date.toLocaleDateString('en-US', { month: 'long' }),
+    day: date.getDate(),
+    fullDate: date.toLocaleDateString('en-US')
+  }
+}
+
+const currentMonthYear = computed(() => {
+  const dateInfo = getCurrentDateInfo()
+  return `${dateInfo.monthName} ${dateInfo.year}`
+})
+
+const todayFormatted = computed(() => {
+  const today = new Date()
+  return today.toLocaleDateString('en-US', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long'
+  })
+})
 </script>
 
 <style scoped>
-/* App Bar Styling */
 .calendar-header {
-  background: transparent !important;
-  backdrop-filter: blur(5px);
+  background: linear-gradient(135deg,
+    rgb(var(--v-theme-surface)) 0%,
+    rgb(var(--v-theme-background)) 100%
+  );
+  border: 1px solid rgb(var(--v-theme-primary), 0.1);
+  border-radius: 16px;
+  margin-top: 80px;
+  overflow: hidden;
 }
 
-.header-content {
-  width: 100%;
-  padding-top: 50px;
-  display: flex;
-  align-items: center;
+.title-text {
+  color: rgb(var(--v-theme-title-text));
+  background: linear-gradient(135deg, #232e3e 0%, #fed44f 50%, #232e3e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.v-toolbar-title {
-  display: flex;
-  align-items: center;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+.subtitle-text {
+  color: rgb(var(--v-theme-subtitle-text));
 }
 
-/* Add Event Button */
-.add-event-btn {
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: 0.5px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.add-event-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(25, 118, 210, 0.15);
-}
-
-.nav-icon {
-  margin-top: 24px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .v-toolbar-title {
-    font-size: 1.25rem;
-  }
-
-  .calendar-header {
-    height: 80px !important;
-  }
-
-  .header-content {
-    padding-top: 20px;
-  }
-
-  .nav-icon, .v-toolbar-title, .add-event-btn {
-    margin-top: 0;
-  }
+.v-btn-group {
+  box-shadow: 0 2px 4px rgba(var(--v-theme-primary), 0.1);
 }
 </style>

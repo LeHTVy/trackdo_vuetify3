@@ -60,7 +60,7 @@
   })
 
   const overallProgressRate = computed(() => {
-    const maxTasks = 50 // Assume max 50 tasks
+    const maxTasks = 50
     const taskProgress = Math.min((totalTasks.value / maxTasks) * 100, 100)
     return Math.round(taskProgress)
   })

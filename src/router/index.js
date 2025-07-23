@@ -1,8 +1,5 @@
 import { setupLayouts } from 'virtual:generated-layouts'
-// Composables
-// eslint-disable-next-line import/no-duplicates
 import { createRouter, createWebHistory } from 'vue-router/auto'
-// eslint-disable-next-line import/no-duplicates
 import { routes } from 'vue-router/auto-routes'
 
 const router = createRouter({
@@ -10,7 +7,6 @@ const router = createRouter({
   routes: setupLayouts(routes),
 })
 
-// Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
     if (localStorage.getItem('vuetify:dynamic-reload')) {

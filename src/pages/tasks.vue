@@ -1,5 +1,5 @@
 <template>
-  <div class="tasks-container">
+  <div class="tasks-container app-background">
     <!-- Header Section -->
     <TasksHeader />
 
@@ -110,6 +110,21 @@
       @close="closeDialog"
       @save="saveTask"
     />
+
+    <!-- Draggable Floating Action Button -->
+    <v-btn
+      fab
+      color="primary"
+      size="large"
+      class="floating-add-btn"
+      :class="{ 'dragging': isDragging }"
+      :style="fabStyle"
+      @click="handleNewTask"
+      @mousedown="startDrag"
+      @touchstart="startDrag"
+    >
+      <v-icon icon="mdi-plus" size="24"></v-icon>
+    </v-btn>
   </div>
 </template>
 
@@ -120,12 +135,19 @@
   import TasksList from '@/components/tasks/TasksList.vue'
   import TasksStats from '@/components/tasks/TasksStats.vue'
   import { useTasksStore } from '@/stores/tasks'
+  import { useDraggableFab } from '@/composables/useDraggableFab'
 
   const showAddDialog = ref(false)
   const editingTask = ref(null)
   const selectedFilter = ref('all')
   const selectedPriority = ref('All')
   const tasksStore = useTasksStore()
+
+  // Draggable FAB
+  const { isDragging, fabStyle, startDrag } = useDraggableFab({
+    storageKey: 'tasksFabPosition'
+  })
+
   const tasks = computed(() => tasksStore.tasks)
   const filterOptions = ['All', 'Completed', 'Pending', 'Overdue']
   const priorityOptions = ['All', 'high', 'medium', 'low']
@@ -135,6 +157,13 @@
   const overdueTasks = computed(() => tasks.value.filter(task => task.status !== 'completed' && isOverdue(task)).length)
 
   // Methods
+  const handleNewTask = () => {
+    // Only trigger if not dragging
+    if (!isDragging.value) {
+      showAddDialog.value = true
+    }
+  }
+
   const toggleTask = async taskId => {
     const task = tasks.value.find(t => t._id === taskId)
     if (task) {
@@ -198,6 +227,48 @@
   backdrop-filter: blur(10px);
 }
 
+/* Floating Action Button Styles */
+.floating-add-btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.4) !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.floating-add-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(var(--v-theme-primary), 0.6) !important;
+}
+
+.floating-add-btn.dragging {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(var(--v-theme-primary), 0.7) !important;
+  transition: none !important;
+}
+
+.floating-add-btn:active {
+  transform: scale(0.95);
+}
+
+/* Pulse animation for attention */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.8);
+  }
+  100% {
+    box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.4);
+  }
+}
+
+.floating-add-btn:not(.dragging):not(:hover) {
+  animation: pulse 2s infinite;
+}
+
 /* Dark theme adjustments */
 .v-theme--dark .tasks-container {
   background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 50%, #2a2a2a 100%);
@@ -206,5 +277,17 @@
 .v-theme--dark .filter-card,
 .v-theme--dark .progress-card {
   background: rgb(45 55 72 / 95%);
+}
+
+.v-theme--dark .floating-add-btn {
+  box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.3) !important;
+}
+
+.v-theme--dark .floating-add-btn:hover {
+  box-shadow: 0 6px 20px rgba(var(--v-theme-primary), 0.5) !important;
+}
+
+.v-theme--dark .floating-add-btn.dragging {
+  box-shadow: 0 8px 25px rgba(var(--v-theme-primary), 0.6) !important;
 }
 </style>

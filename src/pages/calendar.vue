@@ -1,333 +1,254 @@
 <template>
-  <v-app>
-    <!-- Calendar Header Component -->
-    <CalendarHeader
-      @toggle-drawer="drawer = !drawer"
-      @add-event="showAddDialog = true"
-    />
-
-    <!-- Navigation Drawer -->
-    <v-navigation-drawer
-      v-model="drawer"
-      app
-      class="navigation-drawer"
+  <div class="calendar-page app-background">
+    <v-container fluid class="pa-4">
+    <!-- Error Alert -->
+    <v-alert
+      v-if="operations.error.value"
+      type="error"
+      variant="tonal"
+      closable
+      @click:close="operations.clearError"
+      class="mb-4"
     >
-      <v-container class="pa-4 drawer-content">
-        <!-- Date Picker Calendar - Compact -->
-        <div class="date-picker-section">
-          <DatePickerCalendar
-            v-model="selectedDate"
-            :events="eventsStore.events"
-            @add-event="showAddDialog = true"
-            @date-click="handleDateClick"
-          />
-        </div>
+      {{ operations.error.value }}
+    </v-alert>
 
-        <!-- Events List -->
-        <div class="events-section">
-          <EventsList
-            :today-events="todayEvents"
-            :upcoming-events="upcomingEvents"
-            @edit-event="editEvent"
-          />
-        </div>
-      </v-container>
-    </v-navigation-drawer>
-
-    <!-- Main Content -->
-    <v-main>
-      <v-container fluid class="pa-4">
-        <CustomCalendar
-          default-view="week"
-          :selected-date="scheduleXSelectedDate"
-          @date-click="handleScheduleXDateClick"
-          @event-click="handleScheduleXEventClick"
-          @event-create="handleEventCreate"
-          @event-update="handleEventUpdate"
-        />
-      </v-container>
-    </v-main>
-
-    <!-- Event Dialog -->
-    <EventDialog
-      :editing-event="editingEvent"
-      :initial-data="newEvent"
-      :show-dialog="showAddDialog"
-      @close="closeDialog"
-      @save="saveEvent"
+    <!-- Calendar Header -->
+    <CalendarHeader
+      :current-date="navigation.currentDate.value"
     />
-  </v-app>
+
+    <v-row>
+      <!-- Main Calendar -->
+      <v-col cols="12" lg="8">
+        <v-card elevation="2" class="calendar-card">
+          <CalendarMain
+            :events="filters.formattedEvents.value"
+            :loading="operations.loading.value"
+            @date-selected="handleDateSelected"
+            @range-changed="handleRangeChanged"
+            @event-clicked="dialogs.showEventDetails"
+            @edit-event="handleEditEvent"
+          />
+        </v-card>
+      </v-col>
+
+      <!-- Event Lists Sidebar -->
+      <v-col cols="12" lg="4">
+        <div class="events-sidebar">
+          <CalendarList
+            :events="filters.todayEvents.value"
+            type="today"
+            @event-click="dialogs.showEventDetails"
+            @event-menu="dialogs.showEventMenu"
+            @view-all="viewAllToday"
+          />
+
+          <CalendarList
+            :events="filters.upcomingEvents.value"
+            type="upcoming"
+            @event-click="dialogs.showEventDetails"
+            @event-menu="dialogs.showEventMenu"
+            @view-all="viewAllUpcoming"
+          />
+        </div>
+      </v-col>
+    </v-row>
+
+    <!-- Draggable Floating Action Button -->
+    <v-btn
+      fab
+      color="primary"
+      size="large"
+      class="floating-add-btn"
+      :class="{ 'dragging': isDragging }"
+      :style="fabStyle"
+      :loading="operations.loading.value"
+      @click="handleNewEvent"
+      @mousedown="startDrag"
+      @touchstart="startDrag"
+    >
+      <v-icon icon="mdi-plus" size="24"></v-icon>
+    </v-btn>
+
+    <!-- Calendar Dialogs -->
+    <CalendarDialog
+      v-model="dialogs.eventDialog.value"
+      v-model:details-model-value="dialogs.eventDetailsDialog.value"
+      :event="form.editedEvent"
+      :selected-event="dialogs.selectedEvent.value"
+      :edited-index="form.editedIndex.value"
+      :loading="operations.loading.value"
+      @save-event="handleSaveEvent"
+      @delete-event="handleDeleteEvent"
+      @edit-event="handleEditEvent"
+      @close="handleDialogClose"
+    />
+  </v-container>
+  </div>
 </template>
 
 <script setup>
-  import { computed, onMounted, ref } from 'vue'
-  import CalendarHeader from '@/components/calendar/CalendarHeader.vue'
-  import DatePickerCalendar from '@/components/calendar/DatePickerCalendar.vue'
-  import EventDialog from '@/components/calendar/EventDialog.vue'
-  import EventsList from '@/components/calendar/EventsList.vue'
-  import CustomCalendar from '@/components/calendar/CustomCalendar.vue'
-  import { useEventsStore } from '@/stores/events'
-  import { formatEventForDisplay } from '@/utils/eventUtils.js'
+import { useEventsStore } from '@/stores/events.js'
+import { useCalendarNavigation } from '@/composables/useCalendarNavigation'
+import { useEventFilters } from '@/composables/useEventFilters'
+import { useDialogManager } from '@/composables/useDialogManager'
+import { useEventForm } from '@/composables/useEventForm'
+import { useEventOperations } from '@/composables/useEventOperations'
+import { useDraggableFab } from '@/composables/useDraggableFab'
+import CalendarHeader from '@/components/calendar/CalendarHeader.vue'
+import CalendarMain from '@/components/calendar/CalendarMain.vue'
+import CalendarList from '@/components/calendar/CalendarList.vue'
+import CalendarDialog from '@/components/calendar/CalendarDialog.vue'
+import { computed } from 'vue'
 
-  const eventsStore = useEventsStore()
-  const showAddDialog = ref(false)
-  const editingEvent = ref(null)
-  const selectedDate = ref(new Date())
-  const drawer = ref(true)
+// Store
+const eventsStore = useEventsStore()
 
-  const newEvent = ref({
-    title: '',
-    description: '',
-    start: '',
-    end: '',
-    allDay: false,
-    type: 'meeting',
-    priority: 'Medium',
-    location: '',
-    attendees: [],
-    color: '#1976D2',
-    recurring: {
-      enabled: false,
-      frequency: 'weekly',
-      interval: 1,
-      endDate: '',
-    },
-    reminders: [],
-    status: 'confirmed',
-  })
+// Composables
+const navigation = useCalendarNavigation()
+const filters = useEventFilters(computed(() => eventsStore.events))
+const dialogs = useDialogManager()
+const form = useEventForm()
+const operations = useEventOperations(eventsStore)
 
-  const todayEvents = computed(() => {
-    return eventsStore.todayEvents.map(event =>
-      formatEventForDisplay(event, { includeTime: true, includeColor: true, includeIcon: true })
-    )
-  })
+// Draggable FAB
+const { isDragging, fabStyle, startDrag } = useDraggableFab({
+  storageKey: 'calendarFabPosition'
+})
 
-  const upcomingEvents = computed(() => {
-    return eventsStore.upcomingEvents.map(event =>
-      formatEventForDisplay(event, { includeDate: true, includeColor: true, includeIcon: true })
-    )
-  })
+// Event Handlers
+const handleDateSelected = ({ date }) => {
+  form.initializeNewEvent(date)
+  dialogs.openEventDialog()
+}
 
-  const scheduleXSelectedDate = computed(() => new Date().toISOString().split('T')[0])
+const handleRangeChanged = ({ start, end }) => {
+  console.log('Range changed:', start, end)
+}
 
-  const handleScheduleXEventClick = event => {
-    editEvent(event)
+const handleNewEvent = () => {
+  if (!isDragging.value) {
+    form.initializeNewEvent()
+    dialogs.openEventDialog()
   }
+}
 
-  const handleScheduleXDateClick = date => {
-    const selectedDateObj = new Date(date)
-    newEvent.value.start = selectedDateObj.toISOString().slice(0, 16)
-    newEvent.value.end = selectedDateObj.toISOString().slice(0, 16)
-    showAddDialog.value = true
+const handleEditEvent = (event) => {
+  const index = eventsStore.events.indexOf(event)
+  form.initializeEditEvent(event, index)
+  dialogs.switchToEditDialog()
+}
+
+const handleSaveEvent = async (eventData) => {
+  const isEdit = form.isEditMode()
+  const result = await operations.saveEvent(
+    eventData,
+    isEdit,
+    dialogs.selectedEvent.value
+  )
+
+  if (result.success) {
+    form.resetForm()
+    dialogs.closeEventDialog()
   }
+}
 
-  const handleEventCreate = ({ start }) => {
-    const startDate = new Date(start)
-    const endDate = new Date(startDate)
-    endDate.setHours(startDate.getHours() + 1)
+const handleDeleteEvent = async (event) => {
+  const result = await operations.deleteEvent(event)
 
-    newEvent.value.start = startDate.toISOString().slice(0, 16)
-    newEvent.value.end = endDate.toISOString().slice(0, 16)
-    showAddDialog.value = true
+  if (result.success) {
+    dialogs.closeEventDetailsDialog()
   }
+}
 
-  const handleEventUpdate = async (updatedEvent) => {
-    try {
-      console.log('Updating event via drag & drop:', updatedEvent)
-      await eventsStore.updateEvent(updatedEvent.id, updatedEvent)
-    } catch (error) {
-      console.error('Error updating event via drag & drop:', error)
-    }
-  }
+const handleDialogClose = () => {
+  form.resetForm()
+  dialogs.closeAllDialogs()
+}
 
-  const handleDateClick = ({ date, dateString, events, hasEvents }) => {
-    console.log('Date clicked:', date)
-    console.log('Date string:', dateString)
-    console.log('Events for this date:', events)
-    console.log('Has events:', hasEvents)
+// List Actions
+const viewAllToday = () => {
+  console.log('View all today events')
+}
 
-    selectedDate.value = date
-
-    const selectedDateObj = new Date(date)
-    newEvent.value.start = selectedDateObj.toISOString().slice(0, 16)
-    newEvent.value.end = selectedDateObj.toISOString().slice(0, 16)
-    showAddDialog.value = true
-  }
-
-  const saveEvent = async eventData => {
-    if (!eventData || !eventData.title?.trim()) {
-      console.warn('Event data is invalid or title is empty')
-      return
-    }
-
-    try {
-      if (!eventData.start) {
-        console.error('Event start time is required')
-        return
-      }
-
-      await (editingEvent.value
-        ? eventsStore.updateEvent(editingEvent.value.id, eventData)
-        : eventsStore.addEvent(eventData)
-      )
-      closeDialog()
-    } catch (error) {
-      console.error('Error saving event:', error)
-    }
-  }
-
-  const editEvent = event => {
-    if (!event) {
-      console.warn('Cannot edit null event')
-      return
-    }
-    editingEvent.value = event
-    newEvent.value = { ...event }
-    showAddDialog.value = true
-  }
-
-  const closeDialog = () => {
-    newEvent.value = {
-      title: '',
-      description: '',
-      start: '',
-      end: '',
-      allDay: false,
-      type: 'meeting',
-      priority: 'Medium',
-      location: '',
-      attendees: [],
-      color: '#1976D2',
-      recurring: {
-        enabled: false,
-        frequency: 'weekly',
-        interval: 1,
-        endDate: '',
-      },
-      reminders: [],
-      status: 'confirmed',
-    }
-    editingEvent.value = null
-    showAddDialog.value = false
-  }
-
-  onMounted(async () => {
-    try {
-      if (typeof eventsStore.initializeStore === 'function') {
-        await eventsStore.initializeStore()
-      }
-      if (typeof eventsStore.fetchEvents === 'function') {
-        await eventsStore.fetchEvents()
-      } else {
-        console.warn('fetchEvents method not available in events store')
-      }
-    } catch (error) {
-      console.error('Error initializing calendar:', error)
-    }
-
-    const today = new Date()
-    newEvent.value.start = today.toISOString().slice(0, 16)
-    newEvent.value.end = today.toISOString().slice(0, 16)
-  })
+const viewAllUpcoming = () => {
+  console.log('View all upcoming events')
+}
 </script>
 
 <style scoped>
-/* Navigation Drawer Styling */
-.navigation-drawer {
-  width: 300px;
-  background: transparent;
-  border-right: 1px solid rgba(var(--v-theme-primary), 0.1) !important;
-  overflow: hidden !important;
-}
-
-.drawer-content {
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: 8px !important;
-}
-
-/* Date Picker Section - Compact */
-.date-picker-section {
-  flex-shrink: 0;
-  margin-bottom: 8px;
-  padding: 4px;
-}
-
-/* Events Section - Flexible */
-.events-section {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  margin-top: 4px;
-}
-
-/* Main Content Area */
-.main-content {
-  background: linear-gradient(135deg,
-    rgba(var(--v-theme-background), 0.8) 0%,
-    rgba(var(--v-theme-surface), 0.9) 100%);
-  min-height: 100vh;
-  backdrop-filter: blur(10px);
-}
-
-/* Dark Theme Support */
-.v-theme--dark .navigation-drawer {
-  background: linear-gradient(135deg, rgb(30 41 59 / 95%) 0%, rgb(15 23 42 / 95%) 100%);
-  border-right-color: rgb(71 85 105 / 30%);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-}
-
-
-.v-theme--dark .main-content {
-  background: linear-gradient(135deg,
-    rgba(18, 18, 18, 0.8) 0%,
-    rgba(25, 25, 25, 0.9) 100%);
-}
-
-/* Main content styling */
-.v-main {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #fff8e1 100%);
+.calendar-page {
   min-height: 100vh;
 }
 
-.v-theme--dark .v-main {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 50%, #2a2a2a 100%);
+.calendar-card {
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-/* Responsive Design */
-@media (max-width: 960px) {
-  .drawer-content {
-    padding: 6px !important;
-  }
+.v-container {
+  max-width: 1400px;
+}
 
-  .date-picker-section {
-    margin-bottom: 6px;
-    padding: 2px;
-  }
+/* Events Container with Divider */
+.events-sidebar {
+  display: flex;
+  flex-direction: column;
+}
 
-  .events-section {
-    margin-top: 2px;
+/* Floating Action Button Styles */
+.floating-add-btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.4) !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.floating-add-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(var(--v-theme-primary), 0.6) !important;
+}
+
+.floating-add-btn.dragging {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(var(--v-theme-primary), 0.7) !important;
+  transition: none !important;
+}
+
+.floating-add-btn:active {
+  transform: scale(0.95);
+}
+
+/* Pulse animation for attention */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.8);
+  }
+  100% {
+    box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.4);
   }
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .v-navigation-drawer {
-    width: 320px !important;
-  }
+.floating-add-btn:not(.dragging):not(:hover) {
+  animation: pulse 2s infinite;
 }
 
-/* Animation for drawer */
-.v-navigation-drawer {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Dark mode adjustments */
+.v-theme--dark .floating-add-btn {
+  box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.3) !important;
 }
 
-/* Remove scrollbar styling since we're disabling scroll */
-.drawer-no-scroll :deep(.v-navigation-drawer__content) {
-  overflow: hidden !important;
+.v-theme--dark .floating-add-btn:hover {
+  box-shadow: 0 6px 20px rgba(var(--v-theme-primary), 0.5) !important;
+}
+
+.v-theme--dark .floating-add-btn.dragging {
+  box-shadow: 0 8px 25px rgba(var(--v-theme-primary), 0.6) !important;
 }
 </style>

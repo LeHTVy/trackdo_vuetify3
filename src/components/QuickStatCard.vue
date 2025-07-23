@@ -53,7 +53,6 @@
 <script setup>
 
   // Props
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const props = defineProps({
     value: {
       type: [Number, String],

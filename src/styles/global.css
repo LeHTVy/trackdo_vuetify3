@@ -1,28 +1,19 @@
-/**
- * Global CSS styles for the entire application
- * This file contains styles that apply to all pages and components
- */
-
-/* Hide scrollbars globally while maintaining scroll functionality */
 ::-webkit-scrollbar {
   display: none;
   width: 0;
   height: 0;
 }
 
-/* For Firefox */
 html {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-/* For Internet Explorer and Edge */
 body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-/* Ensure scrolling still works */
 * {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -34,17 +25,228 @@ body {
   height: 0;
 }
 
-/* Smooth scrolling for the entire application */
 html {
   scroll-behavior: smooth;
 }
 
-/* Remove any default scrollbar styling */
 body, html, #app {
   overflow-x: hidden;
 }
 
-/* Ensure content is still scrollable vertically */
 body {
   overflow-y: auto;
+}
+
+.app-background {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #F8F9FA 0%, #E3F2FD 50%, #FFF8E1 100%);
+}
+
+/* Dark theme app background */
+.v-theme--dark .app-background {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 50%, #2a2a2a 100%);
+}
+
+/* Global Page Title and Subtitle Styles */
+.page-title {
+  background: linear-gradient(135deg, #232e3e 0%, #fed44f 50%, #232e3e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 4px 12px rgba(254, 212, 79, 0.3);
+  font-weight: 700 !important;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  position: relative;
+}
+
+.page-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #232e3e, #fed44f);
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+.page-subtitle {
+  background: linear-gradient(135deg, #232e3e 0%, #fed44f 30%, #232e3e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 8px rgba(35, 46, 62, 0.2);
+  font-weight: 500 !important;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* Dark theme styles */
+.v-theme--dark .page-title {
+  background: linear-gradient(135deg, #fed44f 0%, #fbbf24 50%, #fed44f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 4px 16px rgba(254, 212, 79, 0.5);
+}
+
+.v-theme--dark .page-title::after {
+  background: linear-gradient(90deg, #fed44f, #fbbf24);
+  box-shadow: 0 2px 8px rgba(254, 212, 79, 0.4);
+}
+
+.v-theme--dark .page-subtitle {
+  background: linear-gradient(135deg, #e5e7eb 0%, #fed44f 30%, #e5e7eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 12px rgba(254, 212, 79, 0.3);
+}
+
+/* ===== CALENDAR GLOBAL STYLES ===== */
+/* Force calendar styling with maximum specificity */
+.v-application .v-calendar,
+.v-calendar,
+[data-v-calendar] {
+  background: transparent !important;
+  font-family: 'Roboto', sans-serif !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Calendar weekday headers - try multiple selectors */
+.v-application .v-calendar .v-calendar-weekday,
+.v-calendar .v-calendar-weekday,
+.v-calendar-weekday,
+.v-calendar .v-calendar-weekly__head-weekday,
+.v-calendar-weekly__head-weekday {
+  background: rgba(var(--v-theme-primary), 0.1) !important;
+  color: rgba(var(--v-theme-primary), 1) !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  padding: 20px 8px !important;
+  border-bottom: 3px solid rgba(var(--v-theme-primary), 0.2) !important;
+  border-right: 1px solid rgba(var(--v-border-color), 0.15) !important;
+}
+
+/* Calendar day cells - multiple selectors */
+.v-application .v-calendar .v-calendar-day,
+.v-calendar .v-calendar-day,
+.v-calendar-day,
+.v-calendar .v-calendar-monthly__day,
+.v-calendar-monthly__day {
+  border: 2px solid rgba(var(--v-border-color), 0.2) !important;
+  background: rgba(var(--v-theme-surface), 0.1) !important;
+  transition: all 0.3s ease !important;
+  min-height: 140px !important;
+  position: relative !important;
+}
+
+.v-application .v-calendar .v-calendar-day:hover,
+.v-calendar .v-calendar-day:hover,
+.v-calendar-day:hover,
+.v-calendar .v-calendar-monthly__day:hover,
+.v-calendar-monthly__day:hover {
+  background: rgba(var(--v-theme-primary), 0.08) !important;
+  border-color: rgba(var(--v-theme-primary), 0.3) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(var(--v-theme-primary), 0.15) !important;
+}
+
+.v-application .v-calendar .v-calendar-day--today,
+.v-calendar .v-calendar-day--today,
+.v-calendar-day--today,
+.v-calendar .v-calendar-monthly__day--today,
+.v-calendar-monthly__day--today {
+  background: rgba(var(--v-theme-primary), 0.15) !important;
+  border-color: rgba(var(--v-theme-primary), 0.5) !important;
+  box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.25) !important;
+}
+
+/* Day numbers styling - multiple selectors */
+.v-application .v-calendar .v-calendar-day__date,
+.v-calendar .v-calendar-day__date,
+.v-calendar-day__date,
+.v-calendar .v-calendar-monthly__day-label,
+.v-calendar-monthly__day-label {
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  color: rgba(var(--v-theme-on-surface), 1) !important;
+  margin: 8px 12px !important;
+  padding: 6px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.v-application .v-calendar .v-calendar-day--today .v-calendar-day__date,
+.v-calendar .v-calendar-day--today .v-calendar-day__date,
+.v-calendar-day--today .v-calendar-day__date,
+.v-calendar .v-calendar-monthly__day--today .v-calendar-monthly__day-label,
+.v-calendar-monthly__day--today .v-calendar-monthly__day-label {
+  background: rgba(var(--v-theme-primary), 1) !important;
+  color: rgba(var(--v-theme-on-primary), 1) !important;
+  border-radius: 50% !important;
+  width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 800 !important;
+  box-shadow: 0 3px 8px rgba(var(--v-theme-primary), 0.5) !important;
+}
+
+/* Event styling - multiple selectors */
+.v-application .v-calendar .v-calendar-event,
+.v-calendar .v-calendar-event,
+.v-calendar-event {
+  border-radius: 8px !important;
+  margin: 3px 4px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  border: none !important;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+.v-application .v-calendar .v-calendar-event:hover,
+.v-calendar .v-calendar-event:hover,
+.v-calendar-event:hover {
+  transform: translateY(-3px) scale(1.03) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Month view specific - multiple selectors */
+.v-application .v-calendar .v-calendar-month,
+.v-calendar .v-calendar-month,
+.v-calendar-month,
+.v-calendar .v-calendar-monthly,
+.v-calendar-monthly {
+  border: 3px solid rgba(var(--v-border-color), 0.2) !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Additional fallback styles */
+.calendar-component .v-calendar-day {
+  border: 2px solid #e0e0e0 !important;
+  min-height: 140px !important;
+  background: #fafafa !important;
+}
+
+.calendar-component .v-calendar-day:hover {
+  background: #f3e5f5 !important;
+  border-color: #9c27b0 !important;
+}
+
+.calendar-component .v-calendar-day--today {
+  background: #e8f5e8 !important;
+  border-color: #4caf50 !important;
 }

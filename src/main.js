@@ -1,9 +1,3 @@
-/**
- * main.js
- *
- * Bootstraps Vuetify and other plugins then mounts the App`
- */
-
 // Composables
 import { createApp } from 'vue'
 
@@ -24,10 +18,8 @@ const app = createApp(App)
 
 registerPlugins(app)
 
-// Initialize stores with MongoDB data after app is mounted
 app.mount('#app')
 
-// Initialize stores asynchronously
 initializeStores().catch(error => {
   console.error('Store initialization failed:', error)
 })
