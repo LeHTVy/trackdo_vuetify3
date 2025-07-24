@@ -7,7 +7,7 @@ export function useCalendarEvents() {
       nativeEvent.stopPropagation()
     }
 
-    dialogManager.showEventDetails(event)
+    // Emit event to parent instead of opening dialog directly
     emit('event-clicked', event)
   }
 
@@ -15,9 +15,13 @@ export function useCalendarEvents() {
     emit('date-selected', date)
   }
 
-  const handleShowMore = ({ nativeEvent, date, events }) => {
-    nativeEvent.stopPropagation()
-    console.log('Hiển thị thêm sự kiện cho ngày:', date, events)
+  const handleShowMore = ({ nativeEvent, date, events }, emit) => {
+    if (nativeEvent) {
+      nativeEvent.stopPropagation()
+    }
+
+    // Emit event để hiển thị modal với tất cả events của ngày đó
+    emit('show-more-events', { date, events })
   }
 
   const handleRangeChange = ({ start, end }, emit) => {

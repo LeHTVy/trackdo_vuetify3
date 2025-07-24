@@ -11,7 +11,7 @@ export const useEventsStore = defineStore('events', {
 
   getters: {
     getEvents: (state) => state.events,
-    getEventById: (state) => (id) => state.events.find(event => event.id === id),
+    getEventById: (state) => (id) => state.events.find(event => (event.id === id) || (event._id === id)),
 
     // Enhanced getters using dateUtils
     getTodayEvents: (state) => {
@@ -93,9 +93,11 @@ export const useEventsStore = defineStore('events', {
         this.loading = true
         this.error = null
 
-        const result = await mongoService.events.update(updatedEvent.id, updatedEvent)
+        const eventId = updatedEvent.id || updatedEvent._id
+        const result = await mongoService.events.update(eventId, updatedEvent)
         if (result.success && result.data) {
-          const index = this.events.findIndex(e => e.id === updatedEvent.id)
+          // Support both 'id' and '_id' fields for MongoDB compatibility
+          const index = this.events.findIndex(e => (e.id === eventId) || (e._id === eventId))
           if (index !== -1) {
             this.events[index] = result.data
           }
@@ -120,7 +122,8 @@ export const useEventsStore = defineStore('events', {
 
         const result = await mongoService.events.delete(eventId)
         if (result.success) {
-          const index = this.events.findIndex(e => e.id === eventId)
+          // Support both 'id' and '_id' fields for MongoDB compatibility
+          const index = this.events.findIndex(e => (e.id === eventId) || (e._id === eventId))
           if (index !== -1) {
             this.events.splice(index, 1)
           }

@@ -29,6 +29,8 @@
             @range-changed="handleRangeChanged"
             @event-clicked="dialogs.showEventDetails"
             @edit-event="handleEditEvent"
+            @show-more-events="handleShowMoreEvents"
+            @event-updated="handleEventUpdated"
           />
         </v-card>
       </v-col>
@@ -84,6 +86,15 @@
       @edit-event="handleEditEvent"
       @close="handleDialogClose"
     />
+
+    <!-- Day Events Modal -->
+    <DayEventsModal
+      v-model="dayEventsModal.isOpen"
+      :selected-date="dayEventsModal.selectedDate"
+      :events="dayEventsModal.events"
+      @event-click="dialogs.showEventDetails"
+      @event-menu="dialogs.showEventMenu"
+    />
   </v-container>
   </div>
 </template>
@@ -100,7 +111,8 @@ import CalendarHeader from '@/components/calendar/CalendarHeader.vue'
 import CalendarMain from '@/components/calendar/CalendarMain.vue'
 import CalendarList from '@/components/calendar/CalendarList.vue'
 import CalendarDialog from '@/components/calendar/CalendarDialog.vue'
-import { computed } from 'vue'
+import DayEventsModal from '@/components/calendar/DayEventsModal.vue'
+import { computed, reactive } from 'vue'
 
 // Store
 const eventsStore = useEventsStore()
@@ -117,6 +129,13 @@ const { isDragging, fabStyle, startDrag } = useDraggableFab({
   storageKey: 'calendarFabPosition'
 })
 
+// Day Events Modal State
+const dayEventsModal = reactive({
+  isOpen: false,
+  selectedDate: new Date(),
+  events: []
+})
+
 // Event Handlers
 const handleDateSelected = ({ date }) => {
   form.initializeNewEvent(date)
@@ -127,6 +146,12 @@ const handleRangeChanged = ({ start, end }) => {
   console.log('Range changed:', start, end)
 }
 
+const handleShowMoreEvents = ({ date, events }) => {
+  dayEventsModal.selectedDate = date
+  dayEventsModal.events = events
+  dayEventsModal.isOpen = true
+}
+
 const handleNewEvent = () => {
   if (!isDragging.value) {
     form.initializeNewEvent()
@@ -135,17 +160,47 @@ const handleNewEvent = () => {
 }
 
 const handleEditEvent = (event) => {
-  const index = eventsStore.events.indexOf(event)
+  // Find the index of the event in the store
+  let index = eventsStore.events.findIndex(e => 
+    (e.id && e.id === event.id) || 
+    (e._id && e._id === event._id) ||
+    (e.title === event.title && e.start === event.start)
+  )
+  
+  // If not found, set index to 0 to indicate edit mode (not -1 which means create mode)
+  if (index === -1) {
+    index = 0
+  }
+  
+  // Set the selected event for backup reference
+  dialogs.selectedEvent.value = event
+  
   form.initializeEditEvent(event, index)
   dialogs.switchToEditDialog()
 }
 
 const handleSaveEvent = async (eventData) => {
   const isEdit = form.isEditMode()
+  
+  // For edit mode, we need to get the original event data that contains the ID
+  let selectedEvent = null
+  if (isEdit) {
+    // Try to get from dialogs first, then find in store
+    selectedEvent = dialogs.selectedEvent.value
+    if (!selectedEvent || (!selectedEvent.id && !selectedEvent._id)) {
+      // Find the event in store using the form's editedEvent data
+      selectedEvent = eventsStore.events.find(e => 
+        (e.id && form.editedEvent.id && e.id === form.editedEvent.id) ||
+        (e._id && form.editedEvent.id && e._id === form.editedEvent.id) ||
+        (e.title === form.editedEvent.title && e.start === form.editedEvent.start)
+      )
+    }
+  }
+  
   const result = await operations.saveEvent(
     eventData,
     isEdit,
-    dialogs.selectedEvent.value
+    selectedEvent
   )
 
   if (result.success) {
@@ -165,6 +220,19 @@ const handleDeleteEvent = async (event) => {
 const handleDialogClose = () => {
   form.resetForm()
   dialogs.closeAllDialogs()
+}
+
+// Handle drag and drop event updates
+const handleEventUpdated = async (updatedEvent) => {
+  const result = await operations.saveEvent(
+    updatedEvent,
+    true, // isEdit = true for drag and drop updates
+    updatedEvent // selectedEvent is the updated event itself
+  )
+
+  if (!result.success) {
+    console.error('Failed to update event via drag and drop:', result.error)
+  }
 }
 
 // List Actions

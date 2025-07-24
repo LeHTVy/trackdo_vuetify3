@@ -19,8 +19,13 @@ export function useEventOperations(eventsStore) {
       loading.value = true
       clearError()
 
-      if (!eventData.name || !eventData.start || !eventData.end) {
+      const eventTitle = eventData.title || eventData.name
+      if (!eventTitle || !eventData.start || !eventData.end) {
         throw new Error('Vui lòng điền đầy đủ thông tin bắt buộc.')
+      }
+
+      if (eventData.title && !eventData.name) {
+        eventData.name = eventData.title
       }
 
       if (new Date(eventData.end) < new Date(eventData.start)) {
@@ -28,9 +33,14 @@ export function useEventOperations(eventsStore) {
       }
 
       if (isEdit && selectedEvent) {
+        const eventId = selectedEvent.id || selectedEvent._id
+        if (!eventId) {
+          throw new Error('Không tìm thấy ID của sự kiện để cập nhật.')
+        }
+        
         await eventsStore.updateEvent({
           ...eventData,
-          id: selectedEvent.id
+          id: eventId
         })
       } else {
         await eventsStore.addEvent(eventData)
@@ -50,11 +60,12 @@ export function useEventOperations(eventsStore) {
       loading.value = true
       clearError()
 
-      if (!event || !event.id) {
+      const eventId = event?.id || event?._id
+      if (!event || !eventId) {
         throw new Error('Không tìm thấy sự kiện để xóa.')
       }
 
-      await eventsStore.deleteEvent(event.id)
+      await eventsStore.deleteEvent(eventId)
 
       return { success: true }
     } catch (err) {
@@ -77,7 +88,7 @@ export function useEventOperations(eventsStore) {
       const duplicatedEvent = {
         ...event,
         name: `${event.name} (Sao chép)`,
-        id: undefined // Remove ID so it creates new event
+        id: undefined
       }
 
       await eventsStore.addEvent(duplicatedEvent)

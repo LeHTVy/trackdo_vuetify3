@@ -4,10 +4,14 @@ export function useEventForm() {
   const editedIndex = ref(-1)
   const defaultEvent = {
     name: '',
+    title: '',
     details: '',
+    description: '',
     start: new Date().toISOString().substr(0, 10),
     end: new Date().toISOString().substr(0, 10),
     color: 'primary',
+    type: 'work',
+    priority: 'Medium',
   }
   const editedEvent = reactive({ ...defaultEvent })
   const resetForm = () => {
@@ -29,13 +33,18 @@ export function useEventForm() {
       return
     }
 
+    // Copy tất cả thông tin từ event sang editedEvent
     Object.assign(editedEvent, {
-      name: event.name || '',
+      name: event.name || event.title || '',
+      title: event.title || event.name || '',
       details: event.details || '',
+      description: event.description || event.details || '',
       start: event.start ? new Date(event.start).toISOString().substr(0, 10) : defaultEvent.start,
       end: event.end ? new Date(event.end).toISOString().substr(0, 10) : defaultEvent.end,
       color: event.color || 'primary',
-      id: event.id || null,
+      type: event.type || 'work',
+      priority: event.priority || 'Medium',
+      id: event.id || event._id || null,
     })
 
     editedIndex.value = index

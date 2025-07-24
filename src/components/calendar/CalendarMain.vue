@@ -6,29 +6,20 @@
       color="surface"
       elevation="1"
     >
-      <!-- View Mode Selector -->
-      <v-select
-        v-model="currentView"
-        :items="viewTypes"
-        class="view-selector"
-        density="compact"
-        label="View Mode"
-        variant="outlined"
-        hide-details
-        prepend-inner-icon="mdi-calendar-view"
-      />
-
-      <!-- Weekday Selector -->
-      <v-select
-        v-model="currentWeekdays"
-        :items="weekdayOptions"
-        class="weekday-selector ml-4"
-        density="compact"
-        label="Weekdays"
-        variant="outlined"
-        hide-details
-        prepend-inner-icon="mdi-calendar-week"
-      />
+      <!-- Weather Display -->
+      <div class="weather-display d-flex align-center">
+        <v-icon color="primary" class="mr-2">mdi-weather-partly-cloudy</v-icon>
+        <div v-if="weatherLoading" class="d-flex align-center">
+          <v-progress-circular size="20" width="2" indeterminate color="primary" class="mr-2" />
+          <span class="text-body-2">Loading weather...</span>
+        </div>
+        <div v-else-if="weatherData" class="weather-info">
+          <div class="text-h6 font-weight-bold">{{ weatherData.temperature }}°C</div>
+        </div>
+        <div v-else class="text-body-2 text-error">
+          Weather unavailable
+        </div>
+      </div>
 
       <v-spacer />
 
@@ -87,27 +78,60 @@
             :class="{
               'is-today': isToday(day.date),
               'is-other-month': !day.isCurrentMonth,
-              'has-events': getDayEvents(day.date).length > 0
+              'has-events': getDayEvents(day.date).length > 0,
+              'drag-over': dragState.isDragging
             }"
+            :data-date="day.date.toISOString()"
             @click="onDateClick(day)"
+            @drop="onDrop($event, day.date)"
+            @dragover.prevent
+            @dragenter.prevent
           >
             <div class="day-content">
               <div class="day-number">{{ day.date.getDate() }}</div>
               <div v-if="getDayEvents(day.date).length > 0" class="day-events">
                 <div
                   v-for="event in getDayEvents(day.date).slice(0, 3)"
-                  :key="event.id"
+                  :key="`${event.id}-${day.date.getTime()}`"
                   class="event-item"
+                  :class="{
+                    'multi-day-event': event.isMultiDay,
+                    'event-start': event.isFirstDay,
+                    'event-end': event.isLastDay,
+                    'event-continuation': event.isContinuation,
+                    'dragging': dragState.isDragging && dragState.draggedEvent?.id === event.id
+                  }"
                   :style="{ backgroundColor: event.color || '#1976d2' }"
+                  :draggable="!event.isContinuation"
                   @click.stop="onEventClick({ event })"
+                  @dragstart="onEventDragStart($event, event)"
+                  @dragend="onEventDragEnd"
                 >
-                  <span class="event-dot"></span>
-                  {{ event.name }}
+                  <!-- Resize handle for start date (only on first day) -->
+                  <div
+                    v-if="event.isFirstDay && event.isMultiDay"
+                    class="resize-handle resize-start"
+                    @mousedown.stop="onResizeStart($event, event, 'start')"
+                    title="Kéo để thay đổi ngày bắt đầu"
+                  ></div>
+                  
+                  <span v-if="!event.isContinuation" class="event-dot"></span>
+                  <span class="event-text">
+                    {{ event.isContinuation ? '' : (event.name || event.title) }}
+                  </span>
+                  
+                  <!-- Resize handle for end date (only on last day) -->
+                  <div
+                    v-if="event.isLastDay && event.isMultiDay"
+                    class="resize-handle resize-end"
+                    @mousedown.stop="onResizeStart($event, event, 'end')"
+                    title="Kéo để thay đổi ngày kết thúc"
+                  ></div>
                 </div>
                 <div
                   v-if="getDayEvents(day.date).length > 3"
                   class="more-events"
-                  @click.stop="onShowMore({ date: day.date, events: getDayEvents(day.date) })"
+                  @click.stop="onShowMore($event, { date: day.date, events: getDayEvents(day.date) })"
                 >
                   +{{ getDayEvents(day.date).length - 3 }} more
                 </div>
@@ -117,14 +141,6 @@
         </div>
       </div>
     </v-sheet>
-
-    <!-- Event Details Dialog -->
-    <EventDetailsDialog
-      v-model="dialogManager.eventDetailsDialog.value"
-      :selected-event="dialogManager.selectedEvent.value"
-      @edit="onEditEvent"
-      @close="dialogManager.closeEventDetailsDialog"
-    />
   </v-sheet>
 </template>
 
@@ -134,7 +150,7 @@ import { useDialogManager } from '@/composables/useDialogManager'
 import { useEventFilters } from '@/composables/useEventFilters'
 import { useCalendarUtils } from '@/composables/useCalendarUtils'
 import { useCalendarEvents } from '@/composables/useCalendarEvents'
-import EventDetailsDialog from './EventDetailsDialog.vue'
+import { useEventDragDrop } from '@/composables/useEventDragDrop'
 
 // Props
 const props = defineProps({
@@ -158,7 +174,9 @@ const emit = defineEmits([
   'event-clicked',
   'range-changed',
   'edit-event',
-  'view-changed'
+  'view-changed',
+  'show-more-events',
+  'event-updated'
 ])
 
 // Refs
@@ -167,11 +185,37 @@ const currentValue = ref(new Date())
 const currentView = ref(props.defaultView)
 const currentWeekdays = ref([0, 1, 2, 3, 4, 5, 6])
 
+// Weather data
+const weatherData = ref(null)
+const weatherLoading = ref(false)
+
+// Weather API function
+const fetchWeatherData = async () => {
+  weatherLoading.value = true
+  try {
+    const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-25.85891&longitude=28.18577&current=temperature_2m')
+    const data = await response.json()
+
+    if (data.current && data.current.temperature_2m !== undefined) {
+      weatherData.value = {
+        temperature: data.current.temperature_2m,
+        time: data.current.time
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching weather data:', error)
+    weatherData.value = null
+  } finally {
+    weatherLoading.value = false
+  }
+}
+
 // Composables
 const dialogManager = useDialogManager()
 const { formattedEvents } = useEventFilters(computed(() => props.events))
-const { formatDateTime, viewTypes, weekdayOptions } = useCalendarUtils()
+const { formatDateTime } = useCalendarUtils()
 const { handleEventClick, handleDateClick, handleShowMore, handleRangeChange, editEvent } = useCalendarEvents()
+const { dragState, startEventDrag, startResize, handleDrop, handleDragEnd } = useEventDragDrop()
 
 // Weekday labels (Monday first)
 const weekdayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -229,9 +273,34 @@ const getDayEvents = (date) => {
   targetDate.setHours(0, 0, 0, 0)
 
   return formattedEvents.value.filter(event => {
-    const eventDate = new Date(event.start)
-    eventDate.setHours(0, 0, 0, 0)
-    return eventDate.getTime() === targetDate.getTime()
+    const eventStartDate = new Date(event.start)
+    eventStartDate.setHours(0, 0, 0, 0)
+
+    const eventEndDate = new Date(event.end || event.start)
+    eventEndDate.setHours(0, 0, 0, 0)
+
+    // Event hiển thị trên tất cả ngày từ start đến end
+    return targetDate.getTime() >= eventStartDate.getTime() &&
+           targetDate.getTime() <= eventEndDate.getTime()
+  }).map(event => {
+    // Thêm thông tin về vị trí của event trong khoảng thời gian
+    const eventStartDate = new Date(event.start)
+    eventStartDate.setHours(0, 0, 0, 0)
+
+    const eventEndDate = new Date(event.end || event.start)
+    eventEndDate.setHours(0, 0, 0, 0)
+
+    const isFirstDay = targetDate.getTime() === eventStartDate.getTime()
+    const isLastDay = targetDate.getTime() === eventEndDate.getTime()
+    const isMultiDay = eventStartDate.getTime() !== eventEndDate.getTime()
+
+    return {
+      ...event,
+      isFirstDay,
+      isLastDay,
+      isMultiDay,
+      isContinuation: !isFirstDay && isMultiDay
+    }
   })
 }
 
@@ -262,8 +331,8 @@ const onDateClick = (day) => {
   handleDateClick(dateData, emit)
 }
 
-const onShowMore = (moreData) => {
-  handleShowMore(moreData)
+const onShowMore = (nativeEvent, moreData) => {
+  handleShowMore({ nativeEvent, ...moreData }, emit)
 }
 
 const onRangeChange = (pages) => {
@@ -302,9 +371,37 @@ const onEditEvent = () => {
   editEvent(dialogManager.selectedEvent.value, emit, dialogManager)
 }
 
+// Drag and Drop Methods
+const onEventDragStart = (nativeEvent, event) => {
+  startEventDrag(event, 'move', nativeEvent)
+}
+
+const onEventDragEnd = () => {
+  handleDragEnd()
+}
+
+const onDrop = async (nativeEvent, dropDate) => {
+  const updatedEvent = handleDrop(nativeEvent)
+  if (updatedEvent) {
+    emit('event-updated', updatedEvent)
+  }
+}
+
+const onResizeStart = (nativeEvent, event, direction) => {
+  nativeEvent.preventDefault()
+  startResize(event, direction, nativeEvent)
+}
+
 // Watchers
 watch(currentView, (newView) => {
   emit('view-changed', newView)
+})
+
+// Lifecycle
+onMounted(() => {
+  fetchWeatherData()
+  // Refresh weather data every 10 minutes
+  setInterval(fetchWeatherData, 10 * 60 * 1000)
 })
 
 </script>
@@ -323,6 +420,19 @@ watch(currentView, (newView) => {
   border-bottom: 1px solid rgba(var(--v-border-color), 0.12);
   min-height: 80px;
   flex-shrink: 0;
+}
+
+.weather-display {
+  background: rgba(var(--v-theme-primary), 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1px solid rgba(var(--v-theme-primary), 0.2);
+}
+
+.weather-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .view-selector,
@@ -404,6 +514,7 @@ watch(currentView, (newView) => {
   position: relative;
   display: flex;
   flex-direction: column;
+  z-index: 1;
 }
 
 .calendar-day:nth-child(7n) {
@@ -467,7 +578,7 @@ watch(currentView, (newView) => {
 
 .event-item {
   background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
+  color: white !important;
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 11px;
@@ -481,13 +592,80 @@ watch(currentView, (newView) => {
   align-items: center;
   gap: 4px;
   margin-bottom: 2px;
+  position: relative;
+}
+
+/* Multi-day event styling */
+.event-item.multi-day-event {
+  border-radius: 0;
+  margin-left: -9px;
+  margin-right: -9px;
+  padding-left: 12px;
+  padding-right: 12px;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.event-item.event-start {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  margin-left: 0;
+  padding-left: 8px;
+}
+
+.event-item.event-end {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  margin-right: 0;
+  padding-right: 8px;
+}
+
+/* multi-day events */
+.event-item.multi-day-event:not(.event-start):not(.event-end) {
+  margin-left: -9px;
+  margin-right: -9px;
+}
+
+.event-item.multi-day-event:not(.event-end) {
+  margin-right: -9px;
+}
+
+.event-item.multi-day-event:not(.event-start) {
+  margin-left: -9px;
+}
+
+.event-item.event-continuation {
+  opacity: 0.8;
+  min-height: 20px;
+  justify-content: center;
+}
+
+.event-item.event-continuation::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: rgb(var(--v-theme-primary));
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.event-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
 }
 
 .event-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: currentColor;
+  background: rgb(var(--v-theme-primary));
   opacity: 0.8;
   flex-shrink: 0;
 }
@@ -537,6 +715,95 @@ watch(currentView, (newView) => {
   background: rgba(var(--v-theme-surface), 0.5);
   border-radius: 8px;
   padding: 12px;
+}
+
+/* Drag and Drop Styles */
+.calendar-day.drag-over {
+  position: relative;
+}
+
+.calendar-day.drop-zone-active {
+  background: rgba(var(--v-theme-primary), 0.1);
+  border: 2px dashed rgba(var(--v-theme-primary), 0.5);
+}
+
+.calendar-day.drop-zone-valid {
+  background: rgba(var(--v-theme-success), 0.1);
+  border-color: rgba(var(--v-theme-success), 0.5);
+}
+
+.calendar-day.drop-zone-invalid {
+  background: rgba(var(--v-theme-error), 0.1);
+  border-color: rgba(var(--v-theme-error), 0.5);
+}
+
+.event-item.dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+  cursor: grabbing;
+}
+
+.event-item[draggable="true"] {
+  cursor: grab;
+  position: relative;
+}
+
+.event-item[draggable="true"]:hover {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.resize-handle {
+  position: absolute;
+  width: 8px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: col-resize;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.resize-handle:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.resize-start {
+  left: 0;
+  border-radius: 8px 0 0 8px;
+}
+
+.resize-end {
+  right: 0;
+  border-radius: 0 8px 8px 0;
+}
+
+.event-item:hover .resize-handle {
+  opacity: 0.7;
+}
+
+.event-item.multi-day-event:hover .resize-handle {
+  opacity: 1;
+}
+
+/* Ghost element for drag feedback */
+.event-drag-ghost {
+  pointer-events: none;
+  user-select: none;
+  font-family: inherit;
+  font-weight: 500;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Disable text selection during drag */
+.calendar-day.drag-over * {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 /* Responsive adjustments */

@@ -124,7 +124,6 @@ export function useCalendarList(type = 'upcoming') {
         return { text: 'Upcoming', color: 'info' }
       }
     } else {
-      // Improved logic for upcoming events using dateUtils
       const today = new Date()
       const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
       const eventDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
@@ -139,10 +138,22 @@ export function useCalendarList(type = 'upcoming') {
         return { text: 'Soon', color: 'info' }
       } else if (diffDays <= 7) {
         return { text: 'This Week', color: 'primary' }
-      } else if (diffDays <= 30) {
-        return { text: 'This Month', color: 'secondary' }
       } else {
-        return { text: 'Later', color: 'primary' }
+        const currentMonth = today.getMonth()
+        const currentYear = today.getFullYear()
+        const eventMonth = startDate.getMonth()
+        const eventYear = startDate.getFullYear()
+
+        if (eventYear === currentYear && eventMonth === currentMonth) {
+          return { text: 'This Month', color: 'secondary' }
+        } else if (
+          (eventYear === currentYear && eventMonth === currentMonth + 1) ||
+          (eventYear === currentYear + 1 && currentMonth === 11 && eventMonth === 0)
+        ) {
+          return { text: 'Next Month', color: 'secondary' }
+        } else {
+          return { text: 'Later', color: 'primary' }
+        }
       }
     }
   }

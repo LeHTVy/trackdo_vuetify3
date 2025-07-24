@@ -1,111 +1,121 @@
 <template>
-  <v-card
-    class="calendar-list"
-    :class="[listClasses, containerClasses]"
-    elevation="2"
-  >
-    <v-card-title
-      class="pa-4 list-header"
-      :class="headerClasses"
-      :style="headerStyles"
+  <v-container class="calendar-list-container pa-0">
+    <v-card
+      class="calendar-list"
+      :class="[listClasses, containerClasses]"
+      elevation="2"
     >
-      <div class="d-flex align-center">
-        <v-icon :icon="titleIcon" class="mr-2"></v-icon>
-        {{ title }}
-        <v-chip
-          :color="chipColor"
-          size="small"
-          variant="elevated"
-          class="event-count-chip ml-2"
-        >
-          {{ events.length }}
-        </v-chip>
-      </div>
-    </v-card-title>
-
-    <v-card-text class="pa-0">
-      <v-list v-if="events.length > 0" class="py-0 event-list">
-        <template v-for="(event, index) in events" :key="event.id || index">
-          <v-list-item
-            class="event-item"
-            :class="eventItemClasses"
-            @click="$emit('event-click', event)"
-            :ripple="true"
-          >
-            <template v-slot:prepend>
-              <v-avatar
-                :color="event.color || avatarColor"
-                size="40"
-                class="mr-3 event-avatar"
-              >
-                <v-icon icon="mdi-calendar" color="white" size="20"></v-icon>
-              </v-avatar>
-            </template>
-
-            <v-list-item-title class="font-weight-medium event-title">
-              {{ event.name || event.title }}
-            </v-list-item-title>
-
-            <v-list-item-subtitle class="mt-1 event-subtitle">
-              <div class="d-flex align-center">
-                <v-icon
-                  icon="mdi-clock-outline"
-                  size="14"
-                  :color="timeIconColor"
-                  class="mr-1"
-                ></v-icon>
-                {{ formatEventTime(event) }}
-              </div>
-              <div v-if="event.details" class="text-truncate mt-1 event-details">
-                {{ event.details }}
-              </div>
-            </v-list-item-subtitle>
-
-            <template v-slot:append>
-              <div class="d-flex flex-column align-center event-actions">
-                <v-chip
-                  :color="getEventStatus(event).color"
-                  size="x-small"
-                  variant="flat"
-                  class="mb-1 status-chip"
-                >
-                  {{ getEventStatus(event).text }}
-                </v-chip>
-                <v-btn
-                  icon="mdi-dots-vertical"
-                  variant="text"
-                  size="small"
-                  class="action-btn"
-                  @click.stop="$emit('event-menu', event)"
-                ></v-btn>
-              </div>
-            </template>
-          </v-list-item>
-        </template>
-      </v-list>
-
-      <v-empty-state
-        v-else
-        :icon="emptyIcon"
-        :title="emptyTitle"
-        :text="emptyText"
-        class="my-8 empty-state"
-      ></v-empty-state>
-    </v-card-text>
-
-    <v-card-actions v-if="showActions" class="pa-4 list-actions">
-      <v-spacer></v-spacer>
-      <v-btn
-        :color="actionButtonColor"
-        variant="text"
-        class="view-all-btn"
-        @click="$emit('view-all')"
+      <v-card-title
+        class="pa-4 list-header"
+        :class="headerClasses"
+        :style="headerStyles"
       >
-        View All
-        <v-icon icon="mdi-arrow-right" class="ml-1"></v-icon>
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+        <div class="d-flex align-center">
+          <v-icon :icon="titleIcon" class="mr-2"></v-icon>
+          {{ title }}
+          <v-chip
+            :color="chipColor"
+            size="small"
+            variant="elevated"
+            class="event-count-chip ml-2"
+          >
+            {{ events.length }}
+          </v-chip>
+        </div>
+      </v-card-title>
+
+      <v-card-text class="pa-0">
+        <v-list v-if="events.length > 0" class="py-0 event-list">
+          <template v-for="(event, index) in events" :key="event.id || index">
+            <v-list-item
+              class="event-item"
+              :class="eventItemClasses"
+              @click="$emit('event-click', event)"
+              :ripple="true"
+            >
+              <template v-slot:prepend>
+                <v-avatar
+                  :color="event.color || avatarColor"
+                  size="40"
+                  class="mr-3 event-avatar"
+                >
+                  <v-icon icon="mdi-calendar" color="white" size="20"></v-icon>
+                </v-avatar>
+              </template>
+
+              <v-list-item-title class="font-weight-medium event-title">
+                {{ event.name || event.title }}
+              </v-list-item-title>
+
+              <v-list-item-subtitle class="mt-1 event-subtitle">
+                <div class="d-flex align-center">
+                  <v-icon
+                    icon="mdi-clock-outline"
+                    size="14"
+                    :color="timeIconColor"
+                    class="mr-1"
+                  ></v-icon>
+                  {{ formatEventTime(event) }}
+                </div>
+                <div v-if="event.details" class="text-truncate mt-1 event-details">
+                  {{ event.details }}
+                </div>
+              </v-list-item-subtitle>
+
+              <template v-slot:append>
+                <div class="d-flex flex-column align-center event-actions">
+                  <v-chip
+                    :color="getEventStatus(event).color"
+                    size="x-small"
+                    variant="flat"
+                    class="mb-1 status-chip"
+                  >
+                    {{ getEventStatus(event).text }}
+                  </v-chip>
+                  <v-btn
+                    icon="mdi-dots-vertical"
+                    variant="text"
+                    size="small"
+                    class="action-btn"
+                    @click.stop="$emit('event-menu', event)"
+                  ></v-btn>
+                </div>
+              </template>
+            </v-list-item>
+          </template>
+        </v-list>
+
+        <v-empty-state
+          v-else
+          :icon="emptyIcon"
+          :title="emptyTitle"
+          :text="emptyText"
+          class="my-8 empty-state"
+        ></v-empty-state>
+      </v-card-text>
+
+      <v-card-actions v-if="showActions" class="pa-4 list-actions">
+        <v-spacer></v-spacer>
+        <v-btn
+          :color="actionButtonColor"
+          variant="text"
+          class="view-all-btn"
+          @click="$emit('view-all')"
+        >
+          View All
+          <v-icon icon="mdi-arrow-right" class="ml-1"></v-icon>
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+
+    <!-- Divider -->
+    <v-divider
+      v-if="type === 'today'"
+      class="my-4 custom-divider"
+      :color="dividerColor"
+      :thickness="6"
+    ></v-divider>
+  </v-container>
 </template>
 
 <script>
@@ -172,6 +182,10 @@ export default {
       return this.getActionButtonColor(this.$vuetify.theme)
     },
 
+    dividerColor() {
+      return this.$vuetify.theme.current.dark ? 'primary' : 'primary'
+    },
+
     containerClasses() {
       return {
         'events-container-item': true,
@@ -184,6 +198,11 @@ export default {
 </script>
 
 <style scoped>
+/* Calendar List Container */
+.calendar-list-container {
+  width: 100%;
+}
+
 /* Base Calendar List Styles */
 .calendar-list {
   border: 1px solid rgb(var(--v-theme-primary), 0.1);
@@ -192,13 +211,23 @@ export default {
   border-radius: 16px;
 }
 
+/* Custom Divider */
+.custom-divider {
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+  width: 60% !important;
+  margin: 16px auto !important;
+  border-radius: 8px !important;
+  height: 3px !important;
+}
+
 /* Events Container Styles */
 .events-container-item {
   position: relative;
 }
 
 .today-events-container {
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .upcoming-events-container {
@@ -214,6 +243,7 @@ export default {
 
 .today-list .list-header {
   border-bottom: 2px solid rgb(var(--v-theme-secondary), 0.3);
+  color: rgb(var(--v-theme-secondary)) !important;
 }
 
 /*  Upcoming List */
@@ -380,6 +410,10 @@ export default {
 
 .v-theme--dark .upcoming-header {
   background: rgb(var(--v-theme-secondary)) !important;
+}
+
+.v-theme--dark .custom-divider {
+  opacity: 0.8;
 }
 
 .v-theme--dark .event-item:hover {

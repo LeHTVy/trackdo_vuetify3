@@ -48,7 +48,7 @@ export default createVuetify({
       dark: {
         colors: {
           'primary': '#fed44f',
-          'secondary': '#90a8ba',
+          'secondary': '#647c84',
           'accent': '#FF9800',
           'error': '#F44336',
           'warning': '#FF9800',
