@@ -13,41 +13,41 @@
             <v-icon :icon="getEventTypeIcon(selectedEvent.type)" :color="selectedEvent.color"></v-icon>
           </v-avatar>
           <div>
-            <h3 class="text-h6 font-weight-bold text-white mb-1">{{ selectedEvent.title || selectedEvent.name }}</h3>
-            <p class="text-body-2 text-white opacity-90 mb-0">{{ selectedEvent.type || 'Event' }}</p>
+            <h3 class="text-h6 font-weight-bold text-white mb-1">{{ eventTitle }}</h3>
+            <p class="text-body-2 text-white opacity-90 mb-0">{{ eventType }}</p>
           </div>
         </div>
       </v-card-title>
 
       <v-card-text class="pa-6">
-        <div v-if="selectedEvent.description || selectedEvent.details" class="mb-4">
+        <div v-if="hasDescription" class="mb-4">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-text" :color="$vuetify.theme.current.colors.primary" class="mr-2"></v-icon>
+            <v-icon icon="mdi-text" :color="getPrimaryColor()" class="mr-2"></v-icon>
             <span class="text-subtitle2 font-weight-medium">Description</span>
           </div>
-          <p class="text-body-1 ml-8">{{ selectedEvent.description || selectedEvent.details }}</p>
+          <p class="text-body-1 ml-8">{{ eventDescription }}</p>
         </div>
 
         <div class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-calendar-start" :color="$vuetify.theme.current.colors.primary" class="mr-2"></v-icon>
+            <v-icon icon="mdi-calendar-start" :color="getPrimaryColor()" class="mr-2"></v-icon>
             <span class="text-subtitle2 font-weight-medium">Start Date</span>
           </div>
           <p class="text-body-1 ml-8">{{ formatDate(selectedEvent.start) }}</p>
         </div>
 
-        <div v-if="selectedEvent.end && selectedEvent.end !== selectedEvent.start" class="mb-3">
+        <div v-if="hasEndDate" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-calendar-end" :color="$vuetify.theme.current.colors.primary" class="mr-2"></v-icon>
+            <v-icon icon="mdi-calendar-end" :color="getPrimaryColor()" class="mr-2"></v-icon>
             <span class="text-subtitle2 font-weight-medium">End Date</span>
           </div>
           <p class="text-body-1 ml-8">{{ formatDate(selectedEvent.end) }}</p>
         </div>
 
-        <div v-if="selectedEvent.priority" class="mb-3">
+        <div v-if="hasPriority" class="mb-3">
           <div class="d-flex align-center mb-2">
             <v-icon icon="mdi-flag" :color="getPriorityColor(selectedEvent.priority)" class="mr-2"></v-icon>
-            <span class="text-subtitle2 font-weight-medium">Priority</span>
+            <span class="text-subtitle2 font-weight-medium">Priority Level</span>
           </div>
           <v-chip
             :color="getPriorityColor(selectedEvent.priority)"
@@ -65,14 +65,14 @@
         <v-btn
           color="error"
           variant="outlined"
-          @click="deleteEvent"
+          @click="handleDeleteEvent"
           class="action-btn mr-3"
         >
           <v-icon icon="mdi-delete" class="mr-1"></v-icon>
           Delete
         </v-btn>
         <v-btn
-          :color="$vuetify.theme.current.colors.primary"
+          :color="getPrimaryColor()"
           variant="elevated"
           @click="editEvent"
           class="action-btn mr-3"
@@ -91,11 +91,31 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- Confirm Modal -->
+  <ConfirmModal
+    v-model="confirmModalOpen"
+    :type="confirmModalConfig.type"
+    :title="confirmModalConfig.title"
+    :message="confirmModalConfig.message"
+    :details="confirmModalConfig.details"
+    :confirm-text="confirmModalConfig.confirmText"
+    :cancel-text="confirmModalConfig.cancelText"
+    :loading="confirmModalLoading"
+    @confirm="confirmModalConfirm"
+    @cancel="confirmModalCancel"
+  />
 </template>
 
 <script>
+import { useEventDetailsDialog } from '@/composables/CalendarDialog/useEventDetailsDialog'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
+
 export default {
   name: 'EventDetailsDialog',
+  components: {
+    ConfirmModal
+  },
   props: {
     modelValue: {
       type: Boolean,
@@ -106,61 +126,89 @@ export default {
       default: null
     }
   },
-  emits: ['update:modelValue', 'delete-event', 'edit-event', 'close'],
-  computed: {
-    isOpen: {
-      get() {
-        return this.modelValue
-      },
-      set(value) {
-        this.$emit('update:modelValue', value)
-      }
+  emits: ['update:modelValue', 'delete-event', 'edit-event', 'duplicate-event', 'close'],
+  setup(props, { emit }) {
+    const {
+      // Theme colors
+      getPrimaryColor,
+      getSecondaryColor,
+      getAccentColor,
+      getErrorColor,
+      getWarningColor,
+      getInfoColor,
+      getSuccessColor,
+
+      // State
+      isOpen,
+
+      // Confirm modal properties
+      confirmModalOpen,
+      confirmModalLoading,
+      confirmModalConfig,
+      confirmModalConfirm,
+      confirmModalCancel,
+
+      // Computed properties
+      eventTitle,
+      eventDescription,
+      eventType,
+      hasEndDate,
+      hasPriority,
+      hasDescription,
+
+      // Methods
+      getEventTypeIcon,
+      getPriorityColor,
+      formatDate,
+      closeDialog,
+      deleteEvent,
+      editEvent,
+      duplicateEvent
+    } = useEventDetailsDialog(props, emit)
+
+    const handleDeleteEvent = () => {
+      console.log('Delete button clicked!')
+      console.log('Selected event:', props.selectedEvent)
+      emit('delete-event', props.selectedEvent)
     }
-  },
-  methods: {
-    closeDialog() {
-      this.isOpen = false
-      this.$emit('close')
-    },
-    deleteEvent() {
-      if (confirm('Are you sure you want to delete this event?')) {
-        console.log('Selected event for deletion:', this.selectedEvent)
-        console.log('Event ID:', this.selectedEvent?.id || this.selectedEvent?._id)
-        this.$emit('delete-event', this.selectedEvent)
-        this.closeDialog()
-      }
-    },
-    editEvent() {
-      this.$emit('edit-event', this.selectedEvent)
-      this.closeDialog()
-    },
-    formatDate(dateStr) {
-      if (!dateStr) return ''
-      const date = new Date(dateStr)
-      return date.toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    },
-    getEventTypeIcon(type) {
-      const typeMap = {
-        meeting: 'mdi-account-group',
-        work: 'mdi-briefcase',
-        social: 'mdi-account-heart',
-        milestone: 'mdi-flag-checkered',
-        deadline: 'mdi-clock-alert'
-      }
-      return typeMap[type] || 'mdi-calendar'
-    },
-    getPriorityColor(priority) {
-      const colorMap = {
-        Low: 'success',
-        Medium: 'warning',
-        High: 'error'
-      }
-      return colorMap[priority] || 'primary'
+
+    return {
+      // Theme colors
+      getPrimaryColor,
+      getSecondaryColor,
+      getAccentColor,
+      getErrorColor,
+      getWarningColor,
+      getInfoColor,
+      getSuccessColor,
+
+      // State
+      isOpen,
+
+      // Confirm modal properties
+      confirmModalOpen,
+      confirmModalLoading,
+      confirmModalConfig,
+      confirmModalConfirm,
+      confirmModalCancel,
+
+      // Computed properties
+      eventTitle,
+      eventDescription,
+      eventType,
+      hasEndDate,
+      hasPriority,
+      hasDescription,
+
+      // Methods
+      getEventTypeIcon,
+      getPriorityColor,
+      formatDate,
+      closeDialog,
+      deleteEvent,
+      editEvent,
+      duplicateEvent,
+      handleDeleteEvent
     }
   }
 }

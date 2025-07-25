@@ -9,8 +9,8 @@ export function useEventForm() {
     description: '',
     start: new Date().toISOString().substr(0, 10),
     end: new Date().toISOString().substr(0, 10),
-    color: 'primary',
-    type: 'work',
+    color: '#1976D2',
+    type: 'meeting',
     priority: 'Medium',
   }
   const editedEvent = reactive({ ...defaultEvent })
@@ -33,7 +33,6 @@ export function useEventForm() {
       return
     }
 
-    // Copy tất cả thông tin từ event sang editedEvent
     Object.assign(editedEvent, {
       name: event.name || event.title || '',
       title: event.title || event.name || '',
@@ -41,8 +40,8 @@ export function useEventForm() {
       description: event.description || event.details || '',
       start: event.start ? new Date(event.start).toISOString().substr(0, 10) : defaultEvent.start,
       end: event.end ? new Date(event.end).toISOString().substr(0, 10) : defaultEvent.end,
-      color: event.color || 'primary',
-      type: event.type || 'work',
+      color: event.color || '#1976D2',
+      type: event.type || 'meeting',
       priority: event.priority || 'Medium',
       id: event.id || event._id || null,
     })
@@ -52,17 +51,17 @@ export function useEventForm() {
 
   const validateForm = () => {
     const errors = []
-
-    if (!editedEvent.name || editedEvent.name.trim() === '') {
-      errors.push('Tên sự kiện là bắt buộc')
+    const eventTitle = editedEvent.title || editedEvent.name
+    if (!eventTitle || eventTitle.trim() === '') {
+      errors.push('Event title is required')
     }
 
     if (!editedEvent.start) {
-      errors.push('Ngày bắt đầu là bắt buộc')
+      errors.push('Start date is required')
     }
 
     if (!editedEvent.end) {
-      errors.push('Ngày kết thúc là bắt buộc')
+      errors.push('End date is required')
     }
 
     if (editedEvent.start && editedEvent.end) {
@@ -70,7 +69,7 @@ export function useEventForm() {
       const endDate = new Date(editedEvent.end)
 
       if (endDate < startDate) {
-        errors.push('Ngày kết thúc không thể trước ngày bắt đầu')
+        errors.push('End date cannot be before start date')
       }
     }
 
@@ -86,10 +85,13 @@ export function useEventForm() {
       endDate = editedEvent.start
     }
 
+    const eventTitle = (editedEvent.title || editedEvent.name || '').trim()
+
     return {
       ...editedEvent,
       end: endDate,
-      name: editedEvent.name.trim()
+      title: eventTitle,
+      name: eventTitle
     }
   }
 

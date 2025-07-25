@@ -84,12 +84,11 @@ export const apiService = {
       || error.message
       || 'An unexpected error occurred'
 
-    return {
-      success: false,
-      message: errorMessage,
-      status: error.response?.status,
-      data: null,
-    }
+    const errorObj = new Error(errorMessage)
+    errorObj.status = error.response?.status
+    errorObj.data = error.response?.data
+
+    return errorObj
   },
 }
 

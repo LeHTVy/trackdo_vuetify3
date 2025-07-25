@@ -8,20 +8,55 @@
     >
       <!-- Weather Display -->
       <div class="weather-display d-flex align-center">
-        <v-icon color="primary" class="mr-2">mdi-weather-partly-cloudy</v-icon>
+        <v-icon
+          :color="weatherError ? 'error' : 'primary'"
+          class="mr-2"
+        >
+          {{ weatherData ? getWeatherIcon(weatherData.weatherCode) : 'mdi-weather-partly-cloudy' }}
+        </v-icon>
         <div v-if="weatherLoading" class="d-flex align-center">
           <v-progress-circular size="20" width="2" indeterminate color="primary" class="mr-2" />
           <span class="text-body-2">Loading weather...</span>
         </div>
         <div v-else-if="weatherData" class="weather-info">
           <div class="text-h6 font-weight-bold">{{ weatherData.temperature }}°C</div>
+          <div v-if="weatherData.windSpeed" class="text-caption">
+            Wind: {{ weatherData.windSpeed }} km/h
+          </div>
         </div>
         <div v-else class="text-body-2 text-error">
-          Weather unavailable
+          {{ weatherError || 'Weather unavailable' }}
         </div>
       </div>
 
       <v-spacer />
+
+      <!-- View Selector -->
+      <div class="view-selector d-flex align-center mr-4">
+        <v-btn-toggle
+          v-model="currentView"
+          @update:model-value="onViewChange"
+          variant="outlined"
+          density="compact"
+          mandatory
+          class="view-toggle"
+        >
+          <v-btn
+            value="monthly"
+            size="small"
+            prepend-icon="mdi-calendar-month"
+          >
+            Month
+          </v-btn>
+          <v-btn
+            value="weekly"
+            size="small"
+            prepend-icon="mdi-calendar-week"
+          >
+            Week
+          </v-btn>
+        </v-btn-toggle>
+      </div>
 
       <!-- Navigation Controls -->
       <div class="navigation-controls d-flex align-center">
@@ -55,11 +90,14 @@
       <div class="custom-calendar">
         <!-- Calendar Header with Month/Year -->
         <div class="calendar-month-header">
-          <h3 class="month-title">{{ formatMonthYear(currentValue) }}</h3>
+          <h3 class="month-title">{{ getViewTitle }}</h3>
         </div>
 
-        <!-- Weekday Headers -->
-        <div class="weekday-headers">
+        <!-- Weekday Headers  -->
+        <div
+          class="weekday-headers"
+          :class="{ 'weekly-headers': currentView === 'weekly' }"
+        >
           <div
             v-for="day in weekdayLabels"
             :key="day"
@@ -70,7 +108,13 @@
         </div>
 
         <!-- Calendar Grid -->
-        <div class="calendar-grid">
+        <div
+          class="calendar-grid"
+          :class="{
+            'monthly-grid': currentView === 'monthly',
+            'weekly-grid': currentView === 'weekly'
+          }"
+        >
           <div
             v-for="day in calendarDays"
             :key="`${day.date.getFullYear()}-${day.date.getMonth()}-${day.date.getDate()}`"
@@ -89,10 +133,10 @@
           >
             <div class="day-content">
               <div class="day-number">{{ day.date.getDate() }}</div>
-              <div v-if="getDayEvents(day.date).length > 0" class="day-events">
+              <div v-if="getVisibleDayEvents(day.date).totalCount > 0" class="day-events">
                 <div
-                  v-for="event in getDayEvents(day.date).slice(0, 3)"
-                  :key="`${event.id}-${day.date.getTime()}`"
+                  v-for="(event, index) in getVisibleDayEvents(day.date).events"
+                  :key="`${event.id || event._id || event.title}-${day.date.getTime()}-${index}`"
                   class="event-item"
                   :class="{
                     'multi-day-event': event.isMultiDay,
@@ -107,33 +151,33 @@
                   @dragstart="onEventDragStart($event, event)"
                   @dragend="onEventDragEnd"
                 >
-                  <!-- Resize handle for start date (only on first day) -->
+                  <!-- Resize handle for start date -->
                   <div
                     v-if="event.isFirstDay && event.isMultiDay"
                     class="resize-handle resize-start"
                     @mousedown.stop="onResizeStart($event, event, 'start')"
-                    title="Kéo để thay đổi ngày bắt đầu"
+                    title=" Resize handle for start date"
                   ></div>
-                  
+
                   <span v-if="!event.isContinuation" class="event-dot"></span>
                   <span class="event-text">
                     {{ event.isContinuation ? '' : (event.name || event.title) }}
                   </span>
-                  
-                  <!-- Resize handle for end date (only on last day) -->
+
+                  <!-- Resize handle for end date  -->
                   <div
                     v-if="event.isLastDay && event.isMultiDay"
                     class="resize-handle resize-end"
                     @mousedown.stop="onResizeStart($event, event, 'end')"
-                    title="Kéo để thay đổi ngày kết thúc"
+                    title="Resize handle for end date"
                   ></div>
                 </div>
                 <div
-                  v-if="getDayEvents(day.date).length > 3"
+                  v-if="getVisibleDayEvents(day.date).hasMore"
                   class="more-events"
                   @click.stop="onShowMore($event, { date: day.date, events: getDayEvents(day.date) })"
                 >
-                  +{{ getDayEvents(day.date).length - 3 }} more
+                  +{{ getVisibleDayEvents(day.date).moreCount }} more
                 </div>
               </div>
             </div>
@@ -145,12 +189,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-import { useDialogManager } from '@/composables/useDialogManager'
-import { useEventFilters } from '@/composables/useEventFilters'
-import { useCalendarUtils } from '@/composables/useCalendarUtils'
-import { useCalendarEvents } from '@/composables/useCalendarEvents'
-import { useEventDragDrop } from '@/composables/useEventDragDrop'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useDialogManager } from '@/composables/CalendarCommon/useDialogManager'
+import { useEventFilters } from '@/composables/CalendarCommon/useEventFilters'
+import { useCalendarEvents } from '@/composables/CalendarCommon/useCalendarEvents'
+import { useEventDragDrop } from '@/composables/CalendarMain/useEventDragDrop'
+import { useWeatherData } from '@/composables/CalendarMain/useWeatherData'
+import { useCalendarGrid } from '@/composables/CalendarMain/useCalendarGrid'
+import { useCalendarNavigation } from '@/composables/CalendarMain/useCalendarNavigation'
+import { useDayEvents } from '@/composables/CalendarMain/useDayEvents'
 
 // Props
 const props = defineProps({
@@ -181,145 +228,60 @@ const emit = defineEmits([
 
 // Refs
 const calendarRef = ref(null)
-const currentValue = ref(new Date())
-const currentView = ref(props.defaultView)
 const currentWeekdays = ref([0, 1, 2, 3, 4, 5, 6])
-
-// Weather data
-const weatherData = ref(null)
-const weatherLoading = ref(false)
-
-// Weather API function
-const fetchWeatherData = async () => {
-  weatherLoading.value = true
-  try {
-    const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-25.85891&longitude=28.18577&current=temperature_2m')
-    const data = await response.json()
-
-    if (data.current && data.current.temperature_2m !== undefined) {
-      weatherData.value = {
-        temperature: data.current.temperature_2m,
-        time: data.current.time
-      }
-    }
-  } catch (error) {
-    console.error('Error fetching weather data:', error)
-    weatherData.value = null
-  } finally {
-    weatherLoading.value = false
-  }
-}
 
 // Composables
 const dialogManager = useDialogManager()
 const { formattedEvents } = useEventFilters(computed(() => props.events))
-const { formatDateTime } = useCalendarUtils()
 const { handleEventClick, handleDateClick, handleShowMore, handleRangeChange, editEvent } = useCalendarEvents()
 const { dragState, startEventDrag, startResize, handleDrop, handleDragEnd } = useEventDragDrop()
 
-// Weekday labels (Monday first)
-const weekdayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+// Weather composable
+const {
+  weatherData,
+  weatherLoading,
+  weatherError,
+  getWeatherIcon,
+  setupAutoRefresh
+} = useWeatherData()
 
-// Computed properties
-const calendarDays = computed(() => {
-  const year = currentValue.value.getFullYear()
-  const month = currentValue.value.getMonth()
+// Calendar navigation composable
+const {
+  currentDate: currentValue,
+  calendarType: currentView,
+  navigatePrev,
+  navigateNext,
+  goToToday,
+  getViewTitle,
+  changeView,
+  viewTypes
+} = useCalendarNavigation(new Date(), props.defaultView)
 
-  // First day of the month
-  const firstDay = new Date(year, month, 1)
-  // Last day of the month
-  const lastDay = new Date(year, month + 1, 0)
+// Calendar grid composable
+const {
+  calendarDays,
+  weekdayLabels,
+  isToday,
+  formatMonthYear
+} = useCalendarGrid(currentValue, currentView)
 
-  // Get the day of week for first day (0 = Sunday, 1 = Monday, etc.)
-  // Convert to Monday = 0 format
-  const firstDayOfWeek = (firstDay.getDay() + 6) % 7
+// Day events composable
+const {
+  getDayEvents,
+  getVisibleDayEvents
+} = useDayEvents(formattedEvents, currentView)
 
-  const days = []
-
-  // Add days from previous month to fill the first week
-  for (let i = firstDayOfWeek - 1; i >= 0; i--) {
-    const date = new Date(year, month, -i)
-    days.push({
-      date,
-      isCurrentMonth: false
-    })
-  }
-
-  // Add all days of current month
-  for (let day = 1; day <= lastDay.getDate(); day++) {
-    const date = new Date(year, month, day)
-    days.push({
-      date,
-      isCurrentMonth: true
-    })
-  }
-
-  // Add days from next month to fill the last week
-  const remainingDays = 42 - days.length // 6 weeks * 7 days
-  for (let day = 1; day <= remainingDays; day++) {
-    const date = new Date(year, month + 1, day)
-    days.push({
-      date,
-      isCurrentMonth: false
-    })
-  }
-
-  return days
+// Auto refresh weather setup
+let weatherInterval = null
+onMounted(() => {
+  weatherInterval = setupAutoRefresh()
 })
 
-// Helper method to get events for a specific day
-const getDayEvents = (date) => {
-  const targetDate = new Date(date)
-  targetDate.setHours(0, 0, 0, 0)
-
-  return formattedEvents.value.filter(event => {
-    const eventStartDate = new Date(event.start)
-    eventStartDate.setHours(0, 0, 0, 0)
-
-    const eventEndDate = new Date(event.end || event.start)
-    eventEndDate.setHours(0, 0, 0, 0)
-
-    // Event hiển thị trên tất cả ngày từ start đến end
-    return targetDate.getTime() >= eventStartDate.getTime() &&
-           targetDate.getTime() <= eventEndDate.getTime()
-  }).map(event => {
-    // Thêm thông tin về vị trí của event trong khoảng thời gian
-    const eventStartDate = new Date(event.start)
-    eventStartDate.setHours(0, 0, 0, 0)
-
-    const eventEndDate = new Date(event.end || event.start)
-    eventEndDate.setHours(0, 0, 0, 0)
-
-    const isFirstDay = targetDate.getTime() === eventStartDate.getTime()
-    const isLastDay = targetDate.getTime() === eventEndDate.getTime()
-    const isMultiDay = eventStartDate.getTime() !== eventEndDate.getTime()
-
-    return {
-      ...event,
-      isFirstDay,
-      isLastDay,
-      isMultiDay,
-      isContinuation: !isFirstDay && isMultiDay
-    }
-  })
-}
-
-// Helper method to check if date is today
-const isToday = (date) => {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const checkDate = new Date(date)
-  checkDate.setHours(0, 0, 0, 0)
-  return today.getTime() === checkDate.getTime()
-}
-
-// Helper method to format month and year
-const formatMonthYear = (date) => {
-  return date.toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric'
-  })
-}
+onUnmounted(() => {
+  if (weatherInterval) {
+    clearInterval(weatherInterval)
+  }
+})
 
 // Methods
 const onEventClick = (eventData) => {
@@ -341,30 +303,6 @@ const onRangeChange = (pages) => {
     end: pages[0]?.range?.end
   }
   handleRangeChange(rangeData, emit)
-}
-
-const navigatePrev = () => {
-  const currentDate = new Date(currentValue.value)
-  if (currentView.value === 'monthly') {
-    currentDate.setMonth(currentDate.getMonth() - 1)
-  } else if (currentView.value === 'weekly') {
-    currentDate.setDate(currentDate.getDate() - 7)
-  }
-  currentValue.value = currentDate
-}
-
-const navigateNext = () => {
-  const currentDate = new Date(currentValue.value)
-  if (currentView.value === 'monthly') {
-    currentDate.setMonth(currentDate.getMonth() + 1)
-  } else if (currentView.value === 'weekly') {
-    currentDate.setDate(currentDate.getDate() + 7)
-  }
-  currentValue.value = currentDate
-}
-
-const goToToday = () => {
-  currentValue.value = new Date()
 }
 
 const onEditEvent = () => {
@@ -392,16 +330,15 @@ const onResizeStart = (nativeEvent, event, direction) => {
   startResize(event, direction, nativeEvent)
 }
 
+// View change handler
+const onViewChange = (newView) => {
+  changeView(newView)
+  emit('view-changed', newView)
+}
+
 // Watchers
 watch(currentView, (newView) => {
   emit('view-changed', newView)
-})
-
-// Lifecycle
-onMounted(() => {
-  fetchWeatherData()
-  // Refresh weather data every 10 minutes
-  setInterval(fetchWeatherData, 10 * 60 * 1000)
 })
 
 </script>
@@ -438,6 +375,26 @@ onMounted(() => {
 .view-selector,
 .weekday-selector {
   max-width: 200px;
+}
+
+.view-selector {
+  background: rgba(var(--v-theme-surface), 0.8);
+  border-radius: 12px;
+  padding: 4px;
+  border: 1px solid rgba(var(--v-border-color), 0.2);
+}
+
+.view-toggle .v-btn {
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: 0.5px !important;
+}
+
+.view-toggle .v-btn--active {
+  background: rgb(var(--v-theme-primary)) !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
+  box-shadow: 0 2px 4px rgba(var(--v-theme-primary), 0.3) !important;
 }
 
 .navigation-controls {
@@ -498,10 +455,55 @@ onMounted(() => {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(6, 1fr);
   flex: 1;
   min-height: 600px;
+}
+
+/* Monthly view grid */
+.calendar-grid.monthly-grid {
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+}
+
+/* Weekly view grid */
+.calendar-grid.weekly-grid {
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 1fr;
+  min-height: 400px;
+}
+
+.calendar-grid.weekly-grid .calendar-day {
+  min-height: 350px;
+  border-radius: 8px;
+  margin: 4px;
+}
+
+.calendar-grid.weekly-grid .day-number {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.calendar-grid.weekly-grid .calendar-day.is-today .day-number {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.calendar-grid.weekly-grid .day-events {
+  gap: 4px;
+}
+
+.calendar-grid.weekly-grid .event-item {
+  padding: 6px 8px;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
+/* Weekly headers styling */
+.weekday-headers.weekly-headers {
+  background: rgba(var(--v-theme-primary), 0.15);
 }
 
 .calendar-day {

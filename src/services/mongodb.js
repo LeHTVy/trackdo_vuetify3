@@ -155,7 +155,7 @@ export class MongoDBService {
     async getAll () {
       try {
         const response = await eventsAPI.getAll()
-        return { success: true, data: response.data || response }
+        return { success: true, data: response }
       } catch (error) {
         console.error('Error fetching events:', error)
         return { success: false, error: error.message, data: [] }
@@ -165,7 +165,7 @@ export class MongoDBService {
     async getById (id) {
       try {
         const response = await eventsAPI.getById(id)
-        return { success: true, data: response.data || response }
+        return { success: true, data: response }
       } catch (error) {
         console.error(`Error fetching event ${id}:`, error)
         return { success: false, error: error.message, data: null }
@@ -175,7 +175,7 @@ export class MongoDBService {
     async getByDateRange (startDate, endDate) {
       try {
         const response = await eventsAPI.getByDateRange(startDate, endDate)
-        return { success: true, data: response.data || response }
+        return { success: true, data: response }
       } catch (error) {
         console.error('Error fetching events by date range:', error)
         return { success: false, error: error.message, data: [] }
@@ -185,7 +185,7 @@ export class MongoDBService {
     async getByProject (projectId) {
       try {
         const response = await eventsAPI.getByProject(projectId)
-        return { success: true, data: response.data || response }
+        return { success: true, data: response }
       } catch (error) {
         console.error(`Error fetching events for project ${projectId}:`, error)
         return { success: false, error: error.message, data: [] }
@@ -195,7 +195,7 @@ export class MongoDBService {
     async create (eventData) {
       try {
         const response = await eventsAPI.create(eventData)
-        return { success: true, data: response.data || response }
+        return { success: true, data: response }
       } catch (error) {
         console.error('Error creating event:', error)
         return { success: false, error: error.message, data: null }
@@ -205,7 +205,7 @@ export class MongoDBService {
     async update (id, updates) {
       try {
         const response = await eventsAPI.update(id, updates)
-        return { success: true, data: response.data || response }
+        return { success: true, data: response }
       } catch (error) {
         console.error(`Error updating event ${id}:`, error)
         return { success: false, error: error.message, data: null }
@@ -215,7 +215,7 @@ export class MongoDBService {
     async delete (id) {
       try {
         const response = await eventsAPI.delete(id)
-        return { success: true, data: response.data || response }
+        return { success: true, data: response }
       } catch (error) {
         console.error(`Error deleting event ${id}:`, error)
         return { success: false, error: error.message, data: null }

@@ -50,7 +50,7 @@
 <script setup>
   import { ref, computed, onMounted } from 'vue'
   import { useProjectsStore } from '@/stores/projects'
-  import { useDraggableFab } from '@/composables/useDraggableFab'
+  import { useDraggableFab } from '@/composables/common/useDraggableFab'
   import ProjectsHeader from '@/components/projects/ProjectsHeader.vue'
   import ProjectsStats from '@/components/projects/ProjectsStats.vue'
   import ProjectsList from '@/components/projects/ProjectsList.vue'

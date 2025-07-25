@@ -120,17 +120,21 @@ export const useEventsStore = defineStore('events', {
         this.loading = true
         this.error = null
 
+        // First check if event exists locally
+        const localIndex = this.events.findIndex(e => (e.id === eventId) || (e._id === eventId))
+        if (localIndex === -1) {
+          console.warn(`Event ${eventId} not found in local state`)
+          return true // Consider it already deleted
+        }
+
         const result = await mongoService.events.delete(eventId)
         if (result.success) {
-          // Support both 'id' and '_id' fields for MongoDB compatibility
-          const index = this.events.findIndex(e => (e.id === eventId) || (e._id === eventId))
-          if (index !== -1) {
-            this.events.splice(index, 1)
-          }
-          console.log('✅ Event deleted from MongoDB')
+          // Only remove from local state if backend deletion was successful
+          this.events.splice(localIndex, 1)
+          console.log('✅ Event deleted from MongoDB and local state')
           return true
         } else {
-          throw new Error(result.message || 'Failed to delete event from MongoDB')
+          throw new Error(result.error || 'Failed to delete event from MongoDB')
         }
       } catch (error) {
         this.error = error.message || 'Failed to delete event'

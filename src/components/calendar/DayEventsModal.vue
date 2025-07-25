@@ -11,7 +11,7 @@
       <v-card-title class="day-events-header pa-6">
         <div class="d-flex align-center">
           <v-avatar
-            :color="$vuetify.theme.current.colors.primary"
+            :color="getPrimaryColor()"
             size="40"
             class="mr-4 header-avatar"
           >
@@ -65,7 +65,7 @@
                   <v-icon
                     icon="mdi-clock-outline"
                     size="16"
-                    :color="$vuetify.theme.current.colors.primary"
+                    :color="getPrimaryColor()"
                     class="mr-2"
                   ></v-icon>
                   <span class="time-text">{{ formatEventTime(event) }}</span>
@@ -95,7 +95,7 @@
       <v-card-actions class="pa-6 pt-4">
         <v-spacer></v-spacer>
         <v-btn
-          :color="$vuetify.theme.current.colors.primary"
+          :color="getPrimaryColor()"
           variant="elevated"
           @click="closeModal"
           class="action-btn"
@@ -110,7 +110,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
+import { useDayEventsModal } from '@/composables/DayEventsModal/useDayEventsModal'
 
 // Props
 const props = defineProps({
@@ -131,68 +132,16 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['update:modelValue', 'event-click', 'event-menu'])
 
-// Computed
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-
-// Methods
-const closeModal = () => {
-  isOpen.value = false
-}
-
-const onEventClick = (event) => {
-  emit('event-click', event)
-  closeModal()
-}
-
-const onEventMenu = (event) => {
-  emit('event-menu', event)
-}
-
-const formatDate = (date) => {
-  if (!date) return ''
-  return date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
-
-const formatEventTime = (event) => {
-  if (!event.start) return ''
-
-  const startDate = new Date(event.start)
-  const endDate = new Date(event.end || event.start)
-
-  const startTime = startDate.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-
-  if (event.end && event.end !== event.start) {
-    const endTime = endDate.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-    return `${startTime} - ${endTime}`
-  }
-
-  return startTime
-}
-
-const getEventTypeIcon = (type) => {
-  const typeMap = {
-    meeting: 'mdi-account-group',
-    work: 'mdi-briefcase',
-    social: 'mdi-account-heart',
-    milestone: 'mdi-flag-checkered',
-    deadline: 'mdi-clock-alert'
-  }
-  return typeMap[type] || 'mdi-calendar'
-}
+// Use composables
+const { getPrimaryColor, getEventTypeIcon } = useThemeColors('modal')
+const {
+  isOpen,
+  closeModal,
+  onEventClick,
+  onEventMenu,
+  formatDate,
+  formatEventTime
+} = useDayEventsModal(props, emit)
 </script>
 
 <style scoped>

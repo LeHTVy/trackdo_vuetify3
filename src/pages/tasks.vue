@@ -135,7 +135,7 @@
   import TasksList from '@/components/tasks/TasksList.vue'
   import TasksStats from '@/components/tasks/TasksStats.vue'
   import { useTasksStore } from '@/stores/tasks'
-  import { useDraggableFab } from '@/composables/useDraggableFab'
+  import { useDraggableFab } from '@/composables/common/useDraggableFab'
 
   const showAddDialog = ref(false)
   const editingTask = ref(null)

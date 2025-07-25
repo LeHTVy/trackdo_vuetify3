@@ -190,3 +190,99 @@ export const getEventsByDate = (events, targetDate) => {
     return eventDate && eventDate.toISOString().split('T')[0] === targetDateStr
   })
 }
+
+/**
+ * Get week number of the year (ISO 8601 standard)
+ * @param {Date|string} date - Date to get week number for
+ * @returns {number} Week number (1-53)
+ */
+export const getWeekNumber = (date) => {
+  try {
+    const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)
+    if (!dateObj) return 0
+
+    // Copy date so we don't modify original
+    const target = new Date(dateObj.valueOf())
+    const dayNr = (dateObj.getDay() + 6) % 7
+    target.setDate(target.getDate() - dayNr + 3)
+    const firstThursday = target.valueOf()
+    target.setMonth(0, 1)
+    if (target.getDay() !== 4) {
+      target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7)
+    }
+    return 1 + Math.ceil((firstThursday - target) / 604800000) // 604800000 = 7 * 24 * 3600 * 1000
+  } catch {
+    return 0
+  }
+}
+
+/**
+ * Get year for the week number (handles edge cases around year boundaries)
+ * @param {Date|string} date - Date to get week year for
+ * @returns {number} Year for the week
+ */
+export const getWeekYear = (date) => {
+  try {
+    const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)
+    if (!dateObj) return new Date().getFullYear()
+
+    const target = new Date(dateObj.valueOf())
+    const dayNr = (dateObj.getDay() + 6) % 7
+    target.setDate(target.getDate() - dayNr + 3)
+    return target.getFullYear()
+  } catch {
+    return new Date().getFullYear()
+  }
+}
+
+/**
+ * Check if a date is in the current week
+ * @param {Date|string} date - Date to check
+ * @returns {boolean} True if date is in current week
+ */
+export const isThisWeek = (date) => {
+  try {
+    const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)
+    if (!dateObj) return false
+
+    const today = new Date()
+    const currentWeek = getWeekNumber(today)
+    const currentYear = getWeekYear(today)
+    const dateWeek = getWeekNumber(dateObj)
+    const dateYear = getWeekYear(dateObj)
+
+    return currentWeek === dateWeek && currentYear === dateYear
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Check if a date is in the next week
+ * @param {Date|string} date - Date to check
+ * @returns {boolean} True if date is in next week
+ */
+export const isNextWeek = (date) => {
+  try {
+    const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)
+    if (!dateObj) return false
+
+    const today = new Date()
+    const currentWeek = getWeekNumber(today)
+    const currentYear = getWeekYear(today)
+    const dateWeek = getWeekNumber(dateObj)
+    const dateYear = getWeekYear(dateObj)
+
+    // Handle year boundary case
+    if (currentYear !== dateYear) {
+      if (currentYear + 1 === dateYear && currentWeek >= 52 && dateWeek === 1) {
+        return true
+      }
+      return false
+    }
+
+    return dateWeek === currentWeek + 1
+  } catch {
+    return false
+  }
+}

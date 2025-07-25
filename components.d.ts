@@ -22,6 +22,7 @@ declare module 'vue' {
     CalendarMainContent: typeof import('./src/components/calendar/CalendarMainContent.vue')['default']
     CalendarSidebar: typeof import('./src/components/calendar/CalendarSidebar.vue')['default']
     CalendarStats: typeof import('./src/components/calendar/CalendarStats.vue')['default']
+    ConfirmModal: typeof import('./src/components/common/ConfirmModal.vue')['default']
     CustomCalendar: typeof import('./src/components/calendar/CustomCalendar.vue')['default']
     DatePickerCalendar: typeof import('./src/components/calendar/DatePickerCalendar.vue')['default']
     DayEventsModal: typeof import('./src/components/calendar/DayEventsModal.vue')['default']

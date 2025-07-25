@@ -118,83 +118,64 @@
   </v-container>
 </template>
 
-<script>
-import { useCalendarList } from '@/composables/useCalendarList.js'
+<script setup>
+import { computed } from 'vue'
+import { useCalendarList } from '@/composables/CalendarList/useCalendarList.js'
+import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors.js'
 
-export default {
-  name: 'CalendarList',
-  props: {
-    events: {
-      type: Array,
-      default: () => []
-    },
-    type: {
-      type: String,
-      default: 'upcoming',
-      validator: value => ['upcoming', 'today'].includes(value)
-    },
-    showActions: {
-      type: Boolean,
-      default: true
-    }
+// Props
+const props = defineProps({
+  events: {
+    type: Array,
+    default: () => []
   },
-  emits: ['event-click', 'event-menu', 'view-all'],
-  setup(props) {
-    const calendarList = useCalendarList(props.type)
-    return {
-      ...calendarList
-    }
+  type: {
+    type: String,
+    default: 'upcoming',
+    validator: value => ['upcoming', 'today'].includes(value)
   },
-  computed: {
-    title() {
-      return this.getTitle()
-    },
-    titleIcon() {
-      return this.getTitleIcon()
-    },
-    emptyIcon() {
-      return this.getEmptyIcon()
-    },
-    emptyTitle() {
-      return this.getEmptyTitle()
-    },
-    emptyText() {
-      return this.getEmptyText()
-    },
-
-    headerStyles() {
-      return this.getHeaderStyles(this.$vuetify.theme)
-    },
-
-    chipColor() {
-      return this.getChipColor(this.$vuetify.theme)
-    },
-
-    avatarColor() {
-      return this.getAvatarColor(this.$vuetify.theme)
-    },
-
-    timeIconColor() {
-      return this.getTimeIconColor(this.$vuetify.theme)
-    },
-
-    actionButtonColor() {
-      return this.getActionButtonColor(this.$vuetify.theme)
-    },
-
-    dividerColor() {
-      return this.$vuetify.theme.current.dark ? 'primary' : 'primary'
-    },
-
-    containerClasses() {
-      return {
-        'events-container-item': true,
-        'today-events-container': this.type === 'today',
-        'upcoming-events-container': this.type === 'upcoming'
-      }
-    }
+  showActions: {
+    type: Boolean,
+    default: true
   }
-}
+})
+
+// Emits
+defineEmits(['event-click', 'event-menu', 'view-all'])
+
+// Composables
+const calendarList = useCalendarList(props.type)
+const themeColors = useThemeColors(props.type)
+
+// Computed properties
+const title = computed(() => calendarList.getTitle())
+const titleIcon = computed(() => calendarList.getTitleIcon())
+const emptyIcon = computed(() => calendarList.getEmptyIcon())
+const emptyTitle = computed(() => calendarList.getEmptyTitle())
+const emptyText = computed(() => calendarList.getEmptyText())
+
+// Styling computed properties
+const headerStyles = computed(() => themeColors.getHeaderStyles())
+const chipColor = computed(() => themeColors.getChipColor())
+const avatarColor = computed(() => themeColors.getAvatarColor())
+const timeIconColor = computed(() => themeColors.getTimeIconColor())
+const actionButtonColor = computed(() => themeColors.getActionButtonColor())
+const dividerColor = computed(() => themeColors.getDividerColor())
+
+// CSS classes
+const listClasses = computed(() => calendarList.listClasses)
+const headerClasses = computed(() => calendarList.headerClasses)
+const eventItemClasses = computed(() => calendarList.eventItemClasses)
+
+const containerClasses = computed(() => ({
+  'events-container-item': true,
+  'today-events-container': props.type === 'today',
+  'upcoming-events-container': props.type === 'upcoming'
+}))
+
+// Methods
+const formatEventTime = (event) => calendarList.formatEventTime(event)
+const getEventStatus = (event) => calendarList.getEventStatus(event)
 </script>
 
 <style scoped>
@@ -221,56 +202,10 @@ export default {
   height: 3px !important;
 }
 
-/* Events Container Styles */
-.events-container-item {
-  position: relative;
-}
-
-.today-events-container {
-  margin-bottom: 0;
-}
-
-.upcoming-events-container {
-  margin-top: 0;
-}
-
-
-/* Today List */
-.today-list {
-  border-bottom: none;
-   border-radius: 16px;
-}
-
-.today-list .list-header {
-  border-bottom: 2px solid rgb(var(--v-theme-secondary), 0.3);
-  color: rgb(var(--v-theme-secondary)) !important;
-}
-
-/*  Upcoming List */
-.upcoming-list {
-  border-top: none;
-  margin-top: 10px;
-  border-radius: 16px;
-}
-
-.upcoming-list .list-header {
-  border-top: 1px solid rgb(var(--v-theme-primary), 0.2);
-}
-
-/* Header Styles */
+/* Generic Header Styles */
 .list-header {
   position: relative;
   transition: all 0.3s ease;
-}
-
-.today-header {
-  background: rgb(var(--v-theme-primary)) !important;
-  color: white !important;
-}
-
-.upcoming-header {
-  background: rgb(var(--v-theme-secondary)) !important;
-  color: rgb(var(--v-theme-primary)) !important;
 }
 
 /* Event Count Chip */
@@ -284,7 +219,7 @@ export default {
   background: rgb(var(--v-theme-surface));
 }
 
-/* Event Item Styles */
+/* Generic Event Item Styles  */
 .event-item {
   transition: all 0.2s ease;
   cursor: pointer;
@@ -295,20 +230,6 @@ export default {
 .event-item:hover {
   background-color: rgb(var(--v-theme-card-hover), 0.5);
   transform: translateX(2px);
-}
-
-.today-event-item:hover {
-  border-left-color: rgb(var(--v-theme-primary));
-  background: linear-gradient(90deg,
-    rgb(var(--v-theme-primary), 0.05) 0%,
-    transparent 100%);
-}
-
-.upcoming-event-item:hover {
-  border-left-color: rgb(var(--v-theme-secondary));
-  background: linear-gradient(90deg,
-    rgb(var(--v-theme-secondary), 0.05) 0%,
-    transparent 100%);
 }
 
 /* Event Avatar */
@@ -366,12 +287,6 @@ export default {
   background-color: rgb(var(--v-theme-primary), 0.1);
 }
 
-/* Event Divider */
-.event-divider {
-  margin: 0 16px;
-  opacity: 0.3;
-}
-
 /* Empty State */
 .empty-state {
   opacity: 0.7;
@@ -395,21 +310,9 @@ export default {
   transform: translateX(2px);
 }
 
-/* Dark Mode Adjustments */
-.v-theme--dark .list-header{
-  color: rgb(var(--v-theme-primary), 0.2);;
-}
-
+/* Dark Mode Adjustments  */
 .v-theme--dark .calendar-list {
   border-color: rgb(var(--v-theme-primary), 0.2);
-}
-
-.v-theme--dark .today-header {
-  background: rgb(var(--v-theme-primary)) !important;
-}
-
-.v-theme--dark .upcoming-header {
-  background: rgb(var(--v-theme-secondary)) !important;
 }
 
 .v-theme--dark .custom-divider {
@@ -427,7 +330,6 @@ export default {
 .v-theme--dark .event-count-chip {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
-
 
 /* Responsive Design */
 @media (max-width: 768px) {

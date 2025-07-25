@@ -1,7 +1,6 @@
 import { ref, computed, readonly, onMounted, onUnmounted } from 'vue'
 
 /**
- * Composable for draggable floating action button
  * @param {Object} options - Configuration options
  * @param {string} options.storageKey - localStorage key for saving position (default: 'fabPosition')
  * @param {number} options.fabSize - Size of the FAB in pixels (default: 56)
@@ -16,24 +15,19 @@ export function useDraggableFab(options = {}) {
     initialOffsetY = 120
   } = options
 
-  // Reactive state
   const isDragging = ref(false)
   const fabPosition = ref({ x: 0, y: 0 })
   const dragOffset = ref({ x: 0, y: 0 })
 
-  // Initialize FAB position and load saved position
   const initializePosition = () => {
-    // Position FAB at bottom-right corner initially
     const initialX = window.innerWidth - initialOffsetX
     const initialY = window.innerHeight - initialOffsetY
     fabPosition.value = { x: initialX, y: initialY }
 
-    // Load saved position
     const savedPosition = localStorage.getItem(storageKey)
     if (savedPosition) {
       try {
         const parsed = JSON.parse(savedPosition)
-        // Validate position is within current viewport
         if (parsed.x >= 0 && parsed.x <= window.innerWidth - fabSize &&
             parsed.y >= 0 && parsed.y <= window.innerHeight - fabSize) {
           fabPosition.value = parsed
@@ -45,11 +39,8 @@ export function useDraggableFab(options = {}) {
   }
 
   const startDrag = (event) => {
-    // Prevent click event when dragging
     event.preventDefault()
-
     isDragging.value = true
-
     const clientX = event.type === 'touchstart' ? event.touches[0].clientX : event.clientX
     const clientY = event.type === 'touchstart' ? event.touches[0].clientY : event.clientY
 
@@ -89,17 +80,14 @@ export function useDraggableFab(options = {}) {
   const stopDrag = () => {
     isDragging.value = false
 
-    // Remove event listeners
     document.removeEventListener('mousemove', onDrag)
     document.removeEventListener('mouseup', stopDrag)
     document.removeEventListener('touchmove', onDrag)
     document.removeEventListener('touchend', stopDrag)
 
-    // Save position to localStorage
     localStorage.setItem(storageKey, JSON.stringify(fabPosition.value))
   }
 
-  // Cleanup function
   const cleanup = () => {
     document.removeEventListener('mousemove', onDrag)
     document.removeEventListener('mouseup', stopDrag)
@@ -107,7 +95,6 @@ export function useDraggableFab(options = {}) {
     document.removeEventListener('touchend', stopDrag)
   }
 
-  // Handle window resize to keep FAB in bounds
   const handleResize = () => {
     const currentPos = fabPosition.value
     const maxX = window.innerWidth - fabSize
@@ -118,7 +105,6 @@ export function useDraggableFab(options = {}) {
         x: Math.min(currentPos.x, maxX),
         y: Math.min(currentPos.y, maxY)
       }
-      // Save updated position
       localStorage.setItem(storageKey, JSON.stringify(fabPosition.value))
     }
   }

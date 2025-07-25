@@ -5,12 +5,11 @@ export function useEventDragDrop() {
   const dragState = reactive({
     isDragging: false,
     draggedEvent: null,
-    dragType: null, // 'move', 'resize-start', 'resize-end'
+    dragType: null,
     originalEvent: null,
     ghostElement: null
   })
 
-  // Visual feedback state
   const dropZoneState = reactive({
     activeDropZone: null,
     validDropZone: false
@@ -49,17 +48,15 @@ export function useEventDragDrop() {
       opacity: 0.8;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     `
-    
+
     document.body.appendChild(ghost)
     dragState.ghostElement = ghost
 
-    // Position ghost element
     if (nativeEvent) {
       updateGhostPosition(nativeEvent)
     }
   }
 
-  // Update ghost element position
   const updateGhostPosition = (nativeEvent) => {
     if (dragState.ghostElement) {
       dragState.ghostElement.style.left = (nativeEvent.clientX + 10) + 'px'
@@ -67,14 +64,11 @@ export function useEventDragDrop() {
     }
   }
 
-  // Handle drag over calendar days
   const handleDragOver = (nativeEvent) => {
     nativeEvent.preventDefault()
-    
-    // Update ghost position
+
     updateGhostPosition(nativeEvent)
 
-    // Find drop zone
     const dropZone = nativeEvent.target.closest('.calendar-day')
     if (dropZone) {
       const dateAttr = dropZone.getAttribute('data-date')
@@ -87,15 +81,12 @@ export function useEventDragDrop() {
     }
   }
 
-  // Update drop zone visual feedback
   const updateDropZone = (date, element) => {
-    // Clear previous drop zone
     clearDropZone()
 
     dropZoneState.activeDropZone = date
     dropZoneState.validDropZone = isValidDropZone(date)
 
-    // Add visual feedback class
     element.classList.add('drop-zone-active')
     if (dropZoneState.validDropZone) {
       element.classList.add('drop-zone-valid')
@@ -104,7 +95,6 @@ export function useEventDragDrop() {
     }
   }
 
-  // Clear drop zone visual feedback
   const clearDropZone = () => {
     document.querySelectorAll('.drop-zone-active').forEach(el => {
       el.classList.remove('drop-zone-active', 'drop-zone-valid', 'drop-zone-invalid')
@@ -113,29 +103,23 @@ export function useEventDragDrop() {
     dropZoneState.validDropZone = false
   }
 
-  // Check if drop zone is valid
   const isValidDropZone = (dropDate) => {
     if (!dragState.draggedEvent || !dropDate) return false
 
     const eventStart = new Date(dragState.originalEvent.start)
     const eventEnd = new Date(dragState.originalEvent.end || dragState.originalEvent.start)
-    
+
     eventStart.setHours(0, 0, 0, 0)
     eventEnd.setHours(0, 0, 0, 0)
     dropDate.setHours(0, 0, 0, 0)
 
     switch (dragState.dragType) {
       case 'move':
-        return true // Can move to any date
-      
+        return true
       case 'resize-start':
-        // Start date can't be after end date
         return dropDate.getTime() <= eventEnd.getTime()
-      
       case 'resize-end':
-        // End date can't be before start date
         return dropDate.getTime() >= eventStart.getTime()
-      
       default:
         return false
     }
@@ -161,32 +145,26 @@ export function useEventDragDrop() {
   const calculateNewEventDates = (dropDate) => {
     const originalStart = new Date(dragState.originalEvent.start)
     const originalEnd = new Date(dragState.originalEvent.end || dragState.originalEvent.start)
-    
+
     let newStart, newEnd
 
     switch (dragState.dragType) {
       case 'move':
-        // Calculate duration and move entire event
         const duration = originalEnd.getTime() - originalStart.getTime()
         newStart = new Date(dropDate)
         newStart.setHours(originalStart.getHours(), originalStart.getMinutes())
         newEnd = new Date(newStart.getTime() + duration)
         break
-
       case 'resize-start':
-        // Change start date, keep end date
         newStart = new Date(dropDate)
         newStart.setHours(originalStart.getHours(), originalStart.getMinutes())
         newEnd = new Date(originalEnd)
         break
-
       case 'resize-end':
-        // Keep start date, change end date
         newStart = new Date(originalStart)
         newEnd = new Date(dropDate)
         newEnd.setHours(originalEnd.getHours(), originalEnd.getMinutes())
         break
-
       default:
         return null
     }

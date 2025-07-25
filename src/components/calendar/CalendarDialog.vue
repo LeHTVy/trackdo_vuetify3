@@ -11,7 +11,7 @@
       <v-card-title class="dialog-header pa-6">
         <div class="d-flex align-center">
           <v-avatar
-            :color="$vuetify.theme.current.colors.primary"
+            :color="getPrimaryColor()"
             size="40"
             class="mr-4 header-avatar"
           >
@@ -20,7 +20,7 @@
           <div>
             <h2 class="text-h5 font-weight-bold text-white mb-1">{{ formTitle }}</h2>
             <p class="text-body-2 text-white opacity-90 mb-0">
-              {{ editedIndex === -1 ? 'Create a new calendar event' : 'Update event details' }}
+              {{ editedIndex === -1 ? 'Create new event in calendar' : 'Update event information' }}
             </p>
           </div>
         </div>
@@ -35,7 +35,7 @@
                 v-model="editedEvent.title"
                 label="Event Title"
                 variant="outlined"
-                :color="$vuetify.theme.current.colors.primary"
+                :color="getPrimaryColor()"
                 required
                 :rules="[v => !!v || 'Event title is required']"
                 prepend-inner-icon="mdi-format-title"
@@ -50,7 +50,7 @@
                 v-model="editedEvent.description"
                 label="Event Description"
                 variant="outlined"
-                :color="$vuetify.theme.current.colors.primary"
+                :color="getPrimaryColor()"
                 rows="3"
                 auto-grow
                 prepend-inner-icon="mdi-text"
@@ -66,7 +66,7 @@
                 label="Start Date"
                 type="date"
                 variant="outlined"
-                :color="$vuetify.theme.current.colors.primary"
+                :color="getPrimaryColor()"
                 required
                 prepend-inner-icon="mdi-calendar-start"
                 class="input-field"
@@ -80,7 +80,7 @@
                 label="End Date"
                 type="date"
                 variant="outlined"
-                :color="$vuetify.theme.current.colors.primary"
+                :color="getPrimaryColor()"
                 required
                 prepend-inner-icon="mdi-calendar-end"
                 class="input-field"
@@ -97,7 +97,7 @@
                 item-value="value"
                 label="Event Type"
                 variant="outlined"
-                :color="$vuetify.theme.current.colors.primary"
+                :color="getPrimaryColor()"
                 prepend-inner-icon="mdi-tag"
                 class="input-field"
                 hide-details="auto"
@@ -131,7 +131,7 @@
                 item-value="value"
                 label="Priority"
                 variant="outlined"
-                :color="$vuetify.theme.current.colors.primary"
+                :color="getPrimaryColor()"
                 prepend-inner-icon="mdi-flag"
                 class="input-field"
                 hide-details="auto"
@@ -166,7 +166,7 @@
                 item-value="value"
                 label="Event Color"
                 variant="outlined"
-                :color="$vuetify.theme.current.colors.primary"
+                :color="getPrimaryColor()"
                 prepend-inner-icon="mdi-palette"
                 class="input-field"
                 hide-details="auto"
@@ -204,7 +204,7 @@
           color="grey-darken-1"
           variant="outlined"
           @click="closeDialog"
-          :disabled="loading"
+          :disabled="actionLoading"
           class="action-btn mr-3"
           size="large"
         >
@@ -212,11 +212,11 @@
           Cancel
         </v-btn>
         <v-btn
-          :color="$vuetify.theme.current.colors.primary"
+          :color="getPrimaryColor()"
           variant="elevated"
           @click="saveEvent"
-          :disabled="!editedEvent.title || loading"
-          :loading="loading"
+          :disabled="!isFormValid || actionLoading"
+          :loading="actionLoading"
           class="action-btn"
           size="large"
         >
@@ -235,15 +235,34 @@
     @edit-event="editEvent"
     @close="detailsDialog = false"
   />
+
+  <!-- Confirm Modal Component -->
+  <ConfirmModal
+    v-model="confirmModalOpen"
+    :type="confirmModalConfig.type"
+    :title="confirmModalConfig.title"
+    :message="confirmModalConfig.message"
+    :details="confirmModalConfig.details"
+    :confirm-text="confirmModalConfig.confirmText"
+    :cancel-text="confirmModalConfig.cancelText"
+    :loading="confirmModalLoading"
+    @confirm="confirmModalConfirm"
+    @cancel="confirmModalCancel"
+  />
 </template>
 
 <script>
 import EventDetailsDialog from './EventDetailsDialog.vue'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
+import { useCalendarDialog } from '@/composables/CalendarDialog/useCalendarDialog'
+import { useEventActions } from '@/composables/CalendarDialog/useEventActions'
+import { useEventsStore } from '@/stores/events'
 
 export default {
   name: 'CalendarDialog',
   components: {
-    EventDetailsDialog
+    EventDetailsDialog,
+    ConfirmModal
   },
   props: {
     modelValue: {
@@ -272,151 +291,122 @@ export default {
     }
   },
   emits: ['update:modelValue', 'update:detailsModelValue', 'save-event', 'delete-event', 'edit-event', 'close'],
-  data() {
+  setup(props, { emit }) {
+    const eventsStore = useEventsStore()
+
+    // Using composables
+    const {
+      // Theme colors
+      getPrimaryColor,
+      getSecondaryColor,
+      getAccentColor,
+      getErrorColor,
+      getWarningColor,
+      getInfoColor,
+      getSuccessColor,
+
+      // Form state
+      editedEvent,
+      dialog,
+      detailsDialog,
+      formTitle,
+      isFormValid,
+
+      // Options
+      eventTypes,
+      priorityLevels,
+      eventColors,
+
+      // Form methods
+      validateForm,
+      getFormData,
+
+      // Dialog methods
+      closeDialog,
+      openDialog
+    } = useCalendarDialog(props, emit)
+
+    const {
+      loading: actionLoading,
+      error: actionError,
+      confirmModalOpen,
+      confirmModalLoading,
+      confirmModalConfig,
+      confirmModalConfirm,
+      confirmModalCancel,
+      saveEvent: saveEventAction,
+      deleteEvent: deleteEventAction,
+      editEvent: editEventAction
+    } = useEventActions(eventsStore)
+
+    const saveEvent = async () => {
+      const validation = validateForm()
+
+      if (!validation.isValid) {
+        console.error('Validation errors:', validation.errors)
+        return
+      }
+      const eventData = getFormData()
+      emit('save-event', eventData)
+    }
+
+    const deleteEvent = async (event = null) => {
+      console.log('CalendarDialog deleteEvent called with:', event)
+      const result = await deleteEventAction(event)
+      console.log('Delete result:', result)
+
+      if (result.success) {
+        detailsDialog.value = false
+        emit('delete-event', event || props.selectedEvent)
+      } else {
+        console.log('Delete event failed:', result.error)
+      }
+    }
+
+    const editEvent = (event) => {
+      console.log('CalendarDialog editEvent called with:', event)
+      detailsDialog.value = false
+      emit('edit-event', event)
+    }
+
     return {
-      editedEvent: {
-        title: '',
-        description: '',
-        start: new Date().toISOString().substr(0, 10),
-        end: new Date().toISOString().substr(0, 10),
-        color: '#1976D2',
-        type: 'meeting',
-        priority: 'Medium',
-      },
-      eventTypes: [
-        { text: 'Meeting', value: 'meeting', icon: 'mdi-account-group', color: '#1976D2' },
-        { text: 'Work', value: 'work', icon: 'mdi-briefcase', color: '#2196F3' },
-        { text: 'Social', value: 'social', icon: 'mdi-account-heart', color: '#E91E63' },
-        { text: 'Milestone', value: 'milestone', icon: 'mdi-flag-checkered', color: '#4CAF50' },
-        { text: 'Deadline', value: 'deadline', icon: 'mdi-clock-alert', color: '#F44336' },
-      ],
-      priorityLevels: [
-        { text: 'Low', value: 'Low', color: '#4CAF50' },
-        { text: 'Medium', value: 'Medium', color: '#FF9800' },
-        { text: 'High', value: 'High', color: '#F44336' },
-      ],
-      eventColors: [
-        { text: 'Blue', value: '#1976D2' },
-        { text: 'Green', value: '#388E3C' },
-        { text: 'Orange', value: '#F57C00' },
-        { text: 'Red', value: '#D32F2F' },
-        { text: 'Purple', value: '#7B1FA2' },
-        { text: 'Teal', value: '#00796B' },
-        { text: 'Pink', value: '#C2185B' },
-        { text: 'Indigo', value: '#303F9F' },
-      ]
-    }
-  },
-  computed: {
-    dialog: {
-      get() {
-        return this.modelValue
-      },
-      set(value) {
-        this.$emit('update:modelValue', value)
-      }
-    },
-    detailsDialog: {
-      get() {
-        return this.detailsModelValue
-      },
-      set(value) {
-        this.$emit('update:detailsModelValue', value)
-      }
-    },
-    formTitle() {
-      return this.editedIndex === -1 ? 'New Event' : 'Edit Event'
-    }
-  },
-  watch: {
-    event: {
-      handler(newEvent) {
-        // Map old field names to new ones for backward compatibility
-        this.editedEvent = {
-          title: newEvent.title || newEvent.name || '',
-          description: newEvent.description || newEvent.details || '',
-          start: newEvent.start || new Date().toISOString().substr(0, 10),
-          end: newEvent.end || new Date().toISOString().substr(0, 10),
-          color: newEvent.color || '#1976D2',
-          type: newEvent.type || 'meeting',
-          priority: newEvent.priority || 'Medium',
-        }
-      },
-      deep: true,
-      immediate: true
-    },
-    editedIndex: {
-      handler(newIndex) {
-        // When editedIndex changes to edit mode and we have event data, update the form
-        if (newIndex !== -1 && this.event && Object.keys(this.event).length > 0) {
-          this.editedEvent = {
-            title: this.event.title || this.event.name || '',
-            description: this.event.description || this.event.details || '',
-            start: this.event.start || new Date().toISOString().substr(0, 10),
-            end: this.event.end || new Date().toISOString().substr(0, 10),
-            color: this.event.color || '#1976D2',
-            type: this.event.type || 'meeting',
-            priority: this.event.priority || 'Medium',
-          }
-        }
-      },
-      immediate: true
-    }
-  },
-  methods: {
-    closeDialog() {
-      this.dialog = false
-      this.resetForm()
-      this.$emit('close')
-    },
-    resetForm() {
-      this.editedEvent = {
-        title: '',
-        description: '',
-        start: new Date().toISOString().substr(0, 10),
-        end: new Date().toISOString().substr(0, 10),
-        color: '#1976D2',
-        type: 'meeting',
-        priority: 'Medium',
-      }
-    },
-    saveEvent() {
-      // Validate dates
-      if (new Date(this.editedEvent.end) < new Date(this.editedEvent.start)) {
-        this.editedEvent.end = this.editedEvent.start
-      }
+      // Theme colors
+      getPrimaryColor,
+      getSecondaryColor,
+      getAccentColor,
+      getErrorColor,
+      getWarningColor,
+      getInfoColor,
+      getSuccessColor,
 
-      // Ensure we have the correct field mapping for backend
-      const eventData = {
-        title: this.editedEvent.title,
-        name: this.editedEvent.title, // Add name field for backward compatibility
-        description: this.editedEvent.description,
-        start: this.editedEvent.start,
-        end: this.editedEvent.end,
-        color: this.editedEvent.color,
-        type: this.editedEvent.type,
-        priority: this.editedEvent.priority,
-      }
+      // Form state
+      editedEvent,
+      dialog,
+      detailsDialog,
+      formTitle,
+      isFormValid,
 
-      // Add ID if in edit mode
-      if (this.editedIndex !== -1 && this.event) {
-        eventData.id = this.event.id || this.event._id
-      }
+      // Options
+      eventTypes,
+      priorityLevels,
+      eventColors,
 
-      this.$emit('save-event', eventData)
-      this.closeDialog()
-    },
-    deleteEvent() {
-      if (confirm('Are you sure you want to delete this event?')) {
-        console.log('Selected event for deletion:', this.selectedEvent)
-        console.log('Event ID:', this.selectedEvent?.id || this.selectedEvent?._id)
-        this.$emit('delete-event', this.selectedEvent)
-        this.detailsDialog = false
-      }
-    },
-    editEvent() {
-      this.$emit('edit-event', this.selectedEvent)
-      this.detailsDialog = false
+      // Loading states
+      actionLoading,
+      actionError,
+
+      // Confirm modal properties
+      confirmModalOpen,
+      confirmModalLoading,
+      confirmModalConfig,
+      confirmModalConfirm,
+      confirmModalCancel,
+
+      // Methods
+      closeDialog,
+      saveEvent,
+      deleteEvent,
+      editEvent
     }
   }
 }

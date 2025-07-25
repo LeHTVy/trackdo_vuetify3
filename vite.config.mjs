@@ -78,7 +78,7 @@ export default defineConfig({
     ],
   },
   server: {
-    host: '192.168.1.73', 
+    host: 'localhost', 
     port: 5173,
   },
   css: {

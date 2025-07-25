@@ -7,7 +7,7 @@
             <v-icon
               icon="mdi-calendar-month"
               size="32"
-              :color="$vuetify.theme.current.colors.primary"
+              :color="getPrimaryColor()"
               class="mr-3"
             ></v-icon>
             <div class="text-center">
@@ -26,7 +26,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { toRef } from 'vue'
+import { useCalendarHeader } from '@/composables/CalendarHeader/useCalendarHeader'
+import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
 
 const props = defineProps({
   currentDate: {
@@ -35,30 +37,8 @@ const props = defineProps({
   }
 })
 
-const getCurrentDateInfo = () => {
-  const date = props.currentDate
-  return {
-    year: date.getFullYear(),
-    month: date.getMonth(),
-    monthName: date.toLocaleDateString('en-US', { month: 'long' }),
-    day: date.getDate(),
-    fullDate: date.toLocaleDateString('en-US')
-  }
-}
-
-const currentMonthYear = computed(() => {
-  const dateInfo = getCurrentDateInfo()
-  return `${dateInfo.monthName} ${dateInfo.year}`
-})
-
-const todayFormatted = computed(() => {
-  const today = new Date()
-  return today.toLocaleDateString('en-US', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long'
-  })
-})
+const { currentMonthYear, todayFormatted } = useCalendarHeader(toRef(props, 'currentDate'))
+const { getPrimaryColor } = useThemeColors('header')
 </script>
 
 <style scoped>
@@ -75,7 +55,7 @@ const todayFormatted = computed(() => {
 
 .title-text {
   color: rgb(var(--v-theme-title-text));
-  background: linear-gradient(135deg, #232e3e 0%, #fed44f 50%, #232e3e 100%);
+  background:  rgb(var(--v-theme-primary)) 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
