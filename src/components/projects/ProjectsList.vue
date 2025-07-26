@@ -29,11 +29,11 @@
                 class="project-card"
                 :class="`project-card--${project.status.toLowerCase().replace(' ', '-')}`"
                 elevation="0"
-                @click="$emit('view-project', project)"
+                @click="showProjectDetails(project)"
               >
               <div class="project-card-header">
                 <div class="project-info">
-                  <h3 class="project-name">{{ project.name }}</h3>
+                  <h3 class="project-name">{{ project.title || project.name }}</h3>
                   <v-chip
                     :color="getStatusColor(project.status)"
                     size="small"
@@ -60,7 +60,7 @@
                         Edit
                       </v-list-item-title>
                     </v-list-item>
-                    <v-list-item @click="$emit('delete-project', project.id)">
+                    <v-list-item @click="$emit('delete-project', project._id || project.id)">
                       <v-list-item-title>
                         <v-icon start>mdi-delete</v-icon>
                         Delete
@@ -90,11 +90,11 @@
 
               <div class="project-dates" v-if="project.startDate || project.endDate">
                 <div class="date-item" v-if="project.startDate">
-                  <v-icon size="16" color="grey">mdi-calendar-start</v-icon>
+                  <v-icon size="16" color="primary">mdi-calendar-start</v-icon>
                   <span>{{ formatDate(project.startDate) }}</span>
                 </div>
                 <div class="date-item" v-if="project.endDate">
-                  <v-icon size="16" color="grey">mdi-calendar-end</v-icon>
+                  <v-icon size="16" color="primary">mdi-calendar-end</v-icon>
                   <span>{{ formatDate(project.endDate) }}</span>
                 </div>
               </div>
@@ -175,10 +175,23 @@
       </v-col>
     </v-row>
   </v-container>
+
+  <!-- Project Details Dialog -->
+  <ProjectDetails
+    v-model="projectDetailsDialog"
+    :selected-project="selectedProject"
+    @edit-project="handleEditProject"
+    @delete-project="handleDeleteProject"
+    @close="closeProjectDetails"
+  />
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed } from 'vue'
+  import { useDialogManager } from '@/composables/common/useDialogManager'
+  import { useProjectFilters } from '@/composables/ProjectCommon/useProjectFilters'
+  import { useProjectFormatting } from '@/composables/ProjectCommon/useProjectFormatting'
+  import ProjectDetails from './ProjectDetails.vue'
 
   const props = defineProps({
     projects: {
@@ -198,38 +211,48 @@
     'view-project',
   ])
 
-  const filter = ref('all')
+  // Convert props to reactive ref for composables
+  const projectsRef = computed(() => props.projects)
 
-  const filteredProjects = computed(() => {
-    if (filter.value === 'all') {
-      return props.projects
-    }
-    return props.projects.filter(project => project.status === filter.value)
-  })
+  // Use composables
+  const {
+    projectDetailsDialog,
+    selectedProject,
+    showProjectDetails,
+    closeProjectDetailsDialog
+  } = useDialogManager()
 
-  const overallProgress = computed(() => {
-    if (props.projects.length === 0) return 0
-    const totalProgress = props.projects.reduce((sum, project) => sum + (project.progress || 0), 0)
-    return Math.round(totalProgress / props.projects.length)
-  })
+  const {
+    filter,
+    filteredProjects
+  } = useProjectFilters(projectsRef)
 
-  const getStatusColor = (status) => {
-    const statusColors = {
-      'Active': 'project-active',
-      'Completed': 'project-completed',
-      'On Hold': 'project-onhold',
-      'Cancelled': 'error'
-    }
-    return statusColors[status] || 'grey'
+  const {
+    formatDate,
+    getStatusColor,
+    overallProgress
+  } = useProjectFormatting(projectsRef)
+
+  // Project details dialog handlers
+  const handleEditProject = (project) => {
+    closeProjectDetails()
+    emit('edit-project', project)
   }
 
-  const formatDate = (date) => {
-    if (!date) return ''
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
+  const handleDeleteProject = (projectIdOrProject) => {
+    closeProjectDetails()
+
+    const projectId = typeof projectIdOrProject === 'string' 
+      ? projectIdOrProject 
+      : (projectIdOrProject._id || projectIdOrProject.id)
+    
+    console.log('ProjectsList handleDeleteProject - ID:', projectId)
+    emit('delete-project', projectId)
+  }
+
+  const closeProjectDetails = () => {
+    projectDetailsDialog.value = false
+    selectedProject.value = null
   }
 </script>
 
@@ -359,7 +382,8 @@
   align-items: center;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: rgb(var(--v-theme-on-surface-variant));
+  color: rgb(var(--v-theme-on-surface));
+  font-weight: 500;
 }
 
 .project-budget {

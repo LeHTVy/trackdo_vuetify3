@@ -44,8 +44,8 @@ export const useProjectsStore = defineStore('projects', () => {
     if (filters.value.search) {
       const search = filters.value.search.toLowerCase()
       filtered = filtered.filter(project =>
-        project.name.toLowerCase().includes(search)
-        || project.description.toLowerCase().includes(search),
+        (project.title || project.name || '').toLowerCase().includes(search)
+        || (project.description || '').toLowerCase().includes(search),
       )
     }
 
@@ -117,7 +117,7 @@ export const useProjectsStore = defineStore('projects', () => {
             milestones.push({
               ...milestone,
               projectId: project.id,
-              projectName: project.name,
+              projectName: project.title || project.name,
               projectColor: project.color,
             })
           }
@@ -143,7 +143,7 @@ export const useProjectsStore = defineStore('projects', () => {
       if (project.status === 'Completed') {
         activities.push({
           id: `completed-${project.id}`,
-          text: `Project "${project.name}" has been completed`,
+          text: `Project "${project.title || project.name}" has been completed`,
           time: timeAgo,
           icon: 'mdi-check-circle',
           color: 'success'
@@ -152,7 +152,7 @@ export const useProjectsStore = defineStore('projects', () => {
         if (project.progress > 80) {
           activities.push({
             id: `near-completion-${project.id}`,
-            text: `Project "${project.name}" is ${project.progress}% complete`,
+            text: `Project "${project.title || project.name}" is ${project.progress}% complete`,
             time: timeAgo,
             icon: 'mdi-progress-check',
             color: 'info'
@@ -160,7 +160,7 @@ export const useProjectsStore = defineStore('projects', () => {
         } else if (project.progress > 0) {
           activities.push({
             id: `progress-${project.id}`,
-            text: `Project "${project.name}" progress updated to ${project.progress}%`,
+            text: `Project "${project.title || project.name}" progress updated to ${project.progress}%`,
             time: timeAgo,
             icon: 'mdi-chart-line',
             color: 'primary'
@@ -168,7 +168,7 @@ export const useProjectsStore = defineStore('projects', () => {
         } else {
           activities.push({
             id: `started-${project.id}`,
-            text: `Project "${project.name}" has been started`,
+            text: `Project "${project.title || project.name}" has been started`,
             time: timeAgo,
             icon: 'mdi-play-circle',
             color: 'success'
@@ -177,7 +177,7 @@ export const useProjectsStore = defineStore('projects', () => {
       } else if (project.status === 'On Hold') {
         activities.push({
           id: `hold-${project.id}`,
-          text: `Project "${project.name}" has been put on hold`,
+          text: `Project "${project.title || project.name}" has been put on hold`,
           time: timeAgo,
           icon: 'mdi-pause-circle',
           color: 'warning'
@@ -185,7 +185,7 @@ export const useProjectsStore = defineStore('projects', () => {
       } else if (project.status === 'Planning') {
         activities.push({
           id: `planning-${project.id}`,
-          text: `Project "${project.name}" is in planning phase`,
+          text: `Project "${project.title || project.name}" is in planning phase`,
           time: timeAgo,
           icon: 'mdi-clipboard-text',
           color: 'info'
@@ -193,7 +193,7 @@ export const useProjectsStore = defineStore('projects', () => {
       } else {
         activities.push({
           id: `created-${project.id}`,
-          text: `Project "${project.name}" was created`,
+          text: `Project "${project.title || project.name}" was created`,
           time: timeAgo,
           icon: 'mdi-plus-circle',
           color: 'primary'
@@ -244,8 +244,13 @@ export const useProjectsStore = defineStore('projects', () => {
       const { mongoService } = await import('@/services/mongodb.js')
       const result = await mongoService.projects.getAll()
       if (result.success) {
-        projects.value = result.data
-        console.log('✅ Projects loaded from MongoDB:', result.data.length)
+        // Ensure all projects have both _id and id for compatibility
+        projects.value = result.data.map(project => ({
+          ...project,
+          id: project._id || project.id,
+          _id: project._id || project.id
+        }))
+        console.log('✅ Projects loaded from MongoDB:', projects.value.length)
       } else {
         console.warn('⚠️ Failed to load from MongoDB')
         error.value = result.error
@@ -266,9 +271,15 @@ export const useProjectsStore = defineStore('projects', () => {
       const { mongoService } = await import('@/services/mongodb.js')
       const result = await mongoService.projects.create(projectData)
       if (result.success) {
-        projects.value.push(result.data)
-        console.log('✅ Project created in MongoDB:', result.data)
-        return result.data
+        // Ensure the new project has both _id and id for compatibility
+        const newProject = {
+          ...result.data,
+          id: result.data._id || result.data.id,
+          _id: result.data._id || result.data.id
+        }
+        projects.value.push(newProject)
+        console.log('✅ Project created in MongoDB:', newProject)
+        return newProject
       } else {
         console.error('❌ Failed to create project:', result.error)
         error.value = result.error
@@ -291,12 +302,26 @@ export const useProjectsStore = defineStore('projects', () => {
       const { mongoService } = await import('@/services/mongodb.js')
       const result = await mongoService.projects.update(projectId, updates)
       if (result.success) {
-        const index = projects.value.findIndex(project => project.id === projectId)
+        // Find project by both _id and id to handle MongoDB compatibility
+        const index = projects.value.findIndex(project =>
+          project._id === projectId || project.id === projectId
+        )
         if (index !== -1) {
-          projects.value[index] = result.data
+          // Ensure the updated project has both _id and id for compatibility
+          const updatedProject = {
+            ...result.data,
+            id: result.data._id || result.data.id,
+            _id: result.data._id || result.data.id
+          }
+          projects.value[index] = updatedProject
+          console.log('✅ Project updated in MongoDB:', updatedProject)
+          return updatedProject
+        } else {
+          console.warn('Project not found in local array with ID:', projectId)
+          // If not found locally, refetch all projects to ensure consistency
+          await fetchProjects()
+          return result.data
         }
-        console.log('✅ Project updated in MongoDB:', result.data)
-        return result.data
       } else {
         console.error('❌ Failed to update project:', result.error)
         error.value = result.error
@@ -315,15 +340,22 @@ export const useProjectsStore = defineStore('projects', () => {
     loading.value = true
     error.value = null
 
+    console.log('Store deleteProject - received ID:', projectId)
+
     try {
       const { mongoService } = await import('@/services/mongodb.js')
       const result = await mongoService.projects.delete(projectId)
       if (result.success) {
-        const index = projects.value.findIndex(project => project.id === projectId)
+        // Find project by both _id and id to handle MongoDB compatibility
+        const index = projects.value.findIndex(project =>
+          project._id === projectId || project.id === projectId
+        )
         if (index !== -1) {
           const deletedProject = projects.value.splice(index, 1)[0]
           console.log('✅ Project deleted from MongoDB:', deletedProject)
           return deletedProject
+        } else {
+          console.warn('Project not found in local array with ID:', projectId)
         }
       } else {
         console.error('❌ Failed to delete project:', result.error)

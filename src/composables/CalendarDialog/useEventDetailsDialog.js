@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
-import { useDialogManager } from '@/composables/CalendarCommon/useDialogManager'
+import { useDialogManager } from '@/composables/common/useDialogManager'
 import { useConfirmModal } from '@/composables/common/useConfirmModal'
 
 export function useEventDetailsDialog(props, emit) {

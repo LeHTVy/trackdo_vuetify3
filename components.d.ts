@@ -40,6 +40,7 @@ declare module 'vue' {
     NavBar: typeof import('./src/components/NavBar.vue')['default']
     NavbarFloatingControls: typeof import('./src/components/NavbarFloatingControls.vue')['default']
     NotificationContainer: typeof import('./src/components/common/NotificationContainer.vue')['default']
+    ProjectDetails: typeof import('./src/components/projects/ProjectDetails.vue')['default']
     ProjectDialog: typeof import('./src/components/projects/ProjectDialog.vue')['default']
     ProjectDialogNew: typeof import('./src/components/projects/ProjectDialogNew.vue')['default']
     ProjectProgress: typeof import('./src/components/ProjectProgress.vue')['default']

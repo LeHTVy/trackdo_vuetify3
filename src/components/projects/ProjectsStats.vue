@@ -32,60 +32,23 @@
 
 <script setup>
   import { computed } from 'vue'
+  import { useProjectStats } from '@/composables/ProjectCommon/useProjectStats'
 
   const props = defineProps({
-    totalProjects: {
-      type: Number,
-      default: 0,
-    },
-    activeProjects: {
-      type: Number,
-      default: 0,
-    },
-    completedProjects: {
-      type: Number,
-      default: 0,
-    },
-    onHoldProjects: {
-      type: Number,
-      default: 0,
+    projects: {
+      type: Array,
+      default: () => [],
     },
   })
 
-  const stats = computed(() => [
-    {
-      label: 'Total Projects',
-      value: props.totalProjects,
-      icon: 'mdi-folder-multiple',
-      color: 'primary',
-      type: 'total',
-      progress: 100
-    },
-    {
-      label: 'Active Projects',
-      value: props.activeProjects,
-      icon: 'mdi-play-circle',
-      color: 'project-active',
-      type: 'active',
-      progress: props.totalProjects > 0 ? (props.activeProjects / props.totalProjects) * 100 : 0
-    },
-    {
-      label: 'Completed',
-      value: props.completedProjects,
-      icon: 'mdi-check-circle',
-      color: 'project-completed',
-      type: 'completed',
-      progress: props.totalProjects > 0 ? (props.completedProjects / props.totalProjects) * 100 : 0
-    },
-    {
-      label: 'On Hold',
-      value: props.onHoldProjects,
-      icon: 'mdi-pause-circle',
-      color: 'project-onhold',
-      type: 'onhold',
-      progress: props.totalProjects > 0 ? (props.onHoldProjects / props.totalProjects) * 100 : 0
-    }
-  ])
+  // Convert props to reactive ref for composable
+  const projectsRef = computed(() => props.projects)
+
+  // Use project stats composable
+  const { statsConfig } = useProjectStats(projectsRef)
+
+  // Alias for template compatibility
+  const stats = statsConfig
 </script>
 
 <style scoped>

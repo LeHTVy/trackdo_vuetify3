@@ -103,7 +103,7 @@
 import { useEventsStore } from '@/stores/events.js'
 import { useCalendarNavigation } from '@/composables/CalendarMain/useCalendarNavigation'
 import { useEventFilters } from '@/composables/CalendarCommon/useEventFilters'
-import { useDialogManager } from '@/composables/CalendarCommon/useDialogManager'
+import { useDialogManager } from '@/composables/common/useDialogManager'
 import { useEventForm } from '@/composables/CalendarDialog/useEventForm'
 import { useEventOperations } from '@/composables/CalendarCommon/useEventOperations'
 import { useDraggableFab } from '@/composables/common/useDraggableFab'

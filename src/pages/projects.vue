@@ -4,20 +4,15 @@
     <ProjectsHeader @add-project="showAddDialog = true" />
 
     <!-- Stats Overview -->
-    <ProjectsStats
-      :total-projects="totalProjects"
-      :active-projects="activeProjects"
-      :completed-projects="completedProjects"
-      :on-hold-projects="onHoldProjects"
-    />
+    <ProjectsStats :projects="projects" />
 
     <!-- Main Content -->
     <ProjectsList
       :projects="projects"
       :recent-activities="recentActivities"
       @add-project="showAddDialog = true"
-      @edit-project="editProject"
-      @delete-project="deleteProject"
+      @edit-project="handleEditProject"
+      @delete-project="handleDeleteProject"
       @view-project="viewProject"
     />
 
@@ -25,9 +20,9 @@
     <ProjectDialog
       :show-dialog="showAddDialog"
       :editing-project="editingProject"
-      :initial-data="initialData"
+      :initial-data="getInitialProjectData()"
       @close="closeDialog"
-      @save="saveProject"
+      @save="handleSaveProject"
     />
 
     <!-- Draggable Floating Action Button -->
@@ -48,15 +43,28 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
-  import { useProjectsStore } from '@/stores/projects'
+  import { ref, onMounted } from 'vue'
   import { useDraggableFab } from '@/composables/common/useDraggableFab'
+  import { useProjectOperations } from '@/composables'
   import ProjectsHeader from '@/components/projects/ProjectsHeader.vue'
   import ProjectsStats from '@/components/projects/ProjectsStats.vue'
   import ProjectsList from '@/components/projects/ProjectsList.vue'
   import ProjectDialog from '@/components/projects/ProjectDialog.vue'
 
-  const projectsStore = useProjectsStore()
+  // Use project operations composable
+  const {
+    loading,
+    error,
+    projects,
+    recentActivities,
+    fetchProjects,
+    saveProject,
+    deleteProject,
+    viewProject,
+    getInitialProjectData
+  } = useProjectOperations()
+
+  // Dialog state
   const showAddDialog = ref(false)
   const editingProject = ref(null)
 
@@ -65,61 +73,31 @@
     storageKey: 'projectsFabPosition'
   })
 
-  const projects = computed(() => projectsStore.projects)
-  const totalProjects = computed(() => projects.value.length)
-  const activeProjects = computed(() => projects.value.filter(p => p.status === 'Active').length)
-  const completedProjects = computed(() => projects.value.filter(p => p.status === 'Completed').length)
-  const onHoldProjects = computed(() => projects.value.filter(p => p.status === 'On Hold').length)
-  const recentActivities = computed(() => projectsStore.recentActivities)
-
-  // Initial data for new projects
-  const initialData = computed(() => ({
-    name: '',
-    description: '',
-    status: 'Active',
-    progress: 0,
-    budget: null,
-    startDate: '',
-    endDate: ''
-  }))
-
   // Methods
   const handleNewProject = () => {
     // Only trigger if not dragging
     if (!isDragging.value) {
+      editingProject.value = null
       showAddDialog.value = true
     }
   }
 
-  const viewProject = (project) => {
-    console.log('View project:', project.name)
-  }
-
-  const editProject = (project) => {
+  const handleEditProject = (project) => {
     editingProject.value = project
     showAddDialog.value = true
   }
 
-  const deleteProject = async (projectId) => {
-    if (confirm('Are you sure you want to delete this project?')) {
-      try {
-        await projectsStore.deleteProject(projectId)
-      } catch (error) {
-        console.error('Error deleting project:', error)
-      }
-    }
+  const handleDeleteProject = async (projectId) => {
+    await deleteProject(projectId)
   }
 
-  const saveProject = async (projectData) => {
+  const handleSaveProject = async (projectData) => {
     try {
-      if (editingProject.value) {
-        await projectsStore.updateProject(editingProject.value.id, projectData)
-      } else {
-        await projectsStore.addProject(projectData)
-      }
+      await saveProject(projectData, editingProject.value)
       closeDialog()
     } catch (error) {
       console.error('Error saving project:', error)
+      // Error is already handled in the composable
     }
   }
 
@@ -128,8 +106,9 @@
     editingProject.value = null
   }
 
+  // Initialize data
   onMounted(async () => {
-    await projectsStore.fetchProjects()
+    await fetchProjects()
   })
 </script>
 

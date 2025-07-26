@@ -1,7 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import { useEventForm } from '@/composables/CalendarDialog/useEventForm'
 import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
-import { useDialogManager } from '@/composables/CalendarCommon/useDialogManager'
+import { useDialogManager } from '@/composables/common/useDialogManager'
 
 export function useCalendarDialog(props, emit) {
   const themeColors = useThemeColors('dialog')

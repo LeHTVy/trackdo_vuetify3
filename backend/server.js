@@ -6,6 +6,7 @@ import morgan from 'morgan'
 import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+import { title } from 'process'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -22,10 +23,7 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
-    'http://192.168.1.71:5173',
-    /^http:\/\/192\.168\.\d+\.\d+:5173$/,
-    /^http:\/\/0\.0\.0\.0:5173$/,
-    /^http:\/\/192\.168\.\d+\.\d+:3000$/
+    process.env.CORS_ORIGIN || 'http://localhost:5173'
   ],
   credentials: true
 }))
@@ -45,17 +43,25 @@ const connectDB = async () => {
 
 // MongoDB Schemas
 const ProjectSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  title: { type: String, required: true },
   description: String,
   status: { type: String, enum: ['Active', 'Completed', 'On Hold', 'Cancelled'], default: 'Active' },
   progress: { type: Number, default: 0 },
-  dueDate: Date,
+  startDate: Date,
+  endDate: Date,
+  dueDate: Date, // Keep for backward compatibility
+  budget: Number,
+  priority: { type: String, enum: ['Low', 'Medium', 'High', 'Critical'], default: 'Medium' },
+  category: { type: String, enum: ['Web Development', 'Mobile App', 'Data Science', 'DevOps', 'Design', 'Marketing', 'Research', 'Development', 'Other'], default: 'Other' },
   teamSize: Number,
   team: [{
     id: Number,
+    name: String,
     initials: String,
-    color: String
+    color: String,
+    role: String
   }],
+  teamMembers: [String], // Array of team member names for easier input
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 })
@@ -159,10 +165,20 @@ app.put('/api/projects/:id', async (req, res) => {
 
 app.delete('/api/projects/:id', async (req, res) => {
   try {
-    const project = await Project.findByIdAndDelete(req.params.id)
+    const projectId = req.params.id
+    console.log('Backend DELETE - received project ID:', projectId)
+
+    if (!projectId || projectId === 'undefined') {
+      return res.status(400).json({ message: 'Invalid project ID provided' })
+    }
+
+    const project = await Project.findByIdAndDelete(projectId)
     if (!project) return res.status(404).json({ message: 'Project not found' })
+
+    console.log('✅ Project deleted successfully:', project._id)
     res.json({ message: 'Project deleted successfully' })
   } catch (error) {
+    console.error('❌ Error deleting project:', error)
     res.status(500).json({ message: error.message })
   }
 })

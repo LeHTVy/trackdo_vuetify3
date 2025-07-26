@@ -119,7 +119,7 @@
 
   const projectOptions = computed(() => {
     return projectsStore.projects.map(project => ({
-      title: project.name,
+      title: project.title || project.name,
       value: project.id,
     }))
   })

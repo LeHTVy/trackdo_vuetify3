@@ -43,6 +43,7 @@ export default createVuetify({
           // Title and subtitle colors
           'title-text': '#232e3e',
           'subtitle-text': '#5a6c7d',
+          'project-font': '#fed44f',
         },
       },
       dark: {
@@ -75,6 +76,7 @@ export default createVuetify({
           // Title and subtitle colors for dark mode
           'title-text': '#fed44f',
           'subtitle-text': '#cbd5e1',
+          'project-font': '#343128',
         },
       },
     },

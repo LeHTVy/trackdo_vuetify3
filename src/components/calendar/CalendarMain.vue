@@ -190,7 +190,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { useDialogManager } from '@/composables/CalendarCommon/useDialogManager'
+import { useDialogManager } from '@/composables/common/useDialogManager'
 import { useEventFilters } from '@/composables/CalendarCommon/useEventFilters'
 import { useCalendarEvents } from '@/composables/CalendarCommon/useCalendarEvents'
 import { useEventDragDrop } from '@/composables/CalendarMain/useEventDragDrop'
