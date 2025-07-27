@@ -15,15 +15,19 @@ export const useTasksStore = defineStore('tasks', () => {
   const totalTasks = computed(() => tasks.value.length)
 
   const completedTasks = computed(() =>
-    tasks.value.filter(task => task.completed),
+    tasks.value.filter(task => task.status === 'completed'),
+  )
+
+  const inProgressTasks = computed(() =>
+    tasks.value.filter(task => task.status === 'in-progress'),
   )
 
   const pendingTasks = computed(() =>
-    tasks.value.filter(task => !task.completed && !isOverdue(task)),
+    tasks.value.filter(task => task.status === 'todo'),
   )
 
   const overdueTasks = computed(() =>
-    tasks.value.filter(task => !task.completed && isOverdue(task)),
+    tasks.value.filter(task => task.status !== 'completed' && isOverdue(task)),
   )
 
   const filteredTasks = computed(() => {
@@ -32,15 +36,19 @@ export const useTasksStore = defineStore('tasks', () => {
     if (filters.value.status !== 'All') {
       switch (filters.value.status) {
         case 'Completed': {
-          filtered = filtered.filter(task => task.completed)
+          filtered = filtered.filter(task => task.status === 'completed')
+          break
+        }
+        case 'In Progress': {
+          filtered = filtered.filter(task => task.status === 'in-progress')
           break
         }
         case 'Pending': {
-          filtered = filtered.filter(task => !task.completed && !isOverdue(task))
+          filtered = filtered.filter(task => task.status === 'todo')
           break
         }
         case 'Overdue': {
-          filtered = filtered.filter(task => !task.completed && isOverdue(task))
+          filtered = filtered.filter(task => task.status !== 'completed' && isOverdue(task))
           break
         }
       }
@@ -68,11 +76,12 @@ export const useTasksStore = defineStore('tasks', () => {
   })
 
   const taskStats = computed(() => ({
-    total: totalTasks.value,
+    total: totalTasks.value.length,
     completed: completedTasks.value.length,
     pending: pendingTasks.value.length,
+    'in-progress': inProgressTasks.value.length,
     overdue: overdueTasks.value.length,
-    completionRate: totalTasks.value > 0 ? Math.round((completedTasks.value.length / totalTasks.value) * 100) : 0,
+    completionRate: totalTasks.value.length > 0 ? Math.round((completedTasks.value.length / totalTasks.value.length) * 100) : 0,
     totalEstimatedHours: tasks.value.reduce((sum, task) => sum + (task.estimatedHours || 0), 0),
     completedHours: completedTasks.value.reduce((sum, task) => sum + (task.estimatedHours || 0), 0),
   }))
@@ -197,7 +206,7 @@ export const useTasksStore = defineStore('tasks', () => {
   }
 
   const toggleTaskCompletion = taskId => {
-    const task = tasks.value.find(task => task.id === taskId)
+    const task = tasks.value.find(task => task._id === taskId)
     if (task) {
       task.completed = !task.completed
       task.updatedAt = new Date().toISOString()
@@ -220,7 +229,7 @@ export const useTasksStore = defineStore('tasks', () => {
   }
 
   const getTaskById = taskId => {
-    return tasks.value.find(task => task.id === taskId)
+    return tasks.value.find(task => task._id === taskId)
   }
 
   const getTasksByPriority = priority => {
@@ -261,6 +270,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
     totalTasks,
     completedTasks,
+    inProgressTasks,
     pendingTasks,
     overdueTasks,
     filteredTasks,

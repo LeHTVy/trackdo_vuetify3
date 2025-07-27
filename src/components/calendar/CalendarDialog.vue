@@ -88,6 +88,33 @@
               ></v-text-field>
             </v-col>
 
+            <!-- Time Fields -->
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="editedEvent.startTime"
+                label="Start Time"
+                type="time"
+                variant="outlined"
+                :color="getPrimaryColor()"
+                prepend-inner-icon="mdi-clock-start"
+                class="input-field"
+                hide-details="auto"
+              ></v-text-field>
+            </v-col>
+
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="editedEvent.endTime"
+                label="End Time"
+                type="time"
+                variant="outlined"
+                :color="getPrimaryColor()"
+                prepend-inner-icon="mdi-clock-end"
+                class="input-field"
+                hide-details="auto"
+              ></v-text-field>
+            </v-col>
+
             <!-- Event Type & Priority -->
             <v-col cols="12" sm="6">
               <v-select
@@ -241,10 +268,7 @@
     v-model="confirmModalOpen"
     :type="confirmModalConfig.type"
     :title="confirmModalConfig.title"
-    :message="confirmModalConfig.message"
-    :details="confirmModalConfig.details"
-    :confirm-text="confirmModalConfig.confirmText"
-    :cancel-text="confirmModalConfig.cancelText"
+    :details="selectedEvent?.title ? `Event: ${selectedEvent.title}` : ''"
     :loading="confirmModalLoading"
     @confirm="confirmModalConfirm"
     @cancel="confirmModalCancel"

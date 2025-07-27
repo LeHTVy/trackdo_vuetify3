@@ -95,3 +95,34 @@ export function useProject() {
   }
 }
 
+// Task Common composables
+export { useTaskColors } from './TaskCommon/useTaskColors.js'
+export { useTaskFormatting } from './TaskCommon/useTaskFormatting.js'
+export { useTaskFilters } from './TaskCommon/useTaskFilters.js'
+export { useTaskValidation } from './TaskCommon/useTaskValidation.js'
+export { useTaskProgress } from './TaskCommon/useTaskProgress.js'
+export { useTaskInsights } from './TaskCommon/useTaskInsights.js'
+export { useTaskCompletion } from './TaskCommon/useTaskCompletion.js'
+
+// Combined composable for task functionality
+export function useTask() {
+  const colors = useTaskColors()
+  const formatting = useTaskFormatting()
+  const filters = useTaskFilters()
+  const validation = useTaskValidation()
+
+  return {
+    // Colors
+    ...colors,
+
+    // Formatting
+    ...formatting,
+
+    // Filters (with prefix to avoid conflicts)
+    taskFilters: filters,
+
+    // Validation
+    ...validation
+  }
+}
+

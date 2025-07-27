@@ -12,6 +12,7 @@ export default createVuetify({
         colors: {
           'primary': '#232e3e',
           'secondary': '#FFC107',
+          'avatar-bg': '#FFC107',
           'accent': '#2196F3',
           'error': '#F44336',
           'warning': '#FF9800',
@@ -44,12 +45,24 @@ export default createVuetify({
           'title-text': '#232e3e',
           'subtitle-text': '#5a6c7d',
           'project-font': '#fed44f',
+          'task-font': '#fed44f',
+          // Task stats colors
+          'task-stats-value': '#232e3e',
+          'task-stats-value-hover': '#1a252f',
+          'task-stats-label': '#FFC107',
+          'task-stats-label-hover': '#4a5568',
+          // Task card colors
+          'task-card-bg': '#FFFFFF',
+          'task-card-hover': '#F8FAFC',
+          'task-progress-bg': '#F1F5F9',
+          'task-header': '#2a416d',
         },
       },
       dark: {
         colors: {
           'primary': '#fed44f',
           'secondary': '#647c84',
+          'avatar-bg': '#343128',
           'accent': '#FF9800',
           'error': '#F44336',
           'warning': '#FF9800',
@@ -77,6 +90,16 @@ export default createVuetify({
           'title-text': '#fed44f',
           'subtitle-text': '#cbd5e1',
           'project-font': '#343128',
+          'task-font': '#343128',
+          // Task stats colors for dark mode
+          'task-stats-value': '#fed44f',
+          'task-stats-value-hover': '#ffed4a',
+          'task-stats-label': '#212121',
+          'task-stats-label-hover': '#e2e8f0',
+          // Task card colors for dark mode
+          'task-card-hover': '#334155',
+          'task-progress-bg': '#2196f3',
+          'task-header': '#fed44f',
         },
       },
     },

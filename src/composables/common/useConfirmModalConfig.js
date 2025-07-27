@@ -58,7 +58,10 @@ export function useConfirmModalConfig(type, title, message, confirmText) {
     confirmText.value || defaultConfirmTexts[type.value] || 'Confirm'
   )
 
-  const confirmVariant = computed(() => 'flat')
+  const confirmVariant = computed(() => {
+    // Use elevated variant for better text visibility
+    return type.value === 'delete' ? 'elevated' : 'flat'
+  })
 
   return {
     icon,

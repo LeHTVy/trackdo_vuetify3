@@ -14,7 +14,7 @@
               <v-avatar
                 size="64"
                 class="header-avatar"
-                color="secondary"
+                color="avatar-bg"
                 elevation="8"
               >
                 <v-icon icon="mdi-folder-multiple" size="32" color="primary"></v-icon>

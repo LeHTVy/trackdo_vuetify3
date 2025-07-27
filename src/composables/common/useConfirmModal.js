@@ -1,4 +1,4 @@
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useConfirmModalConfig } from './useConfirmModalConfig'
 
 export function useConfirmModal() {

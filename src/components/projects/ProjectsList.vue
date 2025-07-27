@@ -242,10 +242,10 @@
   const handleDeleteProject = (projectIdOrProject) => {
     closeProjectDetails()
 
-    const projectId = typeof projectIdOrProject === 'string' 
-      ? projectIdOrProject 
+    const projectId = typeof projectIdOrProject === 'string'
+      ? projectIdOrProject
       : (projectIdOrProject._id || projectIdOrProject.id)
-    
+
     console.log('ProjectsList handleDeleteProject - ID:', projectId)
     emit('delete-project', projectId)
   }

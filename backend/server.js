@@ -22,7 +22,9 @@ app.use(morgan('combined'))
 app.use(cors({
   origin: [
     'http://localhost:5173',
+    'http://localhost:5174',
     'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
     process.env.CORS_ORIGIN || 'http://localhost:5173'
   ],
   credentials: true
@@ -61,7 +63,7 @@ const ProjectSchema = new mongoose.Schema({
     color: String,
     role: String
   }],
-  teamMembers: [String], // Array of team member names for easier input
+  teamMembers: [String],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 })
@@ -70,11 +72,16 @@ const TaskSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
   status: { type: String, enum: ['todo', 'in-progress', 'completed'], default: 'todo' },
-  priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
+  priority: { type: String, enum: ['low', 'medium', 'high', 'critical'], default: 'medium' },
   dueDate: Date,
   projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
+  project: String, // Project name for easier display
   assignee: String,
   tags: [String],
+  completed: { type: Boolean, default: false },
+  completedAt: Date,
+  estimatedHours: { type: Number, default: 0 },
+  actualHours: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 })
@@ -84,6 +91,8 @@ const EventSchema = new mongoose.Schema({
   description: { type: String, default: '' },
   start: { type: String, required: true },
   end: { type: String, required: true },
+  startTime: { type: String, default: '09:00' },
+  endTime: { type: String, default: '10:00' },
   allDay: { type: Boolean, default: false },
   type: { type: String, enum: ['meeting', 'work', 'social', 'milestone', 'deadline'], default: 'meeting' },
   priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
@@ -220,15 +229,28 @@ app.get('/api/tasks/:id', async (req, res) => {
 
 app.put('/api/tasks/:id', async (req, res) => {
   try {
-    const task = await Task.findByIdAndUpdate(
-      req.params.id,
-      { ...req.body, updatedAt: new Date() },
-      { new: true }
-    )
-    if (!task) return res.status(404).json({ message: 'Task not found' })
+    const updates = { ...req.body, updatedAt: new Date() }
+
+    // Handle completion status
+    if (updates.completed !== undefined) {
+      if (updates.completed) {
+        updates.completedAt = new Date()
+        updates.status = 'completed'
+      } else {
+        updates.completedAt = null
+        if (updates.status === 'completed') {
+          updates.status = 'todo'
+        }
+      }
+    }
+
+    const task = await Task.findByIdAndUpdate(req.params.id, updates, { new: true })
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' })
+    }
     res.json(task)
   } catch (error) {
-    res.status(400).json({ message: error.message })
+    res.status(400).json({ error: error.message })
   }
 })
 

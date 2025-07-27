@@ -13,11 +13,11 @@
           class="mr-3"
           size="28"
         />
-        <span class="text-h6">{{ title }}</span>
+        <span class="text-h6">{{ displayTitle }}</span>
       </v-card-title>
 
       <v-card-text class="py-4">
-        <p class="text-body-1 mb-0">{{ message }}</p>
+        <p class="text-body-1 mb-0">{{ displayMessage }}</p>
 
         <!-- Additional details slot -->
         <div v-if="details" class="mt-3 pa-3 bg-grey-lighten-4 rounded">
@@ -45,7 +45,7 @@
           :loading="loading"
           :disabled="loading"
         >
-          {{ confirmText }}
+          {{ displayConfirmText }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -149,5 +149,19 @@ const handleCancel = () => {
 
 .v-theme--dark .v-card-actions {
   background: rgba(var(--v-theme-surface), 0.7);
+}
+
+/* Ensure button text is visible */
+.v-btn {
+  font-weight: 500 !important;
+}
+
+.v-btn.v-btn--variant-elevated {
+  color: white !important;
+}
+
+.v-btn.v-btn--variant-elevated.v-btn--color-error {
+  background-color: rgb(var(--v-theme-error)) !important;
+  color: white !important;
 }
 </style>

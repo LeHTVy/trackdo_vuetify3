@@ -25,15 +25,13 @@ export function useEventTimeFormatter() {
       return 'Invalid time'
     }
 
+    if (event.startTime && event.endTime) {
+      return `${event.startTime} - ${event.endTime}`
+    }
+
     return utilsFormatEventTime(event, locale)
   }
 
-  /**
-   * Format time for upcoming events
-   * @param {Object} event - Event object with start and end dates
-   * @param {string} locale - Locale for formatting (default: 'en-US')
-   * @returns {string} Formatted date string
-   */
   const formatUpcomingEventTime = (event, locale = 'en-US') => {
     if (!isValidDate(event.start)) {
       return 'Invalid date'
@@ -44,32 +42,41 @@ export function useEventTimeFormatter() {
       return 'Invalid date'
     }
 
+    let dateText = ''
+
     if (isToday(startDate)) {
-      return 'Today'
-    }
-
-    const today = new Date()
-    const tomorrow = addDays(today, 1)
-    const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-    const tomorrowDate = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate())
-    const eventDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
-
-    if (eventDate.getTime() === tomorrowDate.getTime()) {
-      return 'Tomorrow'
+      dateText = 'Today'
     } else {
-      const diffDays = getDaysBetween(todayDate, eventDate)
+      const today = new Date()
+      const tomorrow = addDays(today, 1)
+      const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+      const tomorrowDate = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate())
+      const eventDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
 
-      if (diffDays <= 7) {
-        return startDate.toLocaleDateString(locale, {
-          weekday: 'long'
-        })
+      if (eventDate.getTime() === tomorrowDate.getTime()) {
+        dateText = 'Tomorrow'
       } else {
-        return startDate.toLocaleDateString(locale, {
-          month: 'short',
-          day: 'numeric'
-        })
+        const diffDays = getDaysBetween(todayDate, eventDate)
+
+        if (diffDays <= 7) {
+          dateText = startDate.toLocaleDateString(locale, {
+            weekday: 'long'
+          })
+        } else {
+          dateText = startDate.toLocaleDateString(locale, {
+            month: 'short',
+            day: 'numeric'
+          })
+        }
       }
     }
+
+    // Add time if available
+    if (event.startTime) {
+      return `${dateText} at ${event.startTime}`
+    }
+
+    return dateText
   }
 
   /**
