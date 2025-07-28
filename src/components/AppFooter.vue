@@ -33,27 +33,47 @@
             </v-btn>
             <v-btn
               class="footer-link"
+              :class="{ 'footer-link-disabled': !isAuthenticated }"
               color="primary"
-              to="/calendar"
+              :disabled="!isAuthenticated"
+              :to="isAuthenticated ? '/calendar' : undefined"
               variant="text"
+              @click="!isAuthenticated && showAuthRequired('Calendar')"
             >
               Calendar
             </v-btn>
             <v-btn
               class="footer-link"
+              :class="{ 'footer-link-disabled': !isAuthenticated }"
               color="primary"
-              to="/tasks"
+              :disabled="!isAuthenticated"
+              :to="isAuthenticated ? '/tasks' : undefined"
               variant="text"
+              @click="!isAuthenticated && showAuthRequired('Tasks')"
             >
               Tasks
             </v-btn>
             <v-btn
               class="footer-link"
+              :class="{ 'footer-link-disabled': !isAuthenticated }"
               color="primary"
-              to="/projects"
+              :disabled="!isAuthenticated"
+              :to="isAuthenticated ? '/projects' : undefined"
               variant="text"
+              @click="!isAuthenticated && showAuthRequired('Projects')"
             >
               Projects
+            </v-btn>
+
+            <!-- Auth Link for non-authenticated users -->
+            <v-btn
+              v-if="!isAuthenticated"
+              class="footer-link"
+              color="primary"
+              to="/auth"
+              variant="text"
+            >
+              Login/Signup
             </v-btn>
           </div>
         </v-col>
@@ -133,9 +153,20 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
-  const currentYear = computed(() => new Date().getFullYear())
+const authStore = useAuthStore()
+const router = useRouter()
+
+const currentYear = computed(() => new Date().getFullYear())
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+
+const showAuthRequired = (pageName) => {
+  console.log(`${pageName} requires authentication`)
+  router.push('/auth')
+}
 </script>
 
 <style scoped>
@@ -194,6 +225,16 @@
 .footer-link:hover {
   background: rgb(25 118 210 / 10%);
   transform: translateY(-2px);
+}
+
+.footer-link-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.footer-link-disabled:hover {
+  background: transparent !important;
+  transform: none !important;
 }
 
 .social-links {

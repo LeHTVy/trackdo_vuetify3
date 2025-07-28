@@ -8,13 +8,16 @@
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row justify="center">
       <v-col
         v-for="stat in stats"
         :key="stat.id"
         class="text-center"
-        cols="6"
-        md="3"
+        cols="12"
+        sm="6"
+        md="4"
+        lg="3"
+        xl="3"
       >
         <QuickStatCard
           :color="stat.color"
@@ -28,73 +31,10 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
-  import { useEventsStore } from '@/stores/events'
-  import { useProjectsStore } from '@/stores/projects'
-  import { useTasksStore } from '@/stores/tasks'
+  import { useQuickStatsSection } from '@/composables/common/useQuickStatsSection'
   import QuickStatCard from './QuickStatCard.vue'
 
-  const tasksStore = useTasksStore()
-  const projectsStore = useProjectsStore()
-  const eventsStore = useEventsStore()
-
-  const totalTasks = computed(() => tasksStore.tasks.length)
-  const completedTasks = computed(() => tasksStore.tasks.filter(task => task.status === 'completed').length)
-  const upcomingEvents = computed(() => eventsStore.events.length)
-  const activeProjects = computed(() => projectsStore.projects.filter(project => project.status === 'Active').length)
-
-  const taskCompletionRate = computed(() => {
-    if (totalTasks.value === 0) return 0
-    return Math.round((completedTasks.value / totalTasks.value) * 100)
-  })
-
-  const projectProgressRate = computed(() => {
-    const totalProjects = projectsStore.projects.length
-    if (totalProjects === 0) return 0
-    return Math.round((activeProjects.value / totalProjects) * 100)
-  })
-
-  const eventsProgressRate = computed(() => {
-    const maxEventsPerMonth = 30
-    return Math.min(Math.round((upcomingEvents.value / maxEventsPerMonth) * 100), 100)
-  })
-
-  const overallProgressRate = computed(() => {
-    const maxTasks = 50
-    const taskProgress = Math.min((totalTasks.value / maxTasks) * 100, 100)
-    return Math.round(taskProgress)
-  })
-
-  const stats = computed(() => [
-    {
-      id: 1,
-      value: totalTasks.value,
-      label: 'Total Tasks',
-      color: 'primary',
-      progress: overallProgressRate.value,
-    },
-    {
-      id: 2,
-      value: completedTasks.value,
-      label: 'Completed',
-      color: 'success',
-      progress: taskCompletionRate.value,
-    },
-    {
-      id: 3,
-      value: upcomingEvents.value,
-      label: 'Upcoming Events',
-      color: 'info',
-      progress: eventsProgressRate.value,
-    },
-    {
-      id: 4,
-      value: activeProjects.value,
-      label: 'Active Projects',
-      color: 'secondary',
-      progress: projectProgressRate.value,
-    },
-  ])
+  const { stats } = useQuickStatsSection()
 </script>
 
 <style scoped>

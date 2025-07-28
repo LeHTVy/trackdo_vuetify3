@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import { useAuthStore } from './auth.js'
 
 export const useProjectsStore = defineStore('projects', () => {
+  const authStore = useAuthStore()
   const projects = ref([])
   const loading = ref(false)
   const error = ref(null)
@@ -12,26 +14,35 @@ export const useProjectsStore = defineStore('projects', () => {
     tags: [],
   })
 
-  const totalProjects = computed(() => projects.value.length)
+  const totalProjects = computed(() => userProjects.value.length)
+
+  // Filter projects by current user
+  const userProjects = computed(() => {
+    if (!authStore.isAuthenticated) return []
+    return projects.value.filter(project =>
+      project.userId === authStore.currentUser?.id ||
+      project.userId === authStore.currentUser?._id
+    )
+  })
 
   const activeProjects = computed(() =>
-    projects.value.filter(project => project.status === 'Active'),
+    userProjects.value.filter(project => project.status === 'Active'),
   )
 
   const completedProjects = computed(() =>
-    projects.value.filter(project => project.status === 'Completed'),
+    userProjects.value.filter(project => project.status === 'Completed'),
   )
 
   const planningProjects = computed(() =>
-    projects.value.filter(project => project.status === 'Planning'),
+    userProjects.value.filter(project => project.status === 'Planning'),
   )
 
   const onHoldProjects = computed(() =>
-    projects.value.filter(project => project.status === 'On Hold'),
+    userProjects.value.filter(project => project.status === 'On Hold'),
   )
 
   const filteredProjects = computed(() => {
-    let filtered = projects.value
+    let filtered = userProjects.value
 
     if (filters.value.status !== 'All') {
       filtered = filtered.filter(project => project.status === filters.value.status)
@@ -59,10 +70,11 @@ export const useProjectsStore = defineStore('projects', () => {
   })
 
   const projectStats = computed(() => {
-    const totalBudget = projects.value.reduce((sum, project) => sum + project.budget, 0)
-    const totalSpent = projects.value.reduce((sum, project) => sum + project.spent, 0)
-    const avgProgress = projects.value.length > 0
-      ? Math.round(projects.value.reduce((sum, project) => sum + project.progress, 0) / projects.value.length)
+    const userProjectsList = userProjects.value
+    const totalBudget = userProjectsList.reduce((sum, project) => sum + project.budget, 0)
+    const totalSpent = userProjectsList.reduce((sum, project) => sum + project.spent, 0)
+    const avgProgress = userProjectsList.length > 0
+      ? Math.round(userProjectsList.reduce((sum, project) => sum + project.progress, 0) / userProjectsList.length)
       : 0
 
     return {
@@ -76,13 +88,13 @@ export const useProjectsStore = defineStore('projects', () => {
       remainingBudget: totalBudget - totalSpent,
       budgetUtilization: totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0,
       avgProgress,
-      totalTeamMembers: new Set(projects.value.flatMap(p => p.teamMembers)).size,
+      totalTeamMembers: new Set(userProjectsList.flatMap(p => p.teamMembers)).size,
     }
   })
 
   const allTags = computed(() => {
     const tagSet = new Set()
-    for (const project of projects.value) {
+    for (const project of userProjects.value) {
       if (project.tags) {
         for (const tag of project.tags) {
           tagSet.add(tag)
@@ -94,7 +106,7 @@ export const useProjectsStore = defineStore('projects', () => {
 
   const allTeamMembers = computed(() => {
     const memberSet = new Set()
-    for (const project of projects.value) {
+    for (const project of userProjects.value) {
       if (project.teamMembers) {
         for (const member of project.teamMembers) {
           memberSet.add(member)
@@ -109,7 +121,7 @@ export const useProjectsStore = defineStore('projects', () => {
     const today = new Date()
     const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate())
 
-    for (const project of projects.value) {
+    for (const project of userProjects.value) {
       if (project.milestones) {
         for (const milestone of project.milestones) {
           const milestoneDate = new Date(milestone.date)
@@ -130,7 +142,7 @@ export const useProjectsStore = defineStore('projects', () => {
 
   const recentActivities = computed(() => {
     const activities = []
-    const sortedProjects = [...projects.value].sort((a, b) => {
+    const sortedProjects = [...userProjects.value].sort((a, b) => {
       const dateA = new Date(a.updatedAt || a.createdAt || a.startDate || 0)
       const dateB = new Date(b.updatedAt || b.createdAt || b.startDate || 0)
       return dateB - dateA
@@ -268,8 +280,14 @@ export const useProjectsStore = defineStore('projects', () => {
     error.value = null
 
     try {
+      // Add userId to project data
+      const projectWithUser = {
+        ...projectData,
+        userId: authStore.currentUser?.id || authStore.currentUser?._id
+      }
+
       const { mongoService } = await import('@/services/mongodb.js')
-      const result = await mongoService.projects.create(projectData)
+      const result = await mongoService.projects.create(projectWithUser)
       if (result.success) {
         // Ensure the new project has both _id and id for compatibility
         const newProject = {

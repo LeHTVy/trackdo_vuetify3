@@ -162,15 +162,19 @@
             <span class="text-subtitle2 font-weight-medium">Team Members</span>
           </div>
           <div class="ml-8">
-            <v-chip
-              :color="getPrimaryColor()"
-              size="small"
-              class="mr-2 mb-1"
-              variant="outlined"
-            >
-              <v-icon icon="mdi-account-group" size="12" class="mr-1"></v-icon>
-              {{ selectedProject.teamMembers?.length || 0 }} member{{ (selectedProject.teamMembers?.length || 0) !== 1 ? 's' : '' }}
-            </v-chip>
+            <div class="d-flex flex-wrap gap-2">
+              <v-chip
+                v-for="(member, index) in selectedProject.teamMembers"
+                :key="index"
+                :color="getTeamMemberColor(index)"
+                size="small"
+                variant="tonal"
+                class="ma-1"
+              >
+                <v-icon start icon="mdi-account"></v-icon>
+                {{ member }}
+              </v-chip>
+            </div>
           </div>
         </div>
       </v-card-text>
@@ -286,6 +290,14 @@ export default {
       duplicateProject
     } = useProjectDetailsDialog(props, emit)
 
+    // Team member colors
+    const teamMemberColors = ['primary', 'secondary', 'accent', 'info', 'warning', 'success', 'error']
+
+    // Get color for team member chip
+    const getTeamMemberColor = (index) => {
+      return teamMemberColors[index % teamMemberColors.length]
+    }
+
     const handleDeleteProject = async () => {
       console.log('Delete button clicked!')
       console.log('Selected project:', props.selectedProject)
@@ -321,6 +333,7 @@ export default {
       hasDescription,
       hasBudget,
       hasCategory,
+      hasTeamMembers,
 
       // Methods
       getProjectStatusIcon,
@@ -332,7 +345,8 @@ export default {
       deleteProject,
       editProject,
       duplicateProject,
-      handleDeleteProject
+      handleDeleteProject,
+      getTeamMemberColor
     }
   }
 }

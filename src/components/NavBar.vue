@@ -8,7 +8,7 @@
     <v-container class="d-flex align-center">
       <!-- Logo and Brand -->
       <div class="d-flex align-center">
-        <!-- Logo GIF -->
+        <!-- Logo -->
         <div class="logo-container mr-3">
           <v-icon
             class="logo"
@@ -31,21 +31,37 @@
 
       <!-- Desktop Navigation -->
       <div class="d-none d-md-flex align-center">
-        <v-btn
-          v-for="item in navItems"
-          :key="item.title"
-          class="nav-btn mx-1"
-          :class="{ 'active-nav': $route.path === item.to }"
-          :to="item.to"
-          variant="text"
-        >
-          <v-icon class="mr-2" :color="$route.path === item.to ? 'accent-yellow' : 'white'">
-            {{ item.icon }}
-          </v-icon>
-          <span :class="$route.path === item.to ? 'text-accent-yellow' : 'text-white'">
-            {{ item.title }}
-          </span>
-        </v-btn>
+        <!-- Show navigation items only when authenticated -->
+        <template v-if="authStore.isAuthenticated">
+          <v-btn
+            v-for="item in navItems"
+            :key="item.title"
+            class="nav-btn mx-1"
+            :class="{ 'active-nav': $route.path === item.to }"
+            :to="item.to"
+            variant="text"
+          >
+            <v-icon class="mr-2" :color="$route.path === item.to ? 'accent-yellow' : 'white'">
+              {{ item.icon }}
+            </v-icon>
+            <span :class="$route.path === item.to ? 'text-accent-yellow' : 'text-white'">
+              {{ item.title }}
+            </span>
+          </v-btn>
+        </template>
+
+        <!-- Show Login/SignUp button when not authenticated -->
+        <template v-else>
+          <v-btn
+            class="login-btn mx-2"
+            color="accent-yellow"
+            variant="outlined"
+            to="/auth"
+          >
+            <v-icon class="mr-2">mdi-login</v-icon>
+            Login/Signup
+          </v-btn>
+        </template>
       </div>
 
       <!-- Theme Toggle -->
@@ -60,8 +76,8 @@
         </v-icon>
       </v-btn>
 
-      <!-- User Menu -->
-      <v-menu offset-y>
+      <!-- User Menu - Only show when authenticated -->
+      <v-menu v-if="authStore.isAuthenticated" offset-y>
         <template #activator="{ props }">
           <v-btn
             v-bind="props"
@@ -70,15 +86,18 @@
             variant="text"
           >
             <v-avatar color="secondary" size="32">
-              <v-icon color="white">mdi-account</v-icon>
+              <v-img v-if="authStore.currentUser?.avatar" :src="authStore.currentUser.avatar" />
+              <v-icon v-else color="white">mdi-account</v-icon>
             </v-avatar>
           </v-btn>
         </template>
 
         <v-list class="user-menu">
           <v-list-item>
-            <v-list-item-title class="font-weight-medium">Vy Le</v-list-item-title>
-            <v-list-item-subtitle>vyle@trackdo.com</v-list-item-subtitle>
+            <v-list-item-title class="font-weight-medium">
+              {{ authStore.currentUser?.firstName }} {{ authStore.currentUser?.lastName }}
+            </v-list-item-title>
+            <v-list-item-subtitle>{{ authStore.currentUser?.email }}</v-list-item-subtitle>
           </v-list-item>
 
           <v-divider />
@@ -116,36 +135,53 @@
     temporary
   >
     <v-list>
-      <v-list-item class="px-4 py-6">
+      <!-- User info - only show when authenticated -->
+      <v-list-item v-if="authStore.isAuthenticated" class="px-4 py-6">
         <div class="d-flex align-center">
           <v-avatar class="mr-3" color="secondary">
-            <v-icon color="white">mdi-account</v-icon>
+            <v-img v-if="authStore.currentUser?.avatar" :src="authStore.currentUser.avatar" />
+            <v-icon v-else color="white">mdi-account</v-icon>
           </v-avatar>
           <div>
-            <div class="font-weight-medium">John Doe</div>
-            <div class="text-caption text-medium-emphasis">john@trackdo.com</div>
+            <div class="font-weight-medium">
+              {{ authStore.currentUser?.firstName }} {{ authStore.currentUser?.lastName }}
+            </div>
+            <div class="text-caption text-medium-emphasis">{{ authStore.currentUser?.email }}</div>
           </div>
         </div>
       </v-list-item>
 
+      <!-- Login/SignUp button for mobile when not authenticated -->
+      <v-list-item v-else class="px-4 py-6">
+        <v-btn
+          class="login-btn-mobile"
+          color="primary"
+          variant="outlined"
+          block
+          to="/auth"
+          @click="drawer = false"
+        >
+          <v-icon class="mr-2">mdi-login</v-icon>
+          Login/Signup
+        </v-btn>
+      </v-list-item>
+
       <v-divider />
 
-      <v-list-item
-        v-for="item in navItems"
-        :key="item.title"
-        class="mobile-nav-item"
-        :prepend-icon="item.icon"
-        :title="item.title"
-        :to="item.to"
-        @click="drawer = false"
-      />
-
-      <v-divider class="my-2" />
-
-      <v-list-item prepend-icon="mdi-account-circle" title="Profile" />
-      <v-list-item prepend-icon="mdi-cog" title="Settings" />
-      <v-list-item prepend-icon="mdi-help-circle" title="Help" />
-      <v-list-item class="text-error" prepend-icon="mdi-logout" title="Logout" />
+      <!-- Navigation items - only show when authenticated -->
+      <template v-if="authStore.isAuthenticated">
+        <v-list-item
+          v-for="item in navItems"
+          :key="item.title"
+          class="mobile-nav-item"
+          :prepend-icon="item.icon"
+          :title="item.title"
+          :to="item.to"
+          @click="drawer = false"
+        />
+        <v-divider class="my-2" />
+        <v-list-item class="text-error" prepend-icon="mdi-logout" title="Logout" @click="handleLogout" />
+      </template>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -154,9 +190,11 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useTheme } from 'vuetify'
+  import { useAuthStore } from '@/stores/auth'
 
   const router = useRouter()
   const theme = useTheme()
+  const authStore = useAuthStore()
   const drawer = ref(false)
 
   const navItems = [
@@ -182,24 +220,17 @@
     },
   ]
 
+  const handleLogout = () => {
+    authStore.logout()
+    drawer.value = false
+    router.push('/')
+  }
+
   const userMenuItems = [
-    {
-      title: 'Profile',
-      icon: 'mdi-account-circle',
-      action: () => router.push('/profile'),
-    },
-    {
-      title: 'Settings',
-      icon: 'mdi-cog',
-      action: () => router.push('/settings'),
-    },
     {
       title: 'Logout',
       icon: 'mdi-logout',
-      action: () => {
-        // Handle logout logic here
-        console.log('Logout clicked')
-      },
+      action: handleLogout,
     },
   ]
 
@@ -306,6 +337,22 @@
 .mobile-nav-item:hover {
   background-color: rgba(25, 118, 210, 0.1);
   transform: translateX(4px);
+}
+
+.login-btn {
+  border-radius: 12px !important;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.login-btn:hover {
+  background-color: rgba(255, 213, 79, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.login-btn-mobile {
+  border-radius: 12px !important;
+  transition: all 0.3s ease;
 }
 
 /* Responsive adjustments */

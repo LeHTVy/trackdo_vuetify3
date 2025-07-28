@@ -44,6 +44,20 @@ const connectDB = async () => {
 }
 
 // MongoDB Schemas
+const UserSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  avatar: { type: String, default: '' },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  isActive: { type: Boolean, default: true },
+  lastLogin: Date,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+})
+
 const ProjectSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
@@ -64,6 +78,7 @@ const ProjectSchema = new mongoose.Schema({
     role: String
   }],
   teamMembers: [String],
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 })
@@ -82,6 +97,7 @@ const TaskSchema = new mongoose.Schema({
   completedAt: Date,
   estimatedHours: { type: Number, default: 0 },
   actualHours: { type: Number, default: 0 },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 })
@@ -109,11 +125,13 @@ const EventSchema = new mongoose.Schema({
   projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
   taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
   status: { type: String, enum: ['confirmed', 'tentative', 'cancelled'], default: 'confirmed' },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 })
 
 // Models
+const User = mongoose.model('User', UserSchema)
 const Project = mongoose.model('Project', ProjectSchema)
 const Task = mongoose.model('Task', TaskSchema)
 const Event = mongoose.model('Event', EventSchema)
@@ -126,6 +144,146 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   })
+})
+
+// Auth API
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { username, email, password, firstName, lastName } = req.body
+
+    // Validate required fields
+    if (!username) {
+      return res.status(400).json({ message: 'Username is required' })
+    }
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' })
+    }
+    if (!password) {
+      return res.status(400).json({ message: 'Password is required' })
+    }
+    if (!firstName) {
+      return res.status(400).json({ message: 'First name is required' })
+    }
+    if (!lastName) {
+      return res.status(400).json({ message: 'Last name is required' })
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: 'Please enter a valid email address' })
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters long' })
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] })
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return res.status(400).json({ message: 'An account with this email already exists' })
+      }
+      if (existingUser.username === username) {
+        return res.status(400).json({ message: 'This username is already taken' })
+      }
+    }
+
+    // Create new user (in production, password should be hashed)
+    const user = new User({
+      username,
+      email,
+      password, // TODO: Hash password with bcrypt
+      firstName,
+      lastName
+    })
+
+    const savedUser = await user.save()
+
+    // Remove password from response
+    const userResponse = {
+      id: savedUser._id,
+      _id: savedUser._id,
+      username: savedUser.username,
+      email: savedUser.email,
+      firstName: savedUser.firstName,
+      lastName: savedUser.lastName,
+      avatar: savedUser.avatar,
+      role: savedUser.role
+    }
+
+    // Generate token (in production, use JWT)
+    const token = `token_${savedUser._id}_${Date.now()}`
+
+    res.status(201).json({
+      user: userResponse,
+      token
+    })
+  } catch (error) {
+    console.error('Registration error:', error)
+    res.status(500).json({ message: 'Registration failed. Please try again later.' })
+  }
+})
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body
+
+    // Validate required fields
+    if (!username) {
+      return res.status(400).json({ message: 'Username or email is required' })
+    }
+    if (!password) {
+      return res.status(400).json({ message: 'Password is required' })
+    }
+
+    // Find user by username or email
+    const user = await User.findOne({
+      $or: [{ username }, { email: username }]
+    })
+
+    if (!user) {
+      return res.status(401).json({ message: 'No account found with this username or email' })
+    }
+
+    // Check password (in production, compare hashed password)
+    if (user.password !== password) {
+      return res.status(401).json({ message: 'Incorrect password. Please try again.' })
+    }
+
+    // Check if account is active
+    if (!user.isActive) {
+      return res.status(401).json({ message: 'Your account has been deactivated. Please contact support.' })
+    }
+
+    // Update last login
+    user.lastLogin = new Date()
+    await user.save()
+
+    // Remove password from response
+    const userResponse = {
+      id: user._id,
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatar: user.avatar,
+      role: user.role
+    }
+
+    // Generate token (in production, use JWT)
+    const token = `token_${user._id}_${Date.now()}`
+
+    res.json({
+      user: userResponse,
+      token
+    })
+  } catch (error) {
+    console.error('Login error:', error)
+    res.status(500).json({ message: 'Login failed. Please try again later.' })
+  }
 })
 
 // Projects API

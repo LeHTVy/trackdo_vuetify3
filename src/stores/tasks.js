@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import { useAuthStore } from './auth.js'
 
 export const useTasksStore = defineStore('tasks', () => {
+  const authStore = useAuthStore()
   const tasks = ref([])
   const loading = ref(false)
   const error = ref(null)
@@ -12,26 +14,35 @@ export const useTasksStore = defineStore('tasks', () => {
     tags: [],
   })
 
-  const totalTasks = computed(() => tasks.value.length)
+  // Filter tasks by current user
+  const userTasks = computed(() => {
+    if (!authStore.isAuthenticated) return []
+    return tasks.value.filter(task =>
+      task.userId === authStore.currentUser?.id ||
+      task.userId === authStore.currentUser?._id
+    )
+  })
+
+  const totalTasks = computed(() => userTasks.value.length)
 
   const completedTasks = computed(() =>
-    tasks.value.filter(task => task.status === 'completed'),
+    userTasks.value.filter(task => task.status === 'completed'),
   )
 
   const inProgressTasks = computed(() =>
-    tasks.value.filter(task => task.status === 'in-progress'),
+    userTasks.value.filter(task => task.status === 'in-progress'),
   )
 
   const pendingTasks = computed(() =>
-    tasks.value.filter(task => task.status === 'todo'),
+    userTasks.value.filter(task => task.status === 'todo'),
   )
 
   const overdueTasks = computed(() =>
-    tasks.value.filter(task => task.status !== 'completed' && isOverdue(task)),
+    userTasks.value.filter(task => task.status !== 'completed' && isOverdue(task)),
   )
 
   const filteredTasks = computed(() => {
-    let filtered = tasks.value
+    let filtered = userTasks.value
 
     if (filters.value.status !== 'All') {
       switch (filters.value.status) {
@@ -82,13 +93,13 @@ export const useTasksStore = defineStore('tasks', () => {
     'in-progress': inProgressTasks.value.length,
     overdue: overdueTasks.value.length,
     completionRate: totalTasks.value.length > 0 ? Math.round((completedTasks.value.length / totalTasks.value.length) * 100) : 0,
-    totalEstimatedHours: tasks.value.reduce((sum, task) => sum + (task.estimatedHours || 0), 0),
+    totalEstimatedHours: userTasks.value.reduce((sum, task) => sum + (task.estimatedHours || 0), 0),
     completedHours: completedTasks.value.reduce((sum, task) => sum + (task.estimatedHours || 0), 0),
   }))
 
   const allTags = computed(() => {
     const tagSet = new Set()
-    for (const task of tasks.value) {
+    for (const task of userTasks.value) {
       if (task.tags) {
         for (const tag of task.tags) {
           tagSet.add(tag)
@@ -125,8 +136,14 @@ export const useTasksStore = defineStore('tasks', () => {
     error.value = null
 
     try {
+      // Add userId to task data
+      const taskWithUser = {
+        ...taskData,
+        userId: authStore.currentUser?.id || authStore.currentUser?._id
+      }
+
       const { mongoService } = await import('@/services/mongodb.js')
-      const result = await mongoService.tasks.create(taskData)
+      const result = await mongoService.tasks.create(taskWithUser)
       if (result.success) {
         tasks.value.push(result.data)
         console.log('✅ Task created in MongoDB:', result.data)
