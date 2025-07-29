@@ -15,8 +15,8 @@ export const useEventsStore = defineStore('events', {
     getUserEvents: (state) => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
-      return state.events.filter(event => 
-        event.userId === authStore.currentUser?.id || 
+      return state.events.filter(event =>
+        event.userId === authStore.currentUser?.id ||
         event.userId === authStore.currentUser?._id
       )
     },
@@ -24,8 +24,8 @@ export const useEventsStore = defineStore('events', {
     getEvents: (state) => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
-      return state.events.filter(event => 
-        event.userId === authStore.currentUser?.id || 
+      return state.events.filter(event =>
+        event.userId === authStore.currentUser?.id ||
         event.userId === authStore.currentUser?._id
       )
     },
@@ -33,7 +33,7 @@ export const useEventsStore = defineStore('events', {
     getEventById: (state) => (id) => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return null
-      return state.events.find(event => 
+      return state.events.find(event =>
         ((event.id === id) || (event._id === id)) &&
         (event.userId === authStore.currentUser?.id || event.userId === authStore.currentUser?._id)
       )
@@ -43,8 +43,8 @@ export const useEventsStore = defineStore('events', {
     getTodayEvents: (state) => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
-      const userEvents = state.events.filter(event => 
-        event.userId === authStore.currentUser?.id || 
+      const userEvents = state.events.filter(event =>
+        event.userId === authStore.currentUser?.id ||
         event.userId === authStore.currentUser?._id
       )
       return userEvents.filter(event => isEventToday(event))
@@ -54,8 +54,8 @@ export const useEventsStore = defineStore('events', {
     getUpcomingEvents: (state) => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
-      const userEvents = state.events.filter(event => 
-        event.userId === authStore.currentUser?.id || 
+      const userEvents = state.events.filter(event =>
+        event.userId === authStore.currentUser?.id ||
         event.userId === authStore.currentUser?._id
       )
       return userEvents.filter(event => isEventUpcoming(event))
@@ -66,8 +66,8 @@ export const useEventsStore = defineStore('events', {
     getEventsByDate: (state) => (date) => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
-      const userEvents = state.events.filter(event => 
-        event.userId === authStore.currentUser?.id || 
+      const userEvents = state.events.filter(event =>
+        event.userId === authStore.currentUser?.id ||
         event.userId === authStore.currentUser?._id
       )
       const targetDate = new Date(date).toISOString().split('T')[0]
@@ -80,8 +80,8 @@ export const useEventsStore = defineStore('events', {
     getEventsByDateRange: (state) => (startDate, endDate) => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
-      const userEvents = state.events.filter(event => 
-        event.userId === authStore.currentUser?.id || 
+      const userEvents = state.events.filter(event =>
+        event.userId === authStore.currentUser?.id ||
         event.userId === authStore.currentUser?._id
       )
       const start = new Date(startDate)

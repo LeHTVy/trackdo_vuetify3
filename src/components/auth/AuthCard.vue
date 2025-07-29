@@ -1,20 +1,5 @@
 <template>
   <v-card class="auth-card" elevation="12">
-    <!-- Header
-    <v-card-title class="auth-header text-center pa-6">
-      <div class="d-flex flex-column align-center">
-        <v-icon class="auth-logo mb-3" color="primary" size="48">
-          mdi-check-circle
-        </v-icon>
-        <h2 class="text-h4 font-weight-bold text-primary mb-2">
-          Track<span class="text-accent">Do</span>
-        </h2>
-        <p class="text-subtitle-1 text-medium-emphasis">
-          {{ isLogin ? 'Welcome back!' : 'Create new account' }}
-        </p>
-      </div>
-    </v-card-title>-->
-
     <!-- Tabs -->
     <v-tabs
       v-model="tab"
@@ -37,7 +22,7 @@
       <v-window v-model="tab">
         <!-- Login Form -->
         <v-window-item value="login">
-          <div class="form-container mt-4">
+          <div class="form-container mt-8">
             <v-form ref="loginForm" v-model="loginValid" @submit.prevent="handleLogin">
               <v-text-field
                 v-model="loginData.username"
@@ -238,11 +223,14 @@ const {
   backdrop-filter: blur(10px);
   background-color: rgb(var(--v-theme-surface));
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  max-width: 100%;
+  max-width: 420px;
   width: 100%;
+  min-height: 600px;
   box-sizing: border-box;
   border: none;
   transition: all 0.3s ease;
+  margin: 0 auto;
+  margin-top: 5rem;
 }
 
 .auth-card:hover {
@@ -323,6 +311,17 @@ const {
   display: flex;
   flex-direction: column;
   gap: 0;
+  padding: 1.5rem 0;
+}
+
+/* Add more top spacing for form container */
+.form-container {
+  padding-top: 2rem;
+}
+
+/* Add more padding to card content */
+:deep(.v-card-text) {
+  padding: 2rem 2.5rem !important;
 }
 
 /* Mobile responsive improvements */
@@ -334,6 +333,16 @@ const {
 
   .auth-card {
     margin: 0.5rem;
+    max-width: 95%;
+    min-height: 550px;
+  }
+
+  :deep(.v-card-text) {
+    padding: 1.5rem 1.5rem !important;
+  }
+
+  .v-window-item .v-form {
+    padding: 1rem 0;
   }
 }
 </style>
