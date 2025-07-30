@@ -8,7 +8,7 @@ export function useTaskInsights() {
 
   // Today's upcoming events
   const todayEvents = computed(() => {
-    return eventsStore.getTodayEvents.slice(0, 3) // Limit to 3 events
+    return eventsStore.getTodayEvents.slice(0, 3)
   })
 
   // Recent projects (2 newest)
@@ -32,8 +32,8 @@ export function useTaskInsights() {
 
   // Check if there's any data to show
   const hasInsights = computed(() => {
-    return todayEvents.value.length > 0 || 
-           recentProjects.value.length > 0 || 
+    return todayEvents.value.length > 0 ||
+           recentProjects.value.length > 0 ||
            highCompletionProjects.value.length > 0
   })
 
@@ -41,7 +41,7 @@ export function useTaskInsights() {
   const formatEventTime = (event) => {
     const start = new Date(event.start)
     const end = new Date(event.end || event.start)
-    
+
     const formatTime = (date) => {
       return date.toLocaleTimeString('en-US', {
         hour: '2-digit',
@@ -112,10 +112,10 @@ export function useTaskInsights() {
       } else if (pastDays <= 7) {
         return `${pastDays} days ago`
       } else {
-        return targetDate.toLocaleDateString()
+        return targetDate.toLocaleDateString('en-US')
       }
     } else {
-      return targetDate.toLocaleDateString()
+      return targetDate.toLocaleDateString('en-US')
     }
   }
 

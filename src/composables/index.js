@@ -1,128 +1,99 @@
-// Import all composables
-import { useCalendarNavigation } from './CalendarMain/useCalendarNavigation.js'
-import { useEventFilters } from './CalendarCommon/useEventFilters.js'
-import { useDialogManager } from './common/useDialogManager.js'
-import { useEventForm } from './CalendarDialog/useEventForm.js'
-import { useEventOperations } from './CalendarCommon/useEventOperations.js'
-import { useCalendarEvents } from './CalendarCommon/useCalendarEvents.js'
-import { useCalendarList } from './CalendarList/useCalendarList.js'
-import { useDraggableFab } from './common/useDraggableFab.js'
-import { useEventDragDrop } from './CalendarMain/useEventDragDrop.js'
-import { useCalendarHeader } from './CalendarHeader/useCalendarHeader.js'
+// ===============================================
+// 🏗️  COMPOSABLES INDEX - Organized by Function
+// ===============================================
 
-// Calendar Header composables
+// =====================================
+// 📦 CORE & FOUNDATION
+// =====================================
+export { useBaseOperations } from './common/useBaseOperations.js'
+export { useEventHandler } from './common/useEventHandler.js'
+export { useAsyncOperation } from './common/useAsyncOperation.js'
+export { useErrorHandler } from './common/useErrorHandler.js'
+
+// =====================================
+// 🔐 AUTHENTICATION & VALIDATION
+// =====================================
+export { useAuth } from './common/useAuth.js'
+export { useValidation, validationSchemas } from './common/useValidation.js'
+
+// =====================================
+// 🎨 UI COMPONENTS & DIALOGS
+// =====================================
+export { useUniversalDialog, useGlobalDialogManager, useConfirmDialog, useFormDialog, useDetailsDialog, DialogTypes } from './common/useUniversalDialog.js'
+export { useDialogManager } from './common/useDialogManager.js'
+export { useConfirmModal } from './common/useConfirmModal.js'
+export { useConfirmModalConfig } from './common/useConfirmModalConfig.js'
+export { useEmptyState } from './common/useEmptyState.js'
+export { useDraggableFab } from './common/useDraggableFab.js'
+
+// =====================================
+// 📅 CALENDAR FEATURES
+// =====================================
+
+// Calendar Header
 export { useCalendarHeader } from './CalendarHeader/useCalendarHeader.js'
 
-// Calendar Main composables
+// Calendar Main & Grid
 export { useCalendarNavigation } from './CalendarMain/useCalendarNavigation.js'
-export { useCalendarEvents } from './CalendarCommon/useCalendarEvents.js'
 export { useCalendarGrid } from './CalendarMain/useCalendarGrid.js'
 export { useWeatherData } from './CalendarMain/useWeatherData.js'
 export { useDayEvents } from './CalendarMain/useDayEvents.js'
-export { useEventFilters } from './CalendarCommon/useEventFilters.js'
 export { useEventDragDrop } from './CalendarMain/useEventDragDrop.js'
-export { useDialogManager } from './common/useDialogManager.js'
 
-// Calendar Common composables
+// Calendar Common Operations
+export { useCalendarEvents } from './CalendarCommon/useCalendarEvents.js'
+export { useEventFilters } from './CalendarCommon/useEventFilters.js'
 export { useEventOperations } from './CalendarCommon/useEventOperations.js'
-export { useDayEventsModal } from './DayEventsModal/useDayEventsModal.js'
-
-// Calendar List composables
-export { useCalendarList } from './CalendarList/useCalendarList.js'
 export { useThemeColors } from './CalendarCommon/useThemeColors.js'
-export { useEventStatus } from './CalendarList/useEventStatus.js'
-export { useEventTimeFormatter } from './CalendarList/useEventTimeFormatter.js'
-export { useEmptyState } from './common/useEmptyState.js'
+export { useEventUtils } from './CalendarCommon/useEventUtils.js'
 export { useComponentClasses } from './CalendarCommon/useComponentClasses.js'
 
-// Calendar Dialog composables
+// Calendar Dialogs
 export { useCalendarDialog } from './CalendarDialog/useCalendarDialog.js'
 export { useEventActions } from './CalendarDialog/useEventActions.js'
 export { useEventDetailsDialog } from './CalendarDialog/useEventDetailsDialog.js'
 export { useEventValidation } from './CalendarDialog/useEventValidation.js'
+export { useEventForm } from './CalendarDialog/useEventForm.js'
 
-// Other composables
-export { useDraggableFab } from './common/useDraggableFab.js'
-export { useErrorHandler } from './common/useErrorHandler.js'
+// Calendar List & Display
+export { useCalendarList } from './CalendarList/useCalendarList.js'
+export { useEventStatus } from './CalendarList/useEventStatus.js'
+export { useEventTimeFormatter } from './CalendarList/useEventTimeFormatter.js'
 
-// Combined composable for calendar functionality
-export function useCalendar() {
-  return {
-    ...useCalendarNavigation(),
-    ...useEventFilters(),
-    ...useDialogManager(),
-    ...useEventForm(),
-    ...useEventOperations()
-  }
-}
+// Day Events Modal
+export { useDayEventsModal } from './DayEventsModal/useDayEventsModal.js'
 
-// Project Common composables
+// =====================================
+// 🚀 PROJECT FEATURES
+// =====================================
 export { useProjectColors } from './ProjectCommon/useProjectColors.js'
 export { useProjectDetailsDialog } from './ProjectCommon/useProjectDetailsDialog.js'
 export { useProjectDialog } from './ProjectCommon/useProjectDialog.js'
-export { useProjectOperations } from './ProjectCommon/useProjectOperations.js'
 export { useProjectFilters } from './ProjectCommon/useProjectFilters.js'
 export { useProjectFormatting } from './ProjectCommon/useProjectFormatting.js'
+export { useProjectOperations } from './ProjectCommon/useProjectOperations.js'
+export { useProjectProgress } from './ProjectCommon/useProjectProgress.js'
 export { useProjectStats } from './ProjectCommon/useProjectStats.js'
 
-// Combined composable for project functionality
-export function useProject() {
-  const operations = useProjectOperations()
-  const colors = useProjectColors()
-  const dialog = useProjectDialog()
-  const filters = useProjectFilters()
-  const formatting = useProjectFormatting()
-  const stats = useProjectStats()
-
-  return {
-    // Operations
-    ...operations,
-
-    // Colors
-    ...colors,
-
-    // Dialog
-    ...dialog,
-
-    // Filters (with prefix to avoid conflicts)
-    projectFilters: filters,
-
-    // Formatting
-    ...formatting,
-
-    // Stats
-    ...stats
-  }
-}
-
-// Task Common composables
+// =====================================
+// ✅ TASK FEATURES
+// =====================================
 export { useTaskColors } from './TaskCommon/useTaskColors.js'
-export { useTaskFormatting } from './TaskCommon/useTaskFormatting.js'
-export { useTaskFilters } from './TaskCommon/useTaskFilters.js'
-export { useTaskValidation } from './TaskCommon/useTaskValidation.js'
-export { useTaskProgress } from './TaskCommon/useTaskProgress.js'
-export { useTaskInsights } from './TaskCommon/useTaskInsights.js'
 export { useTaskCompletion } from './TaskCommon/useTaskCompletion.js'
+export { useTaskFilters } from './TaskCommon/useTaskFilters.js'
+export { useTaskFormatting } from './TaskCommon/useTaskFormatting.js'
+export { useTaskInsights } from './TaskCommon/useTaskInsights.js'
+export { useTaskProgress } from './TaskCommon/useTaskProgress.js'
+export { useTaskValidation } from './TaskCommon/useTaskValidation.js'
 
-// Combined composable for task functionality
-export function useTask() {
-  const colors = useTaskColors()
-  const formatting = useTaskFormatting()
-  const filters = useTaskFilters()
-  const validation = useTaskValidation()
-
-  return {
-    // Colors
-    ...colors,
-
-    // Formatting
-    ...formatting,
-
-    // Filters (with prefix to avoid conflicts)
-    taskFilters: filters,
-
-    // Validation
-    ...validation
-  }
-}
-
+// ===============================================
+// 📊 COMPOSABLES SUMMARY:
+// - Core: 4 files (Base operations, handlers, utilities)
+// - Auth & Validation: 2 files
+// - UI Components: 6 files (Dialogs, modals, states)
+// - Calendar: 17 files (Full calendar functionality)
+// - Projects: 8 files (Project management)
+// - Tasks: 7 files (Task management)
+//
+// Total: 44 composables (organized & clean) ✨
+// ===============================================

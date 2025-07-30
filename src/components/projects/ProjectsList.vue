@@ -60,7 +60,7 @@
                         Edit
                       </v-list-item-title>
                     </v-list-item>
-                    <v-list-item @click="$emit('delete-project', project._id || project.id)">
+                    <v-list-item @click="handleDeleteProjectWithConfirm(project)">
                       <v-list-item-title>
                         <v-icon start>mdi-delete</v-icon>
                         Delete
@@ -107,7 +107,7 @@
 
             <!-- Empty State -->
             <div v-if="filteredProjects.length === 0" class="empty-state">
-              <v-icon size="80" color="grey-lighten-2">mdi-folder-multiple-outline</v-icon>
+              <v-icon size="80" color="secondary">mdi-folder-multiple-outline</v-icon>
               <h3 class="empty-title">No projects found</h3>
               <p class="empty-subtitle">
                 {{ filter === 'all' ? 'Create your first project to get started!' : 'No projects match the current filter.' }}
@@ -160,7 +160,7 @@
                   <span class="overall-value">{{ overallProgress }}%</span>
                 </div>
                 <v-progress-circular
-                  :model-value="overallProgress"
+                  :value="overallProgress"
                   :size="120"
                   :width="8"
                   color="primary"
@@ -184,14 +184,29 @@
     @delete-project="handleDeleteProject"
     @close="closeProjectDetails"
   />
+
+  <!-- Confirm Modal -->
+  <ConfirmModal
+    v-model="confirmModalOpen"
+    :title="confirmModalConfig.title"
+    :message="confirmModalConfig.message"
+    :details="confirmModalConfig.details"
+    :confirm-text="confirmModalConfig.confirmText"
+    :cancel-text="confirmModalConfig.cancelText"
+    :loading="confirmModalLoading"
+    @confirm="confirmModalConfirm"
+    @cancel="confirmModalCancel"
+  />
 </template>
 
 <script setup>
   import { computed } from 'vue'
   import { useDialogManager } from '@/composables/common/useDialogManager'
+  import { useProjectOperations } from '@/composables/ProjectCommon/useProjectOperations'
   import { useProjectFilters } from '@/composables/ProjectCommon/useProjectFilters'
   import { useProjectFormatting } from '@/composables/ProjectCommon/useProjectFormatting'
   import ProjectDetails from './ProjectDetails.vue'
+  import ConfirmModal from '@/components/common/ConfirmModal.vue'
 
   const props = defineProps({
     projects: {
@@ -211,7 +226,6 @@
     'view-project',
   ])
 
-  // Convert props to reactive ref for composables
   const projectsRef = computed(() => props.projects)
 
   // Use composables
@@ -221,6 +235,15 @@
     showProjectDetails,
     closeProjectDetailsDialog
   } = useDialogManager()
+
+  const {
+    confirmModalOpen,
+    confirmModalLoading,
+    confirmModalConfig,
+    confirmModalConfirm,
+    confirmModalCancel,
+    deleteProjectWithConfirm
+  } = useProjectOperations()
 
   const {
     filter,
@@ -233,26 +256,36 @@
     overallProgress
   } = useProjectFormatting(projectsRef)
 
-  // Project details dialog handlers
+
   const handleEditProject = (project) => {
-    closeProjectDetails()
+    closeProjectDetailsDialog()
     emit('edit-project', project)
   }
 
-  const handleDeleteProject = (projectIdOrProject) => {
-    closeProjectDetails()
+  const handleDeleteProjectWithConfirm = async (project) => {
+    const success = await deleteProjectWithConfirm(project, props.projects)
+    if (success) {
+      emit('delete-project', project._id || project.id)
+    }
+  }
 
-    const projectId = typeof projectIdOrProject === 'string'
-      ? projectIdOrProject
-      : (projectIdOrProject._id || projectIdOrProject.id)
+  const handleDeleteProject = async (projectIdOrProject) => {
+    closeProjectDetailsDialog()
 
-    console.log('ProjectsList handleDeleteProject - ID:', projectId)
-    emit('delete-project', projectId)
+    const project = typeof projectIdOrProject === 'string'
+      ? props.projects.find(p => (p._id || p.id) === projectIdOrProject)
+      : projectIdOrProject
+
+    if (!project) {
+      console.error('Project not found for deletion')
+      return
+    }
+
+    await handleDeleteProjectWithConfirm(project)
   }
 
   const closeProjectDetails = () => {
-    projectDetailsDialog.value = false
-    selectedProject.value = null
+    closeProjectDetailsDialog()
   }
 </script>
 
@@ -426,7 +459,7 @@
 }
 
 .empty-subtitle {
-  color: rgb(var(--v-theme-on-surface-variant));
+  color: rgb(var(--v-theme-on-secondary));
   margin-bottom: 1.5rem;
 }
 

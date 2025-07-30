@@ -42,19 +42,6 @@
             View Projects
           </v-tooltip>
         </v-fab>
-        <v-fab
-          class="fab-btn"
-          color="warning"
-          icon="mdi-plus-circle"
-          size="large"
-          to="/projects/new"
-          variant="tonal"
-        >
-          <v-icon>mdi-plus-circle</v-icon>
-          <v-tooltip activator="parent" location="top">
-            New Project
-          </v-tooltip>
-        </v-fab>
       </div>
     </div>
     <div class="hero-content">

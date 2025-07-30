@@ -17,6 +17,15 @@ export function useEventDragDrop() {
 
   // Start dragging an event
   const startEventDrag = (event, dragType = 'move', nativeEvent) => {
+    // Debug logging to track the original event
+    console.log('startEventDrag called with:', {
+      event,
+      hasId: !!event.id,
+      has_id: !!event._id,
+      eventId: event.id || event._id,
+      dragType
+    })
+
     dragState.isDragging = true
     dragState.draggedEvent = { ...event }
     dragState.originalEvent = { ...event }
@@ -143,6 +152,13 @@ export function useEventDragDrop() {
 
   // Calculate new event dates based on drop
   const calculateNewEventDates = (dropDate) => {
+    console.log('calculateNewEventDates called with:', {
+      dropDate,
+      originalEvent: dragState.originalEvent,
+      originalEventId: dragState.originalEvent?.id || dragState.originalEvent?._id,
+      dragType: dragState.dragType
+    })
+
     const originalStart = new Date(dragState.originalEvent.start)
     const originalEnd = new Date(dragState.originalEvent.end || dragState.originalEvent.start)
 
@@ -169,11 +185,34 @@ export function useEventDragDrop() {
         return null
     }
 
-    return {
+    // Ensure the event ID is properly preserved
+    const updatedEvent = {
       ...dragState.originalEvent,
       start: newStart.toISOString(),
       end: newEnd.toISOString()
     }
+
+    console.log('calculateNewEventDates result:', {
+      updatedEvent,
+      hasId: !!updatedEvent.id,
+      has_id: !!updatedEvent._id,
+      eventId: updatedEvent.id || updatedEvent._id
+    })
+
+    // Make sure we have a valid ID - prefer _id over id for MongoDB compatibility
+    if (!updatedEvent.id && !updatedEvent._id) {
+      console.error('Event missing ID during drag and drop:', updatedEvent)
+      return null
+    }
+
+    // Ensure both id and _id are set for compatibility
+    if (updatedEvent._id && !updatedEvent.id) {
+      updatedEvent.id = updatedEvent._id
+    } else if (updatedEvent.id && !updatedEvent._id) {
+      updatedEvent._id = updatedEvent.id
+    }
+
+    return updatedEvent
   }
 
   // Handle drag end

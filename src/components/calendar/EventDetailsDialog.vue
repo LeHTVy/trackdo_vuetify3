@@ -65,7 +65,7 @@
         <v-btn
           color="error"
           variant="outlined"
-          @click="handleDeleteEvent"
+          @click="deleteEvent"
           class="action-btn mr-3"
         >
           <v-icon icon="mdi-delete" class="mr-1"></v-icon>
@@ -123,7 +123,7 @@ export default {
       default: null
     }
   },
-  emits: ['update:modelValue', 'delete-event', 'edit-event', 'duplicate-event', 'close'],
+  emits: ['update:modelValue', 'edit-event', 'duplicate-event', 'close'],
   setup(props, { emit }) {
     const {
       // Theme colors
@@ -163,12 +163,6 @@ export default {
       duplicateEvent
     } = useEventDetailsDialog(props, emit)
 
-    const handleDeleteEvent = () => {
-      console.log('Delete button clicked!')
-      console.log('Selected event:', props.selectedEvent)
-      emit('delete-event', props.selectedEvent)
-    }
-
     return {
       // Theme colors
       getPrimaryColor,
@@ -204,8 +198,7 @@ export default {
       closeDialog,
       deleteEvent,
       editEvent,
-      duplicateEvent,
-      handleDeleteEvent
+      duplicateEvent
     }
   }
 }

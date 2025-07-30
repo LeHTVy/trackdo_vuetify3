@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useAuthStore } from './auth.js'
+import { storeLogger } from '@/services/logger.js'
 
 export const useTasksStore = defineStore('tasks', () => {
   const authStore = useAuthStore()
@@ -114,17 +115,31 @@ export const useTasksStore = defineStore('tasks', () => {
     error.value = null
 
     try {
+      // Only fetch if user is authenticated
+      if (!authStore.isAuthenticated) {
+        tasks.value = []
+        loading.value = false
+        return
+      }
+
       const { mongoService } = await import('@/services/mongodb.js')
       const result = await mongoService.tasks.getAll()
       if (result.success) {
-        tasks.value = result.data
-        console.log('✅ Tasks loaded from MongoDB:', result.data.length)
+        // Filter tasks by current user
+        const currentUserId = authStore.currentUser?.id || authStore.currentUser?._id
+        tasks.value = result.data.filter(task =>
+          task.userId === currentUserId
+        )
+        storeLogger.success('User tasks loaded from MongoDB', {
+          count: tasks.value.length,
+          userId: currentUserId
+        })
       } else {
-        console.warn('⚠️ Failed to load from MongoDB')
+        storeLogger.warn('Failed to load from MongoDB', result.error)
         error.value = result.error
       }
     } catch (error_) {
-      console.error('❌ Error fetching tasks:', error_)
+      storeLogger.error('Error fetching tasks', error_)
       error.value = error_.message
     } finally {
       loading.value = false
@@ -146,15 +161,15 @@ export const useTasksStore = defineStore('tasks', () => {
       const result = await mongoService.tasks.create(taskWithUser)
       if (result.success) {
         tasks.value.push(result.data)
-        console.log('✅ Task created in MongoDB:', result.data)
+        storeLogger.success('Task created in MongoDB', { title: result.data.title, id: result.data._id })
         return result.data
       } else {
-        console.error('❌ Failed to create task:', result.error)
+        storeLogger.error('Failed to create task', result.error)
         error.value = result.error
         return null
       }
     } catch (error_) {
-      console.error('❌ Error creating task:', error_)
+      storeLogger.error('Error creating task', error_)
       error.value = error_.message
       return null
     } finally {
@@ -174,15 +189,15 @@ export const useTasksStore = defineStore('tasks', () => {
         if (index !== -1) {
           tasks.value[index] = result.data
         }
-        console.log('✅ Task updated in MongoDB:', result.data)
+        storeLogger.success('Task updated in MongoDB', { title: result.data.title, id: taskId })
         return result.data
       } else {
-        console.error('❌ Failed to update task:', result.error)
+        storeLogger.error('Failed to update task', result.error)
         error.value = result.error
         return null
       }
     } catch (error_) {
-      console.error('❌ Error updating task:', error_)
+      storeLogger.error('Error updating task', error_)
       error.value = error_.message
       return null
     } finally {
@@ -201,16 +216,16 @@ export const useTasksStore = defineStore('tasks', () => {
         const index = tasks.value.findIndex(task => task._id === taskId)
         if (index !== -1) {
           const deletedTask = tasks.value.splice(index, 1)[0]
-          console.log('✅ Task deleted from MongoDB:', deletedTask)
+          storeLogger.success('Task deleted from MongoDB', { id: taskId })
           return deletedTask
         }
       } else {
-        console.error('❌ Failed to delete task:', result.error)
+        storeLogger.error('Failed to delete task', result.error)
         error.value = result.error
         return null
       }
     } catch (error_) {
-      console.error('❌ Error deleting task:', error_)
+      storeLogger.error('Error deleting task', error_)
       error.value = error_.message
       return null
     } finally {

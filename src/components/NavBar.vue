@@ -187,7 +187,7 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+    import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useTheme } from 'vuetify'
   import { useAuthStore } from '@/stores/auth'

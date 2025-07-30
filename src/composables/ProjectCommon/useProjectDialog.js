@@ -45,10 +45,10 @@ export function useProjectDialog(editingProject = ref(null)) {
 
   // Validation rules
   const rules = {
-    required: (value) => !!value || 'This field is required',
-    title: (value) => !!value || 'Project title is required',
-    startDate: (value) => !!value || 'Start date is required',
-    endDate: (value) => !!value || 'End date is required',
+    required: (value) => (value === null || value === undefined || value === '' || (typeof value === 'string' && value.trim() === '')) ? 'This field is required' : true,
+    title: (value) => (value === null || value === undefined || value === '' || (typeof value === 'string' && value.trim() === '')) ? 'Project title is required' : true,
+    startDate: (value) => (value === null || value === undefined || value === '' || (typeof value === 'string' && value.trim() === '')) ? 'Start date is required' : true,
+    endDate: (value) => (value === null || value === undefined || value === '' || (typeof value === 'string' && value.trim() === '')) ? 'End date is required' : true,
     progress: progressRules[0]
   }
 

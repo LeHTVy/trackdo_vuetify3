@@ -28,7 +28,45 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: true, user: user.value }
     } catch (error) {
       console.error('Login error:', error)
-      return { success: false, error: error.response?.data?.message || 'Login failed' }
+
+      // Better error handling
+      let errorMessage = 'Login failed'
+
+      if (error.response) {
+        // Server responded with error status
+        const status = error.response.status
+        const data = error.response.data
+
+        // Use the exact message from backend if available
+        if (data?.message) {
+          errorMessage = data.message
+        } else {
+          switch (status) {
+            case 401:
+              errorMessage = 'Invalid username or password. Please check your credentials and try again.'
+              break
+            case 404:
+              errorMessage = 'User not found. Please check your username or sign up for a new account.'
+              break
+            case 429:
+              errorMessage = 'Too many login attempts. Please try again later.'
+              break
+            case 500:
+              errorMessage = 'Server error. Please try again later.'
+              break
+            default:
+              errorMessage = `Login failed (Error ${status})`
+          }
+        }
+      } else if (error.request) {
+        // Network error
+        errorMessage = 'Unable to connect to server. Please check your internet connection and try again.'
+      } else {
+        // Other error
+        errorMessage = error.message || 'An unexpected error occurred during login.'
+      }
+
+      return { success: false, error: errorMessage }
     } finally {
       isLoading.value = false
     }
@@ -49,7 +87,45 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: true, user: user.value }
     } catch (error) {
       console.error('Registration error:', error)
-      return { success: false, error: error.response?.data?.message || 'Registration failed' }
+
+      // Better error handling
+      let errorMessage = 'Registration failed'
+
+      if (error.response) {
+        // Server responded with error status
+        const status = error.response.status
+        const data = error.response.data
+
+        // Use the exact message from backend if available
+        if (data?.message) {
+          errorMessage = data.message
+        } else {
+          switch (status) {
+            case 400:
+              errorMessage = 'Invalid registration data. Please check your information and try again.'
+              break
+            case 409:
+              errorMessage = 'Username or email already exists. Please choose a different one.'
+              break
+            case 422:
+              errorMessage = 'Invalid data format. Please check your information and try again.'
+              break
+            case 500:
+              errorMessage = 'Server error. Please try again later.'
+              break
+            default:
+              errorMessage = `Registration failed (Error ${status})`
+          }
+        }
+      } else if (error.request) {
+        // Network error
+        errorMessage = 'Unable to connect to server. Please check your internet connection and try again.'
+      } else {
+        // Other error
+        errorMessage = error.message || 'An unexpected error occurred during registration.'
+      }
+
+      return { success: false, error: errorMessage }
     } finally {
       isLoading.value = false
     }
@@ -60,6 +136,27 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+
+    // Clear all stores data when logout
+    clearAllStoresData()
+  }
+
+  const clearAllStoresData = () => {
+    // Import stores dynamically to avoid circular dependency
+    import('./tasks.js').then(({ useTasksStore }) => {
+      const tasksStore = useTasksStore()
+      tasksStore.$patch({ tasks: [] })
+    })
+
+    import('./projects.js').then(({ useProjectsStore }) => {
+      const projectsStore = useProjectsStore()
+      projectsStore.$patch({ projects: [] })
+    })
+
+    import('./events.js').then(({ useEventsStore }) => {
+      const eventsStore = useEventsStore()
+      eventsStore.$patch({ events: [] })
+    })
   }
 
   const initializeAuth = () => {

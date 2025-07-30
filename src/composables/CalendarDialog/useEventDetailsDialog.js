@@ -2,10 +2,21 @@ import { computed } from 'vue'
 import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
 import { useDialogManager } from '@/composables/common/useDialogManager'
 import { useConfirmModal } from '@/composables/common/useConfirmModal'
+import { useEventOperations } from '@/composables/CalendarCommon/useEventOperations'
+import { useEventsStore } from '@/stores/events'
 
 export function useEventDetailsDialog(props, emit) {
   const themeColors = useThemeColors('modal')
   const dialogManager = useDialogManager()
+  const eventsStore = useEventsStore()
+
+  const {
+    loading,
+    error,
+    clearError,
+    getEventTitle,
+    deleteEventWithoutConfirm
+  } = useEventOperations(eventsStore)
   const {
     isOpen: confirmModalOpen,
     loading: confirmModalLoading,
@@ -100,12 +111,17 @@ export function useEventDetailsDialog(props, emit) {
       if (confirmed) {
         console.log('Selected event for deletion:', event)
         console.log('Event ID:', event?.id || event?._id)
-        emit('delete-event', event)
-        closeDialog()
+
+        const result = await deleteEventWithoutConfirm(event)
+        if (result.success) {
+          closeDialog()
+          console.log('✅ Event deleted successfully')
+        } else {
+          console.error('❌ Failed to delete event:', result.error)
+        }
       }
     } catch (error) {
-      // User cancelled - do nothing
-      console.log('Event deletion cancelled by user')
+      console.error('Error during event deletion:', error)
     }
   }
 

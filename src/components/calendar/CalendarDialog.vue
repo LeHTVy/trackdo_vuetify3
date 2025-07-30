@@ -37,7 +37,7 @@
                 variant="outlined"
                 :color="getPrimaryColor()"
                 required
-                :rules="[v => !!v || 'Event title is required']"
+                :rules="[v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Event title is required' : true]"
                 prepend-inner-icon="mdi-format-title"
                 class="input-field"
                 hide-details="auto"
@@ -258,7 +258,6 @@
   <EventDetailsDialog
     v-model="detailsDialog"
     :selected-event="selectedEvent"
-    @delete-event="deleteEvent"
     @edit-event="editEvent"
     @close="detailsDialog = false"
   />
@@ -314,7 +313,7 @@ export default {
       default: false
     }
   },
-  emits: ['update:modelValue', 'update:detailsModelValue', 'save-event', 'delete-event', 'edit-event', 'close'],
+  emits: ['update:modelValue', 'update:detailsModelValue', 'save-event', 'edit-event', 'close'],
   setup(props, { emit }) {
     const eventsStore = useEventsStore()
 
@@ -374,19 +373,6 @@ export default {
       emit('save-event', eventData)
     }
 
-    const deleteEvent = async (event = null) => {
-      console.log('CalendarDialog deleteEvent called with:', event)
-      const result = await deleteEventAction(event)
-      console.log('Delete result:', result)
-
-      if (result.success) {
-        detailsDialog.value = false
-        emit('delete-event', event || props.selectedEvent)
-      } else {
-        console.log('Delete event failed:', result.error)
-      }
-    }
-
     const editEvent = (event) => {
       console.log('CalendarDialog editEvent called with:', event)
       detailsDialog.value = false
@@ -429,7 +415,6 @@ export default {
       // Methods
       closeDialog,
       saveEvent,
-      deleteEvent,
       editEvent
     }
   }

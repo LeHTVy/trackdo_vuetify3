@@ -38,7 +38,7 @@
   import { computed } from 'vue'
 
   const currentDate = computed(() => {
-    return new Date().toLocaleDateString('vi-VN', {
+    return new Date().toLocaleDateString('en-US', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

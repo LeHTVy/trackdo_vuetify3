@@ -59,7 +59,7 @@
     recentActivities,
     fetchProjects,
     saveProject,
-    deleteProject,
+    deleteProjectWithConfirm,
     viewProject,
     getInitialProjectData
   } = useProjectOperations()
@@ -88,7 +88,7 @@
   }
 
   const handleDeleteProject = async (projectId) => {
-    await deleteProject(projectId)
+    await deleteProjectWithConfirm(projectId, projects.value)
   }
 
   const handleSaveProject = async (projectData) => {

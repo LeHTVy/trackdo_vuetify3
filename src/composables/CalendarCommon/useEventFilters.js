@@ -4,12 +4,19 @@ export function useEventFilters(events) {
   const formattedEvents = computed(() => {
     if (!events.value || !Array.isArray(events.value)) return []
 
-    return events.value.map(event => ({
-      ...event,
-      title: event.name || event.title,
-      start: new Date(event.start),
-      end: new Date(event.end)
-    }))
+    return events.value.map(event => {
+      // Ensure both id and _id are present for consistency
+      const eventId = event.id || event._id
+
+      return {
+        ...event,
+        id: eventId,
+        _id: eventId,
+        title: event.name || event.title,
+        start: new Date(event.start),
+        end: new Date(event.end)
+      }
+    })
   })
 
   const todayEvents = computed(() => {

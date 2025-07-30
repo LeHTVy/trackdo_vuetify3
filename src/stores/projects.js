@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import { storeLogger } from '@/services/logger'
 import { useAuthStore } from './auth.js'
 
 export const useProjectsStore = defineStore('projects', () => {
@@ -213,7 +214,6 @@ export const useProjectsStore = defineStore('projects', () => {
       }
     })
 
-    // Nếu không có activities nào, hiển thị "no activity"
     if (activities.length === 0) {
       activities.push({
         id: 'no-activity',
@@ -227,7 +227,6 @@ export const useProjectsStore = defineStore('projects', () => {
     return activities
   })
 
-  // Helper function để tính thời gian "time ago"
   const getTimeAgo = (date) => {
     const now = new Date()
     const diffInMs = now - date
@@ -244,7 +243,7 @@ export const useProjectsStore = defineStore('projects', () => {
     } else if (diffInDays < 7) {
       return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`
     } else {
-      return date.toLocaleDateString()
+      return date.toLocaleDateString('en-US')
     }
   }
 
@@ -253,22 +252,35 @@ export const useProjectsStore = defineStore('projects', () => {
     error.value = null
 
     try {
+      if (!authStore.isAuthenticated) {
+        projects.value = []
+        loading.value = false
+        return
+      }
+
       const { mongoService } = await import('@/services/mongodb.js')
       const result = await mongoService.projects.getAll()
       if (result.success) {
-        // Ensure all projects have both _id and id for compatibility
-        projects.value = result.data.map(project => ({
+        const currentUserId = authStore.currentUser?.id || authStore.currentUser?._id
+        const userProjects = result.data.filter(project =>
+          project.userId === currentUserId
+        )
+
+        projects.value = userProjects.map(project => ({
           ...project,
           id: project._id || project.id,
           _id: project._id || project.id
         }))
-        console.log('✅ Projects loaded from MongoDB:', projects.value.length)
+        storeLogger.success('User projects loaded from MongoDB', {
+          count: projects.value.length,
+          userId: currentUserId
+        })
       } else {
-        console.warn('⚠️ Failed to load from MongoDB')
+        storeLogger.warn('Failed to load from MongoDB', result.error)
         error.value = result.error
       }
     } catch (error_) {
-      console.error('❌ Error fetching projects:', error_)
+      storeLogger.error('Error fetching projects', error_)
       error.value = error_.message
     } finally {
       loading.value = false
@@ -296,15 +308,15 @@ export const useProjectsStore = defineStore('projects', () => {
           _id: result.data._id || result.data.id
         }
         projects.value.push(newProject)
-        console.log('✅ Project created in MongoDB:', newProject)
+        storeLogger.success('Project created in MongoDB', { title: newProject.title, id: newProject._id })
         return newProject
       } else {
-        console.error('❌ Failed to create project:', result.error)
+        storeLogger.error('Failed to create project', result.error)
         error.value = result.error
         return null
       }
     } catch (error_) {
-      console.error('❌ Error creating project:', error_)
+      storeLogger.error('Error creating project', error_)
       error.value = error_.message
       return null
     } finally {
@@ -320,33 +332,30 @@ export const useProjectsStore = defineStore('projects', () => {
       const { mongoService } = await import('@/services/mongodb.js')
       const result = await mongoService.projects.update(projectId, updates)
       if (result.success) {
-        // Find project by both _id and id to handle MongoDB compatibility
         const index = projects.value.findIndex(project =>
           project._id === projectId || project.id === projectId
         )
         if (index !== -1) {
-          // Ensure the updated project has both _id and id for compatibility
           const updatedProject = {
             ...result.data,
             id: result.data._id || result.data.id,
             _id: result.data._id || result.data.id
           }
           projects.value[index] = updatedProject
-          console.log('✅ Project updated in MongoDB:', updatedProject)
+          storeLogger.success('Project updated in MongoDB', { title: updatedProject.title, id: projectId })
           return updatedProject
         } else {
-          console.warn('Project not found in local array with ID:', projectId)
-          // If not found locally, refetch all projects to ensure consistency
+          storeLogger.warn('Project not found in local array', { id: projectId })
           await fetchProjects()
           return result.data
         }
       } else {
-        console.error('❌ Failed to update project:', result.error)
+        storeLogger.error('Failed to update project', result.error)
         error.value = result.error
         return null
       }
     } catch (error_) {
-      console.error('❌ Error updating project:', error_)
+      storeLogger.error('Error updating project', error_)
       error.value = error_.message
       return null
     } finally {
@@ -358,30 +367,29 @@ export const useProjectsStore = defineStore('projects', () => {
     loading.value = true
     error.value = null
 
-    console.log('Store deleteProject - received ID:', projectId)
+    storeLogger.debug('Store deleteProject - received ID', { id: projectId })
 
     try {
       const { mongoService } = await import('@/services/mongodb.js')
       const result = await mongoService.projects.delete(projectId)
       if (result.success) {
-        // Find project by both _id and id to handle MongoDB compatibility
         const index = projects.value.findIndex(project =>
           project._id === projectId || project.id === projectId
         )
         if (index !== -1) {
           const deletedProject = projects.value.splice(index, 1)[0]
-          console.log('✅ Project deleted from MongoDB:', deletedProject)
+          storeLogger.success('Project deleted from MongoDB', { id: projectId })
           return deletedProject
         } else {
-          console.warn('Project not found in local array with ID:', projectId)
+          storeLogger.warn('Project not found in local array for deletion', { id: projectId })
         }
       } else {
-        console.error('❌ Failed to delete project:', result.error)
+        storeLogger.error('Failed to delete project', result.error)
         error.value = result.error
         return null
       }
     } catch (error_) {
-      console.error('❌ Error deleting project:', error_)
+      storeLogger.error('Error deleting project', error_)
       error.value = error_.message
       return null
     } finally {

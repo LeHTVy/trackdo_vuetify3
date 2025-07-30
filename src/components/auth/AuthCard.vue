@@ -2,7 +2,8 @@
   <v-card class="auth-card" elevation="12">
     <!-- Tabs -->
     <v-tabs
-      v-model="tab"
+      :model-value="tab"
+      @update:model-value="switchTab"
       class="auth-tabs"
       color="primary"
       centered
@@ -19,14 +20,14 @@
     </v-tabs>
 
     <v-card-text class="pa-6 pt-8">
-      <v-window v-model="tab">
+      <v-window :model-value="tab">
         <!-- Login Form -->
         <v-window-item value="login">
           <div class="form-container mt-8">
-            <v-form ref="loginForm" v-model="loginValid" @submit.prevent="handleLogin">
+            <v-form ref="loginForm" :model-value="loginValid" @submit.prevent="handleLoginSubmit">
               <v-text-field
                 v-model="loginData.username"
-                :rules="[rules.required]"
+                :rules="usernameRules"
                 label="Username or Email"
                 prepend-inner-icon="mdi-account"
                 variant="outlined"
@@ -36,7 +37,7 @@
 
               <v-text-field
                 v-model="loginData.password"
-                :rules="[rules.required]"
+                :rules="passwordRules"
                 :type="showPassword ? 'text' : 'password'"
                 label="Password"
                 prepend-inner-icon="mdi-lock"
@@ -77,13 +78,13 @@
         <!-- Signup Form -->
         <v-window-item value="signup">
           <div class="form-container mt-4">
-            <v-form ref="signupForm" v-model="signupValid" @submit.prevent="handleSignup">
+            <v-form ref="signupForm" :model-value="signupValid" @submit.prevent="handleSignupSubmit">
               <!-- Name Fields with better spacing -->
               <v-row class="mb-2">
                 <v-col cols="12" sm="6" class="pb-2">
                   <v-text-field
                     v-model="signupData.firstName"
-                    :rules="[rules.required]"
+                    :rules="firstNameRules"
                     label="First Name"
                     prepend-inner-icon="mdi-account"
                     variant="outlined"
@@ -94,7 +95,7 @@
                 <v-col cols="12" sm="6" class="pb-2">
                   <v-text-field
                     v-model="signupData.lastName"
-                    :rules="[rules.required]"
+                    :rules="lastNameRules"
                     label="Last Name"
                     prepend-inner-icon="mdi-account-outline"
                     variant="outlined"
@@ -106,7 +107,7 @@
 
               <v-text-field
                 v-model="signupData.username"
-                :rules="[rules.required, rules.username]"
+                :rules="signupUsernameRules"
                 label="Username"
                 prepend-inner-icon="mdi-at"
                 variant="outlined"
@@ -117,7 +118,7 @@
 
               <v-text-field
                 v-model="signupData.email"
-                :rules="[rules.required, rules.email]"
+                :rules="emailRules"
                 label="Email"
                 prepend-inner-icon="mdi-email"
                 variant="outlined"
@@ -128,7 +129,7 @@
 
               <v-text-field
                 v-model="signupData.password"
-                :rules="[rules.required, rules.password]"
+                :rules="signupPasswordRules"
                 :type="showPassword ? 'text' : 'password'"
                 label="Password"
                 prepend-inner-icon="mdi-lock"
@@ -142,7 +143,7 @@
 
               <v-text-field
                 v-model="signupData.confirmPassword"
-                :rules="[rules.required, rules.confirmPassword]"
+                :rules="confirmPasswordRules"
                 :type="showConfirmPassword ? 'text' : 'password'"
                 label="Confirm Password"
                 prepend-inner-icon="mdi-lock-check"
@@ -186,27 +187,26 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useAuth } from '@/composables/common/useAuth'
 import { useAuthStore } from '@/stores/auth'
+import { useSnackbarStore } from '@/stores/snackbar'
 
 const authStore = useAuthStore()
+const snackbarStore = useSnackbarStore()
 
-// Use the auth composable
+// Get state and methods from useAuth (excluding snackbar)
 const {
   // State
   tab,
   showPassword,
   showConfirmPassword,
-  loginValid,
-  signupValid,
   loginData,
   signupData,
 
-  // Computed
-  isLogin,
-
   // Validation
-  rules,
+  loginValidation,
+  signupValidation,
 
   // Methods
   handleLogin,
@@ -214,6 +214,142 @@ const {
   switchTab,
   togglePasswordVisibility
 } = useAuth()
+
+// Get snackbar from store
+const snackbar = computed(() => snackbarStore.snackbar)
+
+// Message methods from store
+const showErrorMessage = (message) => {
+  snackbarStore.showErrorMessage(message)
+}
+
+// Computed validation states
+const loginValid = computed(() => {
+  return loginValidation.validationState.value.isValid
+})
+
+const signupValid = computed(() => {
+  return signupValidation.validationState.value.isValid
+})
+
+const isLogin = computed(() => tab.value === 'login')
+
+// Enhanced validation rules with better error messages
+const usernameRules = computed(() => [
+  (value) => {
+    if (!value || value.trim() === '') return 'Username or email is required'
+    if (value.length < 3) return 'Username must be at least 3 characters'
+    return true
+  }
+])
+
+const passwordRules = computed(() => [
+  (value) => {
+    if (!value || value.trim() === '') return 'Password is required'
+    if (value.length < 6) return 'Password must be at least 6 characters'
+    return true
+  }
+])
+
+const firstNameRules = computed(() => [
+  (value) => {
+    if (!value || value.trim() === '') return 'First name is required'
+    if (value.length < 2) return 'First name must be at least 2 characters'
+    return true
+  }
+])
+
+const lastNameRules = computed(() => [
+  (value) => {
+    if (!value || value.trim() === '') return 'Last name is required'
+    if (value.length < 2) return 'Last name must be at least 2 characters'
+    return true
+  }
+])
+
+const signupUsernameRules = computed(() => [
+  (value) => {
+    if (!value || value.trim() === '') return 'Username is required'
+    if (value.length < 3) return 'Username must be at least 3 characters'
+    if (!/^[a-zA-Z0-9_]+$/.test(value)) return 'Username can only contain letters, numbers, and underscores'
+    return true
+  }
+])
+
+const emailRules = computed(() => [
+  (value) => {
+    if (!value || value.trim() === '') return 'Email is required'
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailPattern.test(value)) return 'Please enter a valid email address'
+    return true
+  }
+])
+
+const signupPasswordRules = computed(() => [
+  (value) => {
+    if (!value || value.trim() === '') return 'Password is required'
+    if (value.length < 6) return 'Password must be at least 6 characters'
+    if (!/(?=.*[a-z])/.test(value)) return 'Password must contain at least one lowercase letter'
+    if (!/(?=.*[A-Z])/.test(value)) return 'Password must contain at least one uppercase letter'
+    if (!/(?=.*\d)/.test(value)) return 'Password must contain at least one number'
+    return true
+  }
+])
+
+const confirmPasswordRules = computed(() => [
+  (value) => {
+    if (!value || value.trim() === '') return 'Password confirmation is required'
+    if (value !== signupData.value.password) return 'Password confirmation does not match'
+    return true
+  }
+])
+
+// Enhanced form submission handlers with better error handling
+const handleLoginSubmit = async () => {
+  console.log('🔄 AuthCard: Login form submitted')
+
+  try {
+    // Validate form first
+    if (!loginValid.value) {
+      showErrorMessage('Please fix validation errors before submitting')
+      return
+    }
+
+    // Call the useAuth handleLogin method
+    const result = await handleLogin()
+    console.log('🔄 AuthCard: Login result:', result)
+
+    if (!result.success) {
+      console.log('❌ AuthCard: Login failed, error should be shown by useAuth')
+    }
+  } catch (error) {
+    console.log('💥 AuthCard: Login error:', error)
+    showErrorMessage('An unexpected error occurred during login')
+  }
+}
+
+const handleSignupSubmit = async () => {
+  console.log('🔄 AuthCard: Signup form submitted')
+
+  try {
+    // Validate form first
+    if (!signupValid.value) {
+      showErrorMessage('Please fix validation errors before submitting')
+      return
+    }
+
+    // Call the useAuth handleSignup method
+    const result = await handleSignup()
+    console.log('🔄 AuthCard: Signup result:', result)
+
+    if (!result.success) {
+      console.log('❌ AuthCard: Signup failed, error should be shown by useAuth')
+    }
+  } catch (error) {
+    console.log('💥 AuthCard: Signup error:', error)
+    showErrorMessage('An unexpected error occurred during registration')
+  }
+}
 </script>
 
 <style scoped>

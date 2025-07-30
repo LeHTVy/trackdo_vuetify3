@@ -24,45 +24,70 @@
       <AuthCard />
     </div>
 
-    <!-- Success/Error Snackbar -->
+    <!-- Enhanced Snackbar with better visibility -->
     <v-snackbar
       v-model="snackbar.show"
       :color="snackbar.color"
-      :timeout="4000"
-      location="top"
+      :timeout="snackbar.color === 'error' ? 8000 : snackbar.color === 'warning' ? 6000 : 4000"
+      location="top center"
+      elevation="6"
+      rounded="lg"
+      class="auth-snackbar"
     >
-      {{ snackbar.message }}
-      <template #actions>
+      <div class="d-flex align-center">
+        <v-icon
+          :icon="getSnackbarIcon(snackbar.color)"
+          class="me-2"
+          size="20"
+        />
+        <span class="font-weight-medium">{{ snackbar.message }}</span>
+      </div>
+
+      <template v-slot:actions>
         <v-btn
-          color="white"
           variant="text"
-          @click="snackbar.show = false"
-        >
-          Close
-        </v-btn>
+          size="small"
+          @click="hideMessage"
+          icon="mdi-close"
+        />
       </template>
     </v-snackbar>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-import { useAuth } from '@/composables/common/useAuth'
+import { onMounted, computed } from 'vue'
+import { useSnackbarStore } from '@/stores/snackbar'
 import AuthCard from '@/components/auth/AuthCard.vue'
 import AppPreview from '@/components/auth/AppPreview.vue'
 
-// Use the auth composable
-const {
-  // State
-  snackbar,
+// Use snackbar store
+const snackbarStore = useSnackbarStore()
+const snackbar = computed(() => snackbarStore.snackbar)
 
-  // Methods
-  checkAuthAndRedirect
-} = useAuth()
+const hideMessage = () => {
+  snackbarStore.hideMessage()
+}
+
+// Method to get appropriate icon for snackbar
+const getSnackbarIcon = (color) => {
+  switch (color) {
+    case 'success':
+      return 'mdi-check-circle'
+    case 'error':
+      return 'mdi-alert-circle'
+    case 'warning':
+      return 'mdi-alert'
+    case 'info':
+      return 'mdi-information'
+    default:
+      return 'mdi-information'
+  }
+}
 
 // Check authentication on mount
 onMounted(() => {
-  checkAuthAndRedirect()
+  console.log('🔧 Auth page mounted, snackbar state:', snackbar.value)
 })
 </script>
 
@@ -72,6 +97,48 @@ onMounted(() => {
   background-color: rgb(var(--v-theme-background));
   position: relative;
   overflow: hidden;
+}
+
+.auth-snackbar {
+  z-index: 9999 !important;
+}
+
+.auth-snackbar .v-snackbar__wrapper {
+  min-width: 300px;
+  max-width: 500px;
+}
+
+.auth-snackbar .v-snackbar__content {
+  padding: 16px 20px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Ensure snackbar is always visible */
+.v-snackbar--active {
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+}
+
+/* Color variants for better visibility */
+.v-snackbar.v-theme--light.success {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+.v-snackbar.v-theme--light.error {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+.v-snackbar.v-theme--light.warning {
+  background-color: #ff9800 !important;
+  color: white !important;
+}
+
+.v-snackbar.v-theme--light.info {
+  background-color: #2196f3 !important;
+  color: white !important;
 }
 
 .background-content {
@@ -140,6 +207,8 @@ onMounted(() => {
   line-height: 1.6;
 }
 
+
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .auth-overlay {
@@ -179,6 +248,8 @@ onMounted(() => {
   .visual-content-wrapper {
     margin-left: 0;
   }
+
+
 }
 
 @media (max-width: 600px) {
@@ -192,6 +263,10 @@ onMounted(() => {
 
   .background-content {
     padding: 1rem;
+  }
+
+    .hero-text-section {
+    margin-top: 20rem;
   }
 }
 </style>

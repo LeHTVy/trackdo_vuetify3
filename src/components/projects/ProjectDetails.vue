@@ -6,7 +6,7 @@
     transition="dialog-top-transition"
     class="details-dialog"
   >
-    <v-card v-if="selectedProject" class="details-card" elevation="16">
+    <v-card v-if="selectedProject && projectTitle" class="details-card" elevation="16">
       <v-card-title class="details-header pa-6" :class="`bg-${getProjectStatusColor(selectedProject.status)}`">
         <div class="d-flex align-center">
           <v-avatar size="36" color="white" class="mr-3">
@@ -133,7 +133,7 @@
         <!-- Budget -->
         <div v-if="hasBudget" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-currency-usd" :color="getSuccessColor()" class="mr-2"></v-icon>
+            <v-icon icon="mdi-currency-usd" :color="getThemeColor('success')" class="mr-2"></v-icon>
             <span class="text-subtitle2 font-weight-medium">Budget</span>
           </div>
           <p class="text-body-1 ml-8 font-weight-medium">{{ formatBudget(selectedProject.budget) }}</p>
@@ -210,145 +210,77 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-
-  <!-- Confirm Modal -->
-  <ConfirmModal
-    v-model="confirmModalOpen"
-    :type="confirmModalConfig.type"
-    :title="confirmModalConfig.title"
-    :message="confirmModalConfig.message"
-    :details="confirmModalConfig.details"
-    :confirm-text="confirmModalConfig.confirmText"
-    :cancel-text="confirmModalConfig.cancelText"
-    :loading="confirmModalLoading"
-    @confirm="confirmModalConfirm"
-    @cancel="confirmModalCancel"
-  />
 </template>
 
-<script>
+<script setup>
 import { useProjectDetailsDialog } from '@/composables/ProjectCommon/useProjectDetailsDialog'
-import ConfirmModal from '@/components/common/ConfirmModal.vue'
 
-export default {
-  name: 'ProjectDetailsDialog',
-  components: {
-    ConfirmModal
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false
   },
-  props: {
-    modelValue: {
-      type: Boolean,
-      default: false
-    },
-    selectedProject: {
-      type: Object,
-      default: null
-    }
-  },
-  emits: ['update:modelValue', 'delete-project', 'edit-project', 'duplicate-project', 'close'],
-  setup(props, { emit }) {
-    const {
-      // Theme colors
-      getPrimaryColor,
-      getSecondaryColor,
-      getAccentColor,
-      getErrorColor,
-      getWarningColor,
-      getInfoColor,
-      getSuccessColor,
-
-      // State
-      isOpen,
-
-      // Confirm modal properties
-      confirmModalOpen,
-      confirmModalLoading,
-      confirmModalConfig,
-      confirmModalConfirm,
-      confirmModalCancel,
-
-      // Computed properties
-      projectTitle,
-      projectDescription,
-      projectStatus,
-      hasEndDate,
-      hasPriority,
-      hasDescription,
-      hasBudget,
-      hasCategory,
-      hasTeamMembers,
-
-      // Methods
-      getProjectStatusIcon,
-      getProjectStatusColor,
-      getPriorityColor,
-      formatDate,
-      formatBudget,
-      closeDialog,
-      deleteProject,
-      editProject,
-      duplicateProject
-    } = useProjectDetailsDialog(props, emit)
-
-    // Team member colors
-    const teamMemberColors = ['primary', 'secondary', 'accent', 'info', 'warning', 'success', 'error']
-
-    // Get color for team member chip
-    const getTeamMemberColor = (index) => {
-      return teamMemberColors[index % teamMemberColors.length]
-    }
-
-    const handleDeleteProject = async () => {
-      console.log('Delete button clicked!')
-      console.log('Selected project:', props.selectedProject)
-      await deleteProject()
-    }
-
-    return {
-      // Theme colors
-      getPrimaryColor,
-      getSecondaryColor,
-      getAccentColor,
-      getErrorColor,
-      getWarningColor,
-      getInfoColor,
-      getSuccessColor,
-
-      // State
-      isOpen,
-
-      // Confirm modal properties
-      confirmModalOpen,
-      confirmModalLoading,
-      confirmModalConfig,
-      confirmModalConfirm,
-      confirmModalCancel,
-
-      // Computed properties
-      projectTitle,
-      projectDescription,
-      projectStatus,
-      hasEndDate,
-      hasPriority,
-      hasDescription,
-      hasBudget,
-      hasCategory,
-      hasTeamMembers,
-
-      // Methods
-      getProjectStatusIcon,
-      getProjectStatusColor,
-      getPriorityColor,
-      formatDate,
-      formatBudget,
-      closeDialog,
-      deleteProject,
-      editProject,
-      duplicateProject,
-      handleDeleteProject,
-      getTeamMemberColor
-    }
+  selectedProject: {
+    type: Object,
+    default: null
   }
+})
+
+const emit = defineEmits(['update:modelValue', 'delete-project', 'edit-project', 'duplicate-project', 'close'])
+
+const {
+  // Theme colors
+  getPrimaryColor,
+  getThemeColor,
+
+  // State
+  isOpen,
+
+  // Computed properties
+  projectTitle,
+  projectDescription,
+  projectStatus,
+  hasEndDate,
+  hasPriority,
+  hasDescription,
+  hasBudget,
+  hasCategory,
+  hasTeamMembers,
+
+  // Methods
+  getProjectStatusIcon,
+  getProjectStatusColor,
+  getPriorityColor,
+  formatDate,
+  formatBudget,
+  closeDialog,
+  editProject,
+  duplicateProject
+} = useProjectDetailsDialog(props, emit)
+
+// Team member colors
+const teamMemberColors = ['primary', 'secondary', 'accent', 'info', 'warning', 'success', 'error']
+
+// Get color for team member chip
+const getTeamMemberColor = (index) => {
+  return teamMemberColors[index % teamMemberColors.length]
+}
+
+const handleDeleteProject = () => {
+  console.log('Delete button clicked!')
+  console.log('Selected project:', props.selectedProject)
+
+  const project = props.selectedProject
+  if (!project) {
+    console.error('No project selected for deletion')
+    return
+  }
+
+  // Emit delete event directly - let parent handle confirmation
+  const projectId = project._id || project.id
+  console.log('ProjectDetails handleDeleteProject - ID:', projectId)
+  emit('delete-project', projectId)
+  closeDialog()
 }
 </script>
 

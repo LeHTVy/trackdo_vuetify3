@@ -31,6 +31,7 @@ declare module 'vue' {
     DayEventsModal: typeof import('./src/components/calendar/DayEventsModal.vue')['default']
     DeleteConfirmModal: typeof import('./src/components/tasks/DeleteConfirmModal.vue')['default']
     EnhancedCalendar: typeof import('./src/components/calendar/EnhancedCalendar.vue')['default']
+    EnhancedComponent: typeof import('./src/components/common/EnhancedComponent.vue')['default']
     EventDetailsDialog: typeof import('./src/components/calendar/EventDetailsDialog.vue')['default']
     EventDialog: typeof import('./src/components/calendar/EventDialog.vue')['default']
     EventsList: typeof import('./src/components/calendar/EventsList.vue')['default']

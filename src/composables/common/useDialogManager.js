@@ -1,95 +1,109 @@
 import { ref, nextTick } from 'vue'
+import { useUniversalDialog, DialogTypes } from './useUniversalDialog'
+import logger from '@/services/logger'
+
+const dialogLogger = logger.createLogger('DialogManager')
 
 export function useDialogManager() {
-  const eventDialog = ref(false)
-  const eventDetailsDialog = ref(false)
-  const selectedEvent = ref(null)
-  
-  // Project dialog states
-  const projectDialog = ref(false)
-  const projectDetailsDialog = ref(false)
-  const selectedProject = ref(null)
+  // Use universal dialog system
+  const eventDialogManager = useUniversalDialog('event-dialog')
+  const eventDetailsDialogManager = useUniversalDialog('event-details-dialog')
+  const projectDialogManager = useUniversalDialog('project-dialog')
+  const projectDetailsDialogManager = useUniversalDialog('project-details-dialog')
 
-  const openEventDialog = () => {
-    eventDialog.value = true
+  // Legacy refs for backwards compatibility
+  const eventDialog = eventDialogManager.isOpen
+  const eventDetailsDialog = eventDetailsDialogManager.isOpen
+  const selectedEvent = eventDetailsDialogManager.data
+  const projectDialog = projectDialogManager.isOpen
+  const projectDetailsDialog = projectDetailsDialogManager.isOpen
+  const selectedProject = projectDetailsDialogManager.data
+
+  // Event dialog methods
+  const openEventDialog = async (eventData = null) => {
+    dialogLogger.debug('Opening event dialog', eventData)
+    return eventDialogManager.openDialog(eventData, { type: DialogTypes.FORM })
   }
 
   const closeEventDialog = async () => {
-    eventDialog.value = false
-    await nextTick()
-    return true
+    dialogLogger.debug('Closing event dialog')
+    return eventDialogManager.closeDialog()
   }
 
-  const openEventDetailsDialog = (event = null) => {
-    if (event) {
-      selectedEvent.value = event
-    }
-    eventDetailsDialog.value = true
+  const openEventDetailsDialog = async (event = null) => {
+    dialogLogger.debug('Opening event details dialog', event)
+    return eventDetailsDialogManager.openDialog(event, { type: DialogTypes.DETAILS })
   }
 
-  const closeEventDetailsDialog = () => {
-    eventDetailsDialog.value = false
-    selectedEvent.value = null
+  const closeEventDetailsDialog = async () => {
+    dialogLogger.debug('Closing event details dialog')
+    return eventDetailsDialogManager.closeDialog()
   }
 
-  const showEventDetails = (event) => {
-    selectedEvent.value = event
-    eventDetailsDialog.value = true
+  const showEventDetails = async (event) => {
+    dialogLogger.debug('Showing event details', event)
+    return eventDetailsDialogManager.openDialog(event, { type: DialogTypes.DETAILS })
   }
 
-  const showEventMenu = (event) => {
-    showEventDetails(event)
+  const showEventMenu = async (event) => {
+    return showEventDetails(event)
   }
 
-  const switchToEditDialog = () => {
-    eventDetailsDialog.value = false
-    eventDialog.value = true
+  const switchToEditDialog = async () => {
+    dialogLogger.debug('Switching from details to edit dialog')
+    const eventData = eventDetailsDialogManager.data.value
+    await eventDetailsDialogManager.closeDialog(false)
+    return eventDialogManager.openDialog(eventData, { type: DialogTypes.EDIT })
   }
 
   // Project dialog methods
-  const openProjectDialog = () => {
-    projectDialog.value = true
+  const openProjectDialog = async (projectData = null) => {
+    dialogLogger.debug('Opening project dialog', projectData)
+    return projectDialogManager.openDialog(projectData, { type: DialogTypes.FORM })
   }
 
   const closeProjectDialog = async () => {
-    projectDialog.value = false
-    await nextTick()
-    return true
+    dialogLogger.debug('Closing project dialog')
+    return projectDialogManager.closeDialog()
   }
 
-  const openProjectDetailsDialog = (project = null) => {
-    if (project) {
-      selectedProject.value = project
-    }
-    projectDetailsDialog.value = true
+  const openProjectDetailsDialog = async (project = null) => {
+    dialogLogger.debug('Opening project details dialog', project)
+    return projectDetailsDialogManager.openDialog(project, { type: DialogTypes.DETAILS })
   }
 
-  const closeProjectDetailsDialog = () => {
-    projectDetailsDialog.value = false
-    selectedProject.value = null
+  const closeProjectDetailsDialog = async () => {
+    dialogLogger.debug('Closing project details dialog')
+    return projectDetailsDialogManager.closeDialog()
   }
 
-  const showProjectDetails = (project) => {
-    selectedProject.value = project
-    projectDetailsDialog.value = true
+  const showProjectDetails = async (project) => {
+    dialogLogger.debug('Showing project details', project)
+    return projectDetailsDialogManager.openDialog(project, { type: DialogTypes.DETAILS })
   }
 
-  const switchToEditProjectDialog = () => {
-    projectDetailsDialog.value = false
-    projectDialog.value = true
+  const switchToEditProjectDialog = async () => {
+    dialogLogger.debug('Switching from project details to edit dialog')
+    const projectData = projectDetailsDialogManager.data.value
+    await projectDetailsDialogManager.closeDialog(false)
+    return projectDialogManager.openDialog(projectData, { type: DialogTypes.EDIT })
   }
 
-  const closeAllDialogs = () => {
-    eventDialog.value = false
-    eventDetailsDialog.value = false
-    selectedEvent.value = null
-    projectDialog.value = false
-    projectDetailsDialog.value = false
-    selectedProject.value = null
+  const closeAllDialogs = async () => {
+    dialogLogger.debug('Closing all dialogs')
+    await Promise.all([
+      eventDialogManager.closeDialog(),
+      eventDetailsDialogManager.closeDialog(),
+      projectDialogManager.closeDialog(),
+      projectDetailsDialogManager.closeDialog()
+    ])
   }
 
   const hasOpenDialog = () => {
-    return eventDialog.value || eventDetailsDialog.value || projectDialog.value || projectDetailsDialog.value
+    return eventDialogManager.isOpen.value ||
+           eventDetailsDialogManager.isOpen.value ||
+           projectDialogManager.isOpen.value ||
+           projectDetailsDialogManager.isOpen.value
   }
 
   return {

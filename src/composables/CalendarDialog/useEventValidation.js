@@ -120,26 +120,26 @@ export function useEventValidation() {
   const getValidationRules = () => {
     return {
       title: [
-        v => !!v || 'Event title is required',
-        v => (v && v.length <= 100) || 'Title must not exceed 100 characters'
+        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Event title is required' : true,
+        v => (v && v.length <= 100) ? true : 'Title must not exceed 100 characters'
       ],
       description: [
-        v => !v || v.length <= 500 || 'Description must not exceed 500 characters'
+        v => !v || v.length <= 500 ? true : 'Description must not exceed 500 characters'
       ],
       start: [
-        v => !!v || 'Start date is required'
+        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Start date is required' : true
       ],
       end: [
-        v => !!v || 'End date is required'
+        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'End date is required' : true
       ],
       type: [
-        v => !!v || 'Event type is required'
+        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Event type is required' : true
       ],
       priority: [
-        v => !!v || 'Priority level is required'
+        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Priority level is required' : true
       ],
       color: [
-        v => !!v || 'Color is required'
+        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Color is required' : true
       ]
     }
   }

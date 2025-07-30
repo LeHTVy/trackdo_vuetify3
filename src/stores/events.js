@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { mongoService } from '@/services/mongodb.js'
 import { isEventToday, isEventUpcoming } from '@/utils/dateUtils.js'
 import { useAuthStore } from './auth.js'
+import { storeLogger } from '@/services/logger.js'
 
 export const useEventsStore = defineStore('events', {
   state: () => ({
@@ -100,10 +101,33 @@ export const useEventsStore = defineStore('events', {
         this.loading = true
         this.error = null
 
+        // Only fetch if user is authenticated
+        const authStore = useAuthStore()
+        if (!authStore.isAuthenticated) {
+          this.events = []
+          this.loading = false
+          return
+        }
+
         const result = await mongoService.events.getAll()
         if (result.success && result.data) {
+          // Filter events by current user and ensure ID consistency
+          const currentUserId = authStore.currentUser?.id || authStore.currentUser?._id
           this.events = result.data
-          console.log('✅ Loaded events from MongoDB')
+            .filter(event => event.userId === currentUserId)
+            .map(event => {
+              // Ensure both id and _id are present for consistency
+              const transformedEvent = {
+                ...event,
+                id: event.id || event._id,
+                _id: event._id || event.id
+              }
+              return transformedEvent
+            })
+          storeLogger.success('User events loaded from MongoDB', {
+            count: this.events.length,
+            userId: currentUserId
+          })
         } else {
           throw new Error(result.message || 'Failed to load events from MongoDB')
         }
@@ -130,9 +154,15 @@ export const useEventsStore = defineStore('events', {
 
         const result = await mongoService.events.create(eventWithUser)
         if (result.success && result.data) {
-          this.events.push(result.data)
-          console.log('✅ Event added to MongoDB')
-          return result.data
+          // Ensure both id and _id are present for consistency
+          const transformedEvent = {
+            ...result.data,
+            id: result.data.id || result.data._id,
+            _id: result.data._id || result.data.id
+          }
+          this.events.push(transformedEvent)
+          storeLogger.success('Event added to MongoDB', { title: event.title || event.name })
+          return transformedEvent
         } else {
           throw new Error(result.message || 'Failed to add event to MongoDB')
         }
@@ -150,15 +180,46 @@ export const useEventsStore = defineStore('events', {
         this.loading = true
         this.error = null
 
-        const eventId = updatedEvent.id || updatedEvent._id
+        // Debug logging to track the event data structure
+        console.log('🔍 updateEvent called with full data:', {
+          updatedEvent: JSON.stringify(updatedEvent, null, 2),
+          keys: Object.keys(updatedEvent || {}),
+          id: updatedEvent?.id,
+          _id: updatedEvent?._id,
+          type: typeof updatedEvent
+        })
+
+        const eventId = updatedEvent?.id || updatedEvent?._id
+
+        // Debug logging to track the event ID
+        console.log('🔍 updateEvent ID extraction:', {
+          extractedEventId: eventId,
+          hasId: !!updatedEvent?.id,
+          has_id: !!updatedEvent?._id,
+          idType: typeof eventId
+        })
+
+        if (!eventId) {
+          console.error('❌ No event ID found in updatedEvent:', updatedEvent)
+          throw new Error('Event ID is required for update')
+        }
+
         const result = await mongoService.events.update(eventId, updatedEvent)
         if (result.success && result.data) {
-          // Support both 'id' and '_id' fields for MongoDB compatibility
+          // Ensure both id and _id are present for consistency
+          const transformedEvent = {
+            ...result.data,
+            id: result.data.id || result.data._id,
+            _id: result.data._id || result.data.id
+          }
           const index = this.events.findIndex(e => (e.id === eventId) || (e._id === eventId))
           if (index !== -1) {
-            this.events[index] = result.data
+            this.events[index] = transformedEvent
           }
-          console.log('✅ Event updated in MongoDB')
+          storeLogger.success('Event updated in MongoDB', {
+            id: eventId,
+            title: updatedEvent.title || updatedEvent.name
+          })
           return true
         } else {
           throw new Error(result.message || 'Failed to update event in MongoDB')
@@ -177,18 +238,16 @@ export const useEventsStore = defineStore('events', {
         this.loading = true
         this.error = null
 
-        // First check if event exists locally
         const localIndex = this.events.findIndex(e => (e.id === eventId) || (e._id === eventId))
         if (localIndex === -1) {
           console.warn(`Event ${eventId} not found in local state`)
-          return true // Consider it already deleted
+          return true
         }
 
         const result = await mongoService.events.delete(eventId)
         if (result.success) {
-          // Only remove from local state if backend deletion was successful
           this.events.splice(localIndex, 1)
-          console.log('✅ Event deleted from MongoDB and local state')
+          storeLogger.success('Event deleted from MongoDB and local state', { id: eventId })
           return true
         } else {
           throw new Error(result.error || 'Failed to delete event from MongoDB')

@@ -1,75 +1,140 @@
 import { ref, computed } from 'vue'
 import { useProjectsStore } from '@/stores/projects'
+import { useBaseOperations } from '@/composables/common/useBaseOperations'
+import { useEventHandler } from '@/composables/common/useEventHandler'
+import { useConfirmModal } from '@/composables/common/useConfirmModal'
+import logger from '@/services/logger'
+
+const projectLogger = logger.createLogger('ProjectOperations')
 
 export function useProjectOperations() {
   const projectsStore = useProjectsStore()
-  const loading = ref(false)
-  const error = ref(null)
-
-  // Computed properties for project data
+  const baseOps = useBaseOperations(projectsStore, 'project')
+  const eventHandler = useEventHandler('ProjectOperations')
+  const {
+    isOpen: confirmModalOpen,
+    loading: confirmModalLoading,
+    modalConfig: confirmModalConfig,
+    confirmDelete,
+    confirm: confirmModalConfirm,
+    cancel: confirmModalCancel
+  } = useConfirmModal()
   const projects = computed(() => projectsStore.projects)
   const recentActivities = computed(() => projectsStore.recentActivities)
-
-  // Project CRUD operations
   const fetchProjects = async () => {
-    loading.value = true
-    error.value = null
-    try {
-      await projectsStore.fetchProjects()
-    } catch (err) {
-      error.value = err.message || 'Failed to fetch projects'
-      console.error('Error fetching projects:', err)
-    } finally {
-      loading.value = false
-    }
+    return eventHandler.handleAsyncEvent(async () => {
+      return baseOps.fetchItems({
+        fetchMethod: 'fetchProjects',
+        successMessage: 'Projects loaded successfully',
+        errorMessage: 'Failed to fetch projects'
+      })
+    }, {
+      actionName: 'fetch_projects'
+    })
   }
 
   const saveProject = async (projectData, editingProject = null) => {
-    loading.value = true
-    error.value = null
-    try {
+    return eventHandler.handleAsyncEvent(async () => {
       if (editingProject) {
         const projectId = projectData._id || editingProject._id
-        console.log('Updating project with ID:', projectId)
-        await projectsStore.updateProject(projectId, projectData)
+        projectLogger.debug('Updating project', { id: projectId, title: projectData.title })
+
+        return baseOps.updateItem(projectData, projectId, {
+          updateMethod: 'updateProject',
+          successMessage: 'Project updated successfully',
+          errorMessage: 'Failed to update project'
+        })
       } else {
-        await projectsStore.addProject(projectData)
+        projectLogger.debug('Creating new project', { title: projectData.title })
+
+        return baseOps.createItem(projectData, {
+          createMethod: 'addProject',
+          successMessage: 'Project created successfully',
+          errorMessage: 'Failed to create project'
+        })
       }
-    } catch (err) {
-      error.value = err.message || 'Failed to save project'
-      console.error('Error saving project:', err)
-      throw err // Re-throw to handle in component
-    } finally {
-      loading.value = false
-    }
+    }, {
+      actionName: editingProject ? 'update_project' : 'create_project',
+      itemName: projectData.title || 'Project'
+    })
   }
 
-  const deleteProject = async (projectId) => {
-    console.log('Deleting project with ID:', projectId)
+  const deleteProject = async (projectId, skipConfirm = false) => {
+    return eventHandler.handleDelete(async () => {
+      if (!projectId) {
+        throw new Error('No project ID provided for deletion')
+      }
 
-    if (!projectId) {
-      console.error('No project ID provided for deletion')
-      error.value = 'No project ID provided for deletion'
-      return false
-    }
+      projectLogger.debug('Deleting project', { id: projectId })
 
-    loading.value = true
-    error.value = null
+      return baseOps.deleteItem(projectId, {
+        deleteMethod: 'deleteProject',
+        successMessage: 'Project deleted successfully',
+        errorMessage: 'Failed to delete project'
+      })
+    }, {
+      itemName: 'Project',
+      confirmMessage: skipConfirm ? undefined : 'Are you sure you want to delete this project? This action cannot be undone.'
+    })
+  }
+
+  // Delete project with confirm modal - for UI components
+  const deleteProjectWithConfirm = async (projectOrId, projects = []) => {
     try {
-      await projectsStore.deleteProject(projectId)
+      let project
+      let projectId
+
+      if (typeof projectOrId === 'string') {
+        projectId = projectOrId
+        // Try to find project in provided array first, then in store
+        project = projects.find(p => (p._id || p.id) === projectId) ||
+                 projectsStore.projects.find(p => (p._id || p.id) === projectId)
+      } else {
+        project = projectOrId
+        projectId = project._id || project.id
+      }
+
+      // If project not found, still allow deletion by ID (timing issue handling)
+      const projectName = project ? (project.title || project.name) : 'this project'
+
+      await confirmDelete(
+        projectName,
+        'This action cannot be undone. All project data will be permanently removed.'
+      )
+
+      projectLogger.debug('Confirmed delete project', { id: projectId, name: projectName })
+
+      await deleteProject(projectId, true)
       return true
-    } catch (err) {
-      error.value = err.message || 'Failed to delete project'
-      console.error('Error deleting project:', err)
+    } catch (error) {
+      projectLogger.debug('Delete cancelled or error:', error)
       return false
-    } finally {
-      loading.value = false
     }
   }
 
   const viewProject = (project) => {
-    console.log('View project:', project.title || project.name)
+    projectLogger.debug('View project', { title: project.title || project.name })
     // TODO: Implement project view logic
+  }
+
+  const duplicateProject = async (project) => {
+    return eventHandler.handleDuplicate(async () => {
+      return baseOps.duplicateItem(project, {
+        createMethod: 'addProject',
+        duplicateTransform: (originalProject) => ({
+          ...originalProject,
+          title: `${originalProject.title} (Copy)`,
+          status: 'Active',
+          progress: 0,
+          startDate: '',
+          endDate: ''
+        }),
+        successMessage: 'Project duplicated successfully',
+        errorMessage: 'Failed to duplicate project'
+      })
+    }, {
+      itemName: project.title || 'Project'
+    })
   }
 
   // Initial data for new projects
@@ -86,9 +151,16 @@ export function useProjectOperations() {
   })
 
   return {
-    // State
-    loading,
-    error,
+    // State from base operations
+    loading: baseOps.loading,
+    error: baseOps.error,
+
+    // Confirm modal properties
+    confirmModalOpen,
+    confirmModalLoading,
+    confirmModalConfig,
+    confirmModalConfirm,
+    confirmModalCancel,
 
     // Computed
     projects,
@@ -98,7 +170,13 @@ export function useProjectOperations() {
     fetchProjects,
     saveProject,
     deleteProject,
+    deleteProjectWithConfirm,
+    duplicateProject,
     viewProject,
-    getInitialProjectData
+    getInitialProjectData,
+
+    // Utilities
+    clearError: baseOps.clearError,
+    setError: baseOps.setError
   }
 }

@@ -14,12 +14,17 @@ import App from './App.vue'
 import 'unfonts.css'
 import '@/styles/global.css'
 
+// Note: Clerk removed - using custom authentication
+
 const app = createApp(App)
 
 registerPlugins(app)
 
 app.mount('#app')
 
+// Import logger for initialization
+import logger from '@/services/logger'
+
 initializeStores().catch(error => {
-  console.error('Store initialization failed:', error)
+  logger.error('Store initialization failed', error)
 })

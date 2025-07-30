@@ -82,7 +82,6 @@
       :edited-index="form.editedIndex.value"
       :loading="operations.loading.value"
       @save-event="handleSaveEvent"
-      @delete-event="handleDeleteEvent"
       @edit-event="handleEditEvent"
       @close="handleDialogClose"
     />
@@ -196,19 +195,23 @@ const handleSaveEvent = async (eventData) => {
   }
 }
 
-const handleDeleteEvent = async (event) => {
-  const result = await errorHandler.handleAsyncError(
-    () => operations.deleteEvent(event),
-    'Delete event failed'
-  )
-
-  if (result.success) {
-    dialogs.closeEventDetailsDialog()
-    console.log('✅ Event deleted successfully')
-  }
-}
-
 const handleEventUpdated = async (updatedEvent) => {
+  // Debug logging to track the event data
+  console.log('🔄 handleEventUpdated called with:', {
+    updatedEvent,
+    hasId: !!updatedEvent.id,
+    has_id: !!updatedEvent._id,
+    eventId: updatedEvent.id || updatedEvent._id,
+    eventKeys: Object.keys(updatedEvent),
+    eventType: typeof updatedEvent
+  })
+
+  // Ensure event has proper ID before updating
+  if (!updatedEvent.id && !updatedEvent._id) {
+    console.error('❌ Event missing both id and _id:', updatedEvent)
+    return
+  }
+
   await errorHandler.handleAsyncError(
     () => operations.saveEvent(updatedEvent, true, updatedEvent),
     'Failed to update event via drag and drop'

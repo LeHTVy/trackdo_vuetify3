@@ -34,8 +34,14 @@ export function useCalendarDialog(props, emit) {
       return props.detailsModelValue || dialogManager.eventDetailsDialog.value
     },
     set(value) {
-      emit('update:detailsModelValue', value)
-      dialogManager.eventDetailsDialog.value = value
+      // Only emit if we have the prop
+      if (props.detailsModelValue !== undefined) {
+        emit('update:detailsModelValue', value)
+      }
+      // Only set if it's not readonly
+      if (dialogManager.eventDetailsDialog.value !== value) {
+        dialogManager.eventDetailsDialog.value = value
+      }
     }
   })
 

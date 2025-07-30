@@ -8,18 +8,8 @@ import {
   isValidDate
 } from '@/utils/dateUtils.js'
 
-/**
- * Composable for formatting event time display
- * @returns {Object} Event time formatting functions
- */
 export function useEventTimeFormatter() {
 
-  /**
-   * Format time for today's events
-   * @param {Object} event - Event object with start and end dates
-   * @param {string} locale - Locale for formatting (default: 'en-US')
-   * @returns {string} Formatted time string
-   */
   const formatTodayEventTime = (event, locale = 'en-US') => {
     if (!isValidDate(event.start)) {
       return 'Invalid time'
@@ -79,13 +69,6 @@ export function useEventTimeFormatter() {
     return dateText
   }
 
-  /**
-   * Main event time formatter
-   * @param {Object} event - Event object
-   * @param {string} type - Type of list ('today' or 'upcoming')
-   * @param {string} locale - Locale for formatting
-   * @returns {string} Formatted time string
-   */
   const formatEventTime = (event, type = 'upcoming', locale = 'en-US') => {
     if (type === 'today') {
       return formatTodayEventTime(event, locale)
@@ -94,12 +77,6 @@ export function useEventTimeFormatter() {
     }
   }
 
-  /**
-   * Format event duration
-   * @param {Object} event - Event object
-   * @param {string} locale - Locale for formatting
-   * @returns {string} Formatted duration string
-   */
   const formatEventDuration = (event, locale = 'en-US') => {
     if (!isValidDate(event.start)) {
       return 'Invalid duration'
@@ -134,12 +111,6 @@ export function useEventTimeFormatter() {
     }
   }
 
-  /**
-   * Format event date range
-   * @param {Object} event - Event object
-   * @param {string} locale - Locale for formatting
-   * @returns {string} Formatted date range string
-   */
   const formatEventDateRange = (event, locale = 'en-US') => {
     if (!isValidDate(event.start)) {
       return 'Invalid date'
@@ -176,12 +147,6 @@ export function useEventTimeFormatter() {
     return `${startDateStr} - ${endDateStr}`
   }
 
-  /**
-   * Format relative time (e.g., "in 2 hours", "3 days ago")
-   * @param {Object} event - Event object
-   * @param {string} locale - Locale for formatting
-   * @returns {string} Relative time string
-   */
   const formatRelativeTime = (event, locale = 'en-US') => {
     if (!isValidDate(event.start)) {
       return 'Invalid time'
@@ -223,11 +188,6 @@ export function useEventTimeFormatter() {
     }
   }
 
-  /**
-   * Check if event is all day
-   * @param {Object} event - Event object
-   * @returns {boolean} True if event is all day
-   */
   const isAllDayEvent = (event) => {
     if (!isValidDate(event.start)) {
       return false
@@ -251,10 +211,6 @@ export function useEventTimeFormatter() {
            endDate.getMinutes() === 0
   }
 
-  /**
-   * Get time formatting options for different contexts
-   * @returns {Object}
-   */
   const getTimeFormatOptions = () => {
     return {
       short: { hour: '2-digit', minute: '2-digit' },

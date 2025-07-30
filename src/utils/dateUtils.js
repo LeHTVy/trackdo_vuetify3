@@ -17,7 +17,7 @@ export const safeCreateDate = (dateString) => {
   }
 }
 
-export const formatDate = (date, locale = 'vi-VN') => {
+export const formatDate = (date, locale = 'en-US') => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date
     return dateObj.toLocaleDateString(locale, {
@@ -39,7 +39,7 @@ export const formatDateISO = (date) => {
   }
 }
 
-export const formatEventTime = (event, locale = 'vi-VN') => {
+export const formatEventTime = (event, locale = 'en-US') => {
   if (event.allDay) return 'All day'
 
   if (!isValidDate(event.start) || !isValidDate(event.end)) {
@@ -64,7 +64,7 @@ export const formatEventTime = (event, locale = 'vi-VN') => {
   return `${startTime} - ${endTime}`
 }
 
-export const formatEventDate = (event, locale = 'vi-VN') => {
+export const formatEventDate = (event, locale = 'en-US') => {
   if (!event.start && !event.date) return ''
 
   const dateString = event.start || event.date
@@ -191,17 +191,11 @@ export const getEventsByDate = (events, targetDate) => {
   })
 }
 
-/**
- * Get week number of the year (ISO 8601 standard)
- * @param {Date|string} date - Date to get week number for
- * @returns {number} Week number (1-53)
- */
 export const getWeekNumber = (date) => {
   try {
     const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)
     if (!dateObj) return 0
 
-    // Copy date so we don't modify original
     const target = new Date(dateObj.valueOf())
     const dayNr = (dateObj.getDay() + 6) % 7
     target.setDate(target.getDate() - dayNr + 3)
@@ -216,11 +210,6 @@ export const getWeekNumber = (date) => {
   }
 }
 
-/**
- * Get year for the week number (handles edge cases around year boundaries)
- * @param {Date|string} date - Date to get week year for
- * @returns {number} Year for the week
- */
 export const getWeekYear = (date) => {
   try {
     const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)
@@ -235,11 +224,6 @@ export const getWeekYear = (date) => {
   }
 }
 
-/**
- * Check if a date is in the current week
- * @param {Date|string} date - Date to check
- * @returns {boolean} True if date is in current week
- */
 export const isThisWeek = (date) => {
   try {
     const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)
@@ -257,11 +241,6 @@ export const isThisWeek = (date) => {
   }
 }
 
-/**
- * Check if a date is in the next week
- * @param {Date|string} date - Date to check
- * @returns {boolean} True if date is in next week
- */
 export const isNextWeek = (date) => {
   try {
     const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)

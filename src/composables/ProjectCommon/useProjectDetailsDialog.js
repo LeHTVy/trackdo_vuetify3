@@ -1,30 +1,16 @@
 import { computed } from 'vue'
 import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
 import { useDialogManager } from '@/composables/common/useDialogManager'
-import { useConfirmModal } from '@/composables/common/useConfirmModal'
 
 export function useProjectDetailsDialog(props, emit) {
   const themeColors = useThemeColors('modal')
   const dialogManager = useDialogManager()
-  const {
-    isOpen: confirmModalOpen,
-    loading: confirmModalLoading,
-    modalConfig: confirmModalConfig,
-    confirmDelete,
-    confirmUpdate,
-    confirmAction,
-    confirm: confirmModalConfirm,
-    cancel: confirmModalCancel
-  } = useConfirmModal()
 
-  // Dialog state - use from dialogManager
+  // Dialog state - use from props
   const isOpen = computed({
-    get: () => props.modelValue || dialogManager.projectDetailsDialog.value,
+    get: () => props.modelValue,
     set: (value) => {
       emit('update:modelValue', value)
-      if (!value) {
-        dialogManager.closeProjectDetailsDialog()
-      }
     }
   })
 
@@ -122,30 +108,10 @@ export function useProjectDetailsDialog(props, emit) {
     }).format(budget)
   }
 
-  // Dialog methods - use from dialogManager
+  // Dialog methods
   const closeDialog = () => {
-    dialogManager.closeProjectDetailsDialog()
+    emit('update:modelValue', false)
     emit('close')
-  }
-
-  // Delete project without confirmation dialog
-  const deleteProject = async () => {
-    const project = props.selectedProject || dialogManager.selectedProject.value
-
-    if (!project) {
-      console.error('No project selected for deletion')
-      return
-    }
-
-    const projectId = project._id || project.id
-    if (!projectId) {
-      console.error('No valid project ID found:', project)
-      return
-    }
-
-    console.log('ProjectDetailsDialog deleteProject - ID:', projectId)
-    emit('delete-project', projectId)
-    closeDialog()
   }
 
   const editProject = () => {
@@ -170,13 +136,6 @@ export function useProjectDetailsDialog(props, emit) {
     // State
     isOpen,
 
-    // Confirm modal properties
-    confirmModalOpen,
-    confirmModalLoading,
-    confirmModalConfig,
-    confirmModalConfirm,
-    confirmModalCancel,
-
     // Computed properties
     projectTitle,
     projectDescription,
@@ -195,7 +154,6 @@ export function useProjectDetailsDialog(props, emit) {
     formatDate,
     formatBudget,
     closeDialog,
-    deleteProject,
     editProject,
     duplicateProject
   }

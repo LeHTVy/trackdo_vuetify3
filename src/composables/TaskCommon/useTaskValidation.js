@@ -8,25 +8,25 @@ import { ref, computed } from 'vue'
 export function useTaskValidation(formData) {
   // Validation rules
   const titleRules = [
-    v => !!v || 'Title is required',
-    v => (v && v.length >= 3) || 'Title must be at least 3 characters',
-    v => (v && v.length <= 100) || 'Title must be less than 100 characters'
+    v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Title is required' : true,
+    v => (v && v.length >= 3) ? true : 'Title must be at least 3 characters',
+    v => (v && v.length <= 100) ? true : 'Title must be less than 100 characters'
   ]
 
   const descriptionRules = [
-    v => !v || v.length <= 500 || 'Description must be less than 500 characters'
+    v => !v || v.length <= 500 ? true : 'Description must be less than 500 characters'
   ]
 
   const dueDateRules = [
-    v => !v || isValidDate(v) || 'Please enter a valid date'
+    v => !v || isValidDate(v) ? true : 'Please enter a valid date'
   ]
 
   const estimatedHoursRules = [
-    v => !v || (!isNaN(v) && v > 0 && v <= 1000) || 'Estimated hours must be a positive number less than 1000'
+    v => !v || (!isNaN(v) && v > 0 && v <= 1000) ? true : 'Estimated hours must be a positive number less than 1000'
   ]
 
   const projectRules = [
-    v => !v || v.length <= 50 || 'Project name must be less than 50 characters'
+    v => !v || v.length <= 50 ? true : 'Project name must be less than 50 characters'
   ]
 
   // Validation helper functions

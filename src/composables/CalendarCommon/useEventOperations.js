@@ -1,10 +1,15 @@
-import { useAsyncOperation } from '@/composables/common/useAsyncOperation'
+import { useBaseOperations } from '@/composables/common/useBaseOperations'
+import { useEventHandler } from '@/composables/common/useEventHandler'
+import logger from '@/services/logger'
+
+const eventLogger = logger.createLogger('EventOperations')
 
 export function useEventOperations(eventsStore) {
-  const { loading, error, execute, executeMultiple, clearError, setError } = useAsyncOperation()
+  const baseOps = useBaseOperations(eventsStore, 'event')
+  const eventHandler = useEventHandler('EventOperations')
 
   /**
-   * Tạo event title thống nhất cho duplicate
+   * Get event title with fallback
    * @param {Object} event - Event object
    * @returns {string} - Event title
    */
@@ -13,7 +18,7 @@ export function useEventOperations(eventsStore) {
   }
 
   /**
-   * Tạo duplicated event data thống nhất
+   * Create duplicated event data
    * @param {Object} event - Original event
    * @returns {Object} - Duplicated event data
    */
@@ -28,131 +33,250 @@ export function useEventOperations(eventsStore) {
     }
   }
 
+  /**
+   * Validate event data
+   * @param {Object} eventData - Event data to validate
+   * @returns {Object} - Validation result
+   */
+  const validateEventData = (eventData) => {
+    const errors = []
+
+    const eventTitle = eventData.title || eventData.name
+    if (!eventTitle) {
+      errors.push('Event title is required')
+    }
+
+    if (!eventData.start) {
+      errors.push('Start date is required')
+    }
+
+    if (!eventData.end) {
+      errors.push('End date is required')
+    }
+
+    if (eventData.start && eventData.end && new Date(eventData.end) < new Date(eventData.start)) {
+      errors.push('End date must be after start date')
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      error: errors.join(', ')
+    }
+  }
+
+  /**
+   * Normalize event data
+   * @param {Object} eventData - Event data to normalize
+   * @returns {Object} - Normalized event data
+   */
+  const normalizeEventData = (eventData) => {
+    const normalized = { ...eventData }
+
+    // Ensure both title and name are set
+    if (normalized.title && !normalized.name) {
+      normalized.name = normalized.title
+    }
+    if (normalized.name && !normalized.title) {
+      normalized.title = normalized.name
+    }
+
+    // Fix date range if needed
+    if (normalized.start && normalized.end && new Date(normalized.end) < new Date(normalized.start)) {
+      normalized.end = normalized.start
+      eventLogger.warn('End date was before start date, adjusted to match start date')
+    }
+
+    return normalized
+  }
+
+  /**
+   * Save event (create or update)
+   * @param {Object} eventData - Event data
+   * @param {boolean} isEdit - Whether this is an edit operation
+   * @param {Object} selectedEvent - Selected event for edit
+   * @returns {Promise<Object>} - Operation result
+   */
   const saveEvent = async (eventData, isEdit = false, selectedEvent = null) => {
-    return execute(async () => {
-      const eventTitle = eventData.title || eventData.name
-      if (!eventTitle || !eventData.start || !eventData.end) {
-        throw new Error('Please fill in all required information.')
+    return eventHandler.handleAsyncEvent(async () => {
+      // Validate data
+      const validation = validateEventData(eventData)
+      if (!validation.isValid) {
+        throw new Error(validation.error)
       }
 
-      // Ensure both title and name are set
-      if (eventData.title && !eventData.name) {
-        eventData.name = eventData.title
-      }
-      if (eventData.name && !eventData.title) {
-        eventData.title = eventData.name
-      }
-
-      // Validate date range
-      if (new Date(eventData.end) < new Date(eventData.start)) {
-        eventData.end = eventData.start
-      }
+      // Normalize data
+      const normalizedData = normalizeEventData(eventData)
 
       if (isEdit && selectedEvent) {
+        // For update, ensure the event has proper ID
         const eventId = selectedEvent.id || selectedEvent._id
         if (!eventId) {
-          throw new Error('Event ID not found for update.')
+          throw new Error('Event ID is required for update')
         }
 
-        await eventsStore.updateEvent({
-          ...eventData,
-          id: eventId
-        })
+        // Merge the normalized data with the event ID
+        const eventToUpdate = {
+          ...normalizedData,
+          id: eventId,
+          _id: eventId
+        }
+
+        // Call the store's updateEvent method directly with the full event object
+        const result = await eventsStore.updateEvent(eventToUpdate)
+        return {
+          success: true,
+          data: result,
+          message: 'Event updated successfully'
+        }
       } else {
-        await eventsStore.addEvent(eventData)
+        return baseOps.createItem(normalizedData, {
+          createMethod: 'addEvent',
+          successMessage: 'Event created successfully',
+          errorMessage: 'Unable to create event'
+        })
       }
-
-      return { success: true }
-    }, 'Unable to save event')
+    }, {
+      actionName: isEdit ? 'update_event' : 'create_event',
+      itemName: 'Event'
+    })
   }
 
+  /**
+   * Delete event
+   * @param {Object} event - Event to delete
+   * @returns {Promise<Object>} - Operation result
+   */
   const deleteEvent = async (event) => {
-    return execute(async () => {
-      const eventId = event?.id || event?._id
-      if (!event || !eventId) {
-        throw new Error('Event not found for deletion.')
-      }
+    const eventTitle = getEventTitle(event)
 
-      await eventsStore.deleteEvent(eventId)
-      return { success: true }
-    }, 'Unable to delete event')
+    return eventHandler.handleDelete(async () => {
+      return baseOps.deleteItem(event, {
+        deleteMethod: 'deleteEvent',
+        successMessage: 'Event deleted successfully',
+        errorMessage: 'Unable to delete event'
+      })
+    }, {
+      itemName: eventTitle,
+      confirmMessage: `Are you sure you want to delete "${eventTitle}"? This action cannot be undone.`
+    })
   }
 
+  /**
+   * Delete event without confirmation (for use when confirmation is already handled)
+   * @param {Object} event - Event to delete
+   * @returns {Promise<Object>} - Operation result
+   */
+  const deleteEventWithoutConfirm = async (event) => {
+    return eventHandler.handleAsyncEvent(async () => {
+      return baseOps.deleteItem(event, {
+        deleteMethod: 'deleteEvent',
+        successMessage: 'Event deleted successfully',
+        errorMessage: 'Unable to delete event'
+      })
+    }, {
+      actionName: 'delete_event',
+      itemName: getEventTitle(event)
+    })
+  }
+
+  /**
+   * Duplicate event
+   * @param {Object} event - Event to duplicate
+   * @returns {Promise<Object>} - Operation result
+   */
   const duplicateEvent = async (event) => {
-    return execute(async () => {
-      if (!event) {
-        throw new Error('Event not found for duplication.')
-      }
-
-      const duplicatedEvent = createDuplicatedEventData(event)
-      await eventsStore.addEvent(duplicatedEvent)
-
-      return { success: true }
-    }, 'Unable to duplicate event')
+    return eventHandler.handleDuplicate(async () => {
+      return baseOps.duplicateItem(event, {
+        createMethod: 'addEvent',
+        duplicateTransform: createDuplicatedEventData,
+        successMessage: 'Event duplicated successfully',
+        errorMessage: 'Unable to duplicate event'
+      })
+    }, {
+      itemName: getEventTitle(event)
+    })
   }
 
+  /**
+   * Delete multiple events
+   * @param {Array} eventIds - Array of event IDs
+   * @returns {Promise<Object>} - Operation result
+   */
   const deleteMultipleEvents = async (eventIds) => {
-    return execute(async () => {
-      if (!eventIds || eventIds.length === 0) {
-        throw new Error('No events selected for deletion.')
-      }
-
-      const operations = eventIds.map(id => () => eventsStore.deleteEvent(id))
-      const result = await executeMultiple(operations, 'Unable to delete some events')
-
-      if (!result.success) {
-        throw new Error(result.error)
-      }
-
-      return { success: true, deletedCount: eventIds.length }
-    }, 'Unable to delete selected events')
+    return eventHandler.handleAsyncEvent(async () => {
+      return baseOps.deleteMultipleItems(eventIds, {
+        deleteMethod: 'deleteEvent',
+        successMessage: `${eventIds.length} events deleted successfully`,
+        errorMessage: 'Unable to delete selected events'
+      })
+    }, {
+      actionName: 'delete_multiple_events',
+      confirmBefore: () => window.confirm(`Are you sure you want to delete ${eventIds.length} events? This action cannot be undone.`)
+    })
   }
 
+  /**
+   * Refresh events
+   * @returns {Promise<Object>} - Operation result
+   */
   const refreshEvents = async () => {
-    return execute(async () => {
-      await eventsStore.initializeStore()
-      return { success: true }
-    }, 'Unable to refresh events list')
+    return eventHandler.handleAsyncEvent(async () => {
+      return baseOps.refreshItems({
+        refreshMethod: 'initializeStore',
+        successMessage: 'Events refreshed successfully',
+        errorMessage: 'Unable to refresh events'
+      })
+    }, {
+      actionName: 'refresh_events'
+    })
   }
 
+  /**
+   * Export events to JSON file
+   * @returns {Object} - Export result
+   */
   const exportEvents = () => {
     try {
       const events = eventsStore.events
       const dataStr = JSON.stringify(events, null, 2)
-      const dataBlob = new Blob([dataStr], { type: 'application/json' })
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr)
 
-      const url = URL.createObjectURL(dataBlob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `events_${new Date().toISOString().split('T')[0]}.json`
-      link.click()
+      const exportFileDefaultName = `events-export-${new Date().toISOString().split('T')[0]}.json`
 
-      URL.revokeObjectURL(url)
+      const linkElement = document.createElement('a')
+      linkElement.setAttribute('href', dataUri)
+      linkElement.setAttribute('download', exportFileDefaultName)
+      linkElement.click()
 
-      return { success: true }
-    } catch (err) {
-      setError(err, 'Unable to export events data.')
-      return { success: false, error: error.value }
+      eventLogger.success(`Exported ${events.length} events to ${exportFileDefaultName}`)
+      return { success: true, message: 'Events exported successfully' }
+    } catch (error) {
+      eventLogger.error('Export failed', error)
+      return { success: false, error: 'Export failed' }
     }
   }
 
   return {
-    // State
-    error,
-    loading,
+    // State from base operations
+    loading: baseOps.loading,
+    error: baseOps.error,
 
-    // Methods
+    // Operations
     saveEvent,
     deleteEvent,
+    deleteEventWithoutConfirm,
     duplicateEvent,
     deleteMultipleEvents,
     refreshEvents,
     exportEvents,
-    clearError,
-    setError,
 
-    // Utility methods
+    // Utilities
+    clearError: baseOps.clearError,
+    setError: baseOps.setError,
     getEventTitle,
-    createDuplicatedEventData
+    createDuplicatedEventData,
+    validateEventData,
+    normalizeEventData
   }
 }
