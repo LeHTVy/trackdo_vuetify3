@@ -3,10 +3,9 @@ import { useTheme } from 'vuetify'
 
 /**
  * Business Color Management for Project Components
- * @param {string} componentType - Type of component (header, card, stats, etc.)
  * @returns {Object} Color management utilities and computed properties
  */
-export function useProjectColors(componentType = 'default') {
+export function useProjectColors () {
   const theme = useTheme()
   const colors = computed(() => theme.current.value.colors)
   const isDark = computed(() => theme.current.value.dark)
@@ -17,7 +16,7 @@ export function useProjectColors(componentType = 'default') {
     completed: 'completed',
     onhold: 'onhold',
     cancelled: 'cancelled',
-    planning: 'planning'
+    planning: 'planning',
   }
 
   // Project Priority Constants
@@ -25,7 +24,7 @@ export function useProjectColors(componentType = 'default') {
     low: 'low',
     medium: 'medium',
     high: 'high',
-    critical: 'critical'
+    critical: 'critical',
   }
 
   // Status color mapping using Vuetify theme colors
@@ -34,7 +33,7 @@ export function useProjectColors(componentType = 'default') {
     [PROJECT_STATUS_TYPES.completed]: colors.value.info,
     [PROJECT_STATUS_TYPES.onhold]: colors.value.warning,
     [PROJECT_STATUS_TYPES.cancelled]: colors.value.error,
-    [PROJECT_STATUS_TYPES.planning]: colors.value.secondary
+    [PROJECT_STATUS_TYPES.planning]: colors.value.secondary,
   }))
 
   // Priority color mapping using Vuetify theme colors
@@ -42,7 +41,7 @@ export function useProjectColors(componentType = 'default') {
     [PROJECT_PRIORITY_TYPES.low]: colors.value.success,
     [PROJECT_PRIORITY_TYPES.medium]: colors.value.warning,
     [PROJECT_PRIORITY_TYPES.high]: colors.value.error,
-    [PROJECT_PRIORITY_TYPES.critical]: colors.value.error
+    [PROJECT_PRIORITY_TYPES.critical]: colors.value.error,
   }))
 
   // Header styling functions
@@ -113,22 +112,22 @@ export function useProjectColors(componentType = 'default') {
     '--project-progress-fill': `rgb(var(--v-theme-primary))`,
     '--project-text-primary': `rgb(var(--v-theme-title-text))`,
     '--project-text-secondary': `rgb(var(--v-theme-subtitle-text))`,
-    '--project-bg-primary': getBackgroundPrimary()
+    '--project-bg-primary': getBackgroundPrimary(),
   }))
 
   // Business logic functions
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     return statusColorMap.value[status?.toLowerCase()] || colors.value.secondary
   }
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = priority => {
     return priorityColorMap.value[priority?.toLowerCase()] || colors.value.warning
   }
 
   // Theme color getters
   const getPrimaryColor = () => colors.value.primary
   const getSecondaryColor = () => colors.value.secondary
-  const getThemeColor = (colorName) => colors.value[colorName] || colors.value.primary
+  const getThemeColor = colorName => colors.value[colorName] || colors.value.primary
 
   // CSS Variables application
   const applyCssVars = () => {
@@ -154,6 +153,6 @@ export function useProjectColors(componentType = 'default') {
     getThemeColor,
 
     // Utility functions
-    applyCssVars
+    applyCssVars,
   }
 }

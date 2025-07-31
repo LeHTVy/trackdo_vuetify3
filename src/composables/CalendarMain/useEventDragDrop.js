@@ -1,18 +1,18 @@
-import { ref, reactive, readonly } from 'vue'
+import { reactive, readonly } from 'vue'
 
-export function useEventDragDrop() {
+export function useEventDragDrop () {
   // Drag state
   const dragState = reactive({
     isDragging: false,
     draggedEvent: null,
     dragType: null,
     originalEvent: null,
-    ghostElement: null
+    ghostElement: null,
   })
 
   const dropZoneState = reactive({
     activeDropZone: null,
-    validDropZone: false
+    validDropZone: false,
   })
 
   // Start dragging an event
@@ -23,7 +23,7 @@ export function useEventDragDrop() {
       hasId: !!event.id,
       has_id: !!event._id,
       eventId: event.id || event._id,
-      dragType
+      dragType,
     })
 
     dragState.isDragging = true
@@ -66,14 +66,14 @@ export function useEventDragDrop() {
     }
   }
 
-  const updateGhostPosition = (nativeEvent) => {
+  const updateGhostPosition = nativeEvent => {
     if (dragState.ghostElement) {
       dragState.ghostElement.style.left = (nativeEvent.clientX + 10) + 'px'
       dragState.ghostElement.style.top = (nativeEvent.clientY - 10) + 'px'
     }
   }
 
-  const handleDragOver = (nativeEvent) => {
+  const handleDragOver = nativeEvent => {
     nativeEvent.preventDefault()
 
     updateGhostPosition(nativeEvent)
@@ -112,7 +112,7 @@ export function useEventDragDrop() {
     dropZoneState.validDropZone = false
   }
 
-  const isValidDropZone = (dropDate) => {
+  const isValidDropZone = dropDate => {
     if (!dragState.draggedEvent || !dropDate) return false
 
     const eventStart = new Date(dragState.originalEvent.start)
@@ -135,7 +135,7 @@ export function useEventDragDrop() {
   }
 
   // Handle drop event
-  const handleDrop = (nativeEvent) => {
+  const handleDrop = nativeEvent => {
     nativeEvent.preventDefault()
 
     if (!dropZoneState.validDropZone || !dropZoneState.activeDropZone) {
@@ -151,12 +151,12 @@ export function useEventDragDrop() {
   }
 
   // Calculate new event dates based on drop
-  const calculateNewEventDates = (dropDate) => {
+  const calculateNewEventDates = dropDate => {
     console.log('calculateNewEventDates called with:', {
       dropDate,
       originalEvent: dragState.originalEvent,
       originalEventId: dragState.originalEvent?.id || dragState.originalEvent?._id,
-      dragType: dragState.dragType
+      dragType: dragState.dragType,
     })
 
     const originalStart = new Date(dragState.originalEvent.start)
@@ -189,14 +189,14 @@ export function useEventDragDrop() {
     const updatedEvent = {
       ...dragState.originalEvent,
       start: newStart.toISOString(),
-      end: newEnd.toISOString()
+      end: newEnd.toISOString(),
     }
 
     console.log('calculateNewEventDates result:', {
       updatedEvent,
       hasId: !!updatedEvent.id,
       has_id: !!updatedEvent._id,
-      eventId: updatedEvent.id || updatedEvent._id
+      eventId: updatedEvent.id || updatedEvent._id,
     })
 
     // Make sure we have a valid ID - prefer _id over id for MongoDB compatibility
@@ -252,6 +252,6 @@ export function useEventDragDrop() {
     startResize,
     handleDrop,
     handleDragEnd,
-    isValidDropZone
+    isValidDropZone,
   }
 }

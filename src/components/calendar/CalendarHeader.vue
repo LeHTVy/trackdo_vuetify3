@@ -5,11 +5,11 @@
         <v-col cols="12">
           <div class="d-flex align-center justify-center">
             <v-icon
+              class="mr-3"
+              :color="getPrimaryColor()"
               icon="mdi-calendar-month"
               size="32"
-              :color="getPrimaryColor()"
-              class="mr-3"
-            ></v-icon>
+            />
             <div class="text-center">
               <h2 class="text-h4 font-weight-bold title-text">
                 {{ currentMonthYear }}
@@ -26,19 +26,19 @@
 </template>
 
 <script setup>
-import { toRef } from 'vue'
-import { useCalendarHeader } from '@/composables/CalendarHeader/useCalendarHeader'
-import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
+  import { toRef } from 'vue'
+  import { useCalendarHeader } from '@/composables/CalendarHeader/useCalendarHeader'
+  import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
 
-const props = defineProps({
-  currentDate: {
-    type: Date,
-    default: () => new Date()
-  }
-})
+  const props = defineProps({
+    currentDate: {
+      type: Date,
+      default: () => new Date(),
+    },
+  })
 
-const { currentMonthYear, todayFormatted } = useCalendarHeader(toRef(props, 'currentDate'))
-const { getPrimaryColor } = useThemeColors('header')
+  const { currentMonthYear, todayFormatted } = useCalendarHeader(toRef(props, 'currentDate'))
+  const { getPrimaryColor } = useThemeColors('header')
 </script>
 
 <style scoped>

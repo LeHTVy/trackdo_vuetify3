@@ -9,13 +9,19 @@
       <!-- Weather Display -->
       <div class="weather-display d-flex align-center">
         <v-icon
-          :color="weatherError ? 'error' : 'primary'"
           class="mr-2"
+          :color="weatherError ? 'error' : 'primary'"
         >
           {{ weatherData ? getWeatherIcon(weatherData.weatherCode) : 'mdi-weather-partly-cloudy' }}
         </v-icon>
         <div v-if="weatherLoading" class="d-flex align-center">
-          <v-progress-circular size="20" width="2" indeterminate color="primary" class="mr-2" />
+          <v-progress-circular
+            class="mr-2"
+            color="primary"
+            indeterminate
+            size="20"
+            width="2"
+          />
           <span class="text-body-2">Loading weather...</span>
         </div>
         <div v-else-if="weatherData" class="weather-info">
@@ -35,23 +41,23 @@
       <div class="view-selector d-flex align-center mr-4">
         <v-btn-toggle
           v-model="currentView"
-          @update:model-value="onViewChange"
-          variant="outlined"
+          class="view-toggle"
           density="compact"
           mandatory
-          class="view-toggle"
+          variant="outlined"
+          @update:model-value="onViewChange"
         >
           <v-btn
-            value="monthly"
-            size="small"
             prepend-icon="mdi-calendar-month"
+            size="small"
+            value="monthly"
           >
             Month
           </v-btn>
           <v-btn
-            value="weekly"
-            size="small"
             prepend-icon="mdi-calendar-week"
+            size="small"
+            value="weekly"
           >
             Week
           </v-btn>
@@ -61,25 +67,25 @@
       <!-- Navigation Controls -->
       <div class="navigation-controls d-flex align-center">
         <v-btn
-          color="primary"
-          variant="outlined"
-          prepend-icon="mdi-calendar-today"
-          @click="goToToday"
           class="mr-2"
+          color="primary"
+          prepend-icon="mdi-calendar-today"
+          variant="outlined"
+          @click="goToToday"
         >
           Today
         </v-btn>
 
-        <v-btn-group variant="outlined" density="compact">
+        <v-btn-group density="compact" variant="outlined">
           <v-btn
+            :disabled="loading"
             icon="mdi-chevron-left"
             @click="navigatePrev"
-            :disabled="loading"
           />
           <v-btn
+            :disabled="loading"
             icon="mdi-chevron-right"
             @click="navigateNext"
-            :disabled="loading"
           />
         </v-btn-group>
       </div>
@@ -127,9 +133,9 @@
             }"
             :data-date="day.date.toISOString()"
             @click="onDateClick(day)"
-            @drop="onDrop($event, day.date)"
-            @dragover.prevent
             @dragenter.prevent
+            @dragover.prevent
+            @drop="onDrop($event, day.date)"
           >
             <div class="day-content">
               <div class="day-number">{{ day.date.getDate() }}</div>
@@ -145,21 +151,21 @@
                     'event-continuation': event.isContinuation,
                     'dragging': dragState.isDragging && dragState.draggedEvent?.id === event.id
                   }"
-                  :style="{ backgroundColor: event.color || '#1976d2' }"
                   :draggable="!event.isContinuation"
+                  :style="{ backgroundColor: event.color || '#1976d2' }"
                   @click.stop="onEventClick({ event })"
-                  @dragstart="onEventDragStart($event, event)"
                   @dragend="onEventDragEnd"
+                  @dragstart="onEventDragStart($event, event)"
                 >
                   <!-- Resize handle for start date -->
                   <div
                     v-if="event.isFirstDay && event.isMultiDay"
                     class="resize-handle resize-start"
-                    @mousedown.stop="onResizeStart($event, event, 'start')"
                     title=" Resize handle for start date"
-                  ></div>
+                    @mousedown.stop="onResizeStart($event, event, 'start')"
+                  />
 
-                  <span v-if="!event.isContinuation" class="event-dot"></span>
+                  <span v-if="!event.isContinuation" class="event-dot" />
                   <span class="event-text">
                     {{ event.isContinuation ? '' : (event.name || event.title) }}
                   </span>
@@ -168,9 +174,9 @@
                   <div
                     v-if="event.isLastDay && event.isMultiDay"
                     class="resize-handle resize-end"
-                    @mousedown.stop="onResizeStart($event, event, 'end')"
                     title="Resize handle for end date"
-                  ></div>
+                    @mousedown.stop="onResizeStart($event, event, 'end')"
+                  />
                 </div>
                 <div
                   v-if="getVisibleDayEvents(day.date).hasMore"
@@ -189,157 +195,142 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { useDialogManager } from '@/composables/common/useDialogManager'
-import { useEventFilters } from '@/composables/CalendarCommon/useEventFilters'
-import { useCalendarEvents } from '@/composables/CalendarCommon/useCalendarEvents'
-import { useEventDragDrop } from '@/composables/CalendarMain/useEventDragDrop'
-import { useWeatherData } from '@/composables/CalendarMain/useWeatherData'
-import { useCalendarGrid } from '@/composables/CalendarMain/useCalendarGrid'
-import { useCalendarNavigation } from '@/composables/CalendarMain/useCalendarNavigation'
-import { useDayEvents } from '@/composables/CalendarMain/useDayEvents'
+  import { computed, onMounted, onUnmounted, watch } from 'vue'
+  import { useDialogManager } from '@/composables/common/useDialogManager'
+  import { useEventFilters } from '@/composables/CalendarCommon/useEventFilters'
+  import { useCalendarEvents } from '@/composables/CalendarCommon/useCalendarEvents'
+  import { useEventDragDrop } from '@/composables/CalendarMain/useEventDragDrop'
+  import { useWeatherData } from '@/composables/CalendarMain/useWeatherData'
+  import { useCalendarGrid } from '@/composables/CalendarMain/useCalendarGrid'
+  import { useCalendarNavigation } from '@/composables/CalendarMain/useCalendarNavigation'
+  import { useDayEvents } from '@/composables/CalendarMain/useDayEvents'
 
-// Props
-const props = defineProps({
-  events: {
-    type: Array,
-    default: () => []
-  },
-  defaultView: {
-    type: String,
-    default: 'monthly'
-  },
-  loading: {
-    type: Boolean,
-    default: false
+  // Props
+  const props = defineProps({
+    events: {
+      type: Array,
+      default: () => [],
+    },
+    defaultView: {
+      type: String,
+      default: 'monthly',
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  })
+
+  // Emits
+  const emit = defineEmits([
+    'date-selected',
+    'event-clicked',
+    'range-changed',
+    'edit-event',
+    'view-changed',
+    'show-more-events',
+    'event-updated',
+  ])
+
+  // Refs
+  // (removed unused calendarRef and currentWeekdays)
+
+  // Composables
+  const dialogManager = useDialogManager()
+  const { formattedEvents } = useEventFilters(computed(() => props.events))
+  const { handleEventClick, handleDateClick, handleShowMore } = useCalendarEvents()
+  const { dragState, startEventDrag, startResize, handleDrop, handleDragEnd } = useEventDragDrop()
+
+  // Weather composable
+  const {
+    weatherData,
+    weatherLoading,
+    weatherError,
+    getWeatherIcon,
+    setupAutoRefresh,
+  } = useWeatherData()
+
+  // Calendar navigation composable
+  const {
+    currentDate: currentValue,
+    calendarType: currentView,
+    navigatePrev,
+    navigateNext,
+    goToToday,
+    getViewTitle,
+    changeView,
+  } = useCalendarNavigation(new Date(), props.defaultView)
+
+  // Calendar grid composable
+  const {
+    calendarDays,
+    weekdayLabels,
+    isToday,
+  } = useCalendarGrid(currentValue, currentView)
+
+  // Day events composable
+  const {
+    getDayEvents,
+    getVisibleDayEvents,
+  } = useDayEvents(formattedEvents, currentView)
+
+  // Auto refresh weather setup
+  let weatherInterval = null
+  onMounted(() => {
+    weatherInterval = setupAutoRefresh()
+  })
+
+  onUnmounted(() => {
+    if (weatherInterval) {
+      clearInterval(weatherInterval)
+    }
+  })
+
+  // Methods
+  const onEventClick = eventData => {
+    handleEventClick(eventData, emit, dialogManager)
   }
-})
 
-// Emits
-const emit = defineEmits([
-  'date-selected',
-  'event-clicked',
-  'range-changed',
-  'edit-event',
-  'view-changed',
-  'show-more-events',
-  'event-updated'
-])
-
-// Refs
-const calendarRef = ref(null)
-const currentWeekdays = ref([0, 1, 2, 3, 4, 5, 6])
-
-// Composables
-const dialogManager = useDialogManager()
-const { formattedEvents } = useEventFilters(computed(() => props.events))
-const { handleEventClick, handleDateClick, handleShowMore, handleRangeChange, editEvent } = useCalendarEvents()
-const { dragState, startEventDrag, startResize, handleDrop, handleDragEnd } = useEventDragDrop()
-
-// Weather composable
-const {
-  weatherData,
-  weatherLoading,
-  weatherError,
-  getWeatherIcon,
-  setupAutoRefresh
-} = useWeatherData()
-
-// Calendar navigation composable
-const {
-  currentDate: currentValue,
-  calendarType: currentView,
-  navigatePrev,
-  navigateNext,
-  goToToday,
-  getViewTitle,
-  changeView,
-  viewTypes
-} = useCalendarNavigation(new Date(), props.defaultView)
-
-// Calendar grid composable
-const {
-  calendarDays,
-  weekdayLabels,
-  isToday,
-  formatMonthYear
-} = useCalendarGrid(currentValue, currentView)
-
-// Day events composable
-const {
-  getDayEvents,
-  getVisibleDayEvents
-} = useDayEvents(formattedEvents, currentView)
-
-// Auto refresh weather setup
-let weatherInterval = null
-onMounted(() => {
-  weatherInterval = setupAutoRefresh()
-})
-
-onUnmounted(() => {
-  if (weatherInterval) {
-    clearInterval(weatherInterval)
+  const onDateClick = day => {
+    const dateData = { date: day.date }
+    handleDateClick(dateData, emit)
   }
-})
 
-// Methods
-const onEventClick = (eventData) => {
-  handleEventClick(eventData, emit, dialogManager)
-}
-
-const onDateClick = (day) => {
-  const dateData = { date: day.date }
-  handleDateClick(dateData, emit)
-}
-
-const onShowMore = (nativeEvent, moreData) => {
-  handleShowMore({ nativeEvent, ...moreData }, emit)
-}
-
-const onRangeChange = (pages) => {
-  const rangeData = {
-    start: pages[0]?.range?.start,
-    end: pages[0]?.range?.end
+  const onShowMore = (nativeEvent, moreData) => {
+    handleShowMore({ nativeEvent, ...moreData }, emit)
   }
-  handleRangeChange(rangeData, emit)
-}
 
-const onEditEvent = () => {
-  editEvent(dialogManager.selectedEvent.value, emit, dialogManager)
-}
-
-// Drag and Drop Methods
-const onEventDragStart = (nativeEvent, event) => {
-  startEventDrag(event, 'move', nativeEvent)
-}
-
-const onEventDragEnd = () => {
-  handleDragEnd()
-}
-
-const onDrop = async (nativeEvent, dropDate) => {
-  const updatedEvent = handleDrop(nativeEvent)
-  if (updatedEvent) {
-    emit('event-updated', updatedEvent)
+  // Drag and Drop Methods
+  const onEventDragStart = (nativeEvent, event) => {
+    startEventDrag(event, 'move', nativeEvent)
   }
-}
 
-const onResizeStart = (nativeEvent, event, direction) => {
-  nativeEvent.preventDefault()
-  startResize(event, direction, nativeEvent)
-}
+  const onEventDragEnd = () => {
+    handleDragEnd()
+  }
 
-// View change handler
-const onViewChange = (newView) => {
-  changeView(newView)
-  emit('view-changed', newView)
-}
+  const onDrop = async nativeEvent => {
+    const updatedEvent = handleDrop(nativeEvent)
+    if (updatedEvent) {
+      emit('event-updated', updatedEvent)
+    }
+  }
 
-// Watchers
-watch(currentView, (newView) => {
-  emit('view-changed', newView)
-})
+  const onResizeStart = (nativeEvent, event, direction) => {
+    nativeEvent.preventDefault()
+    startResize(event, direction, nativeEvent)
+  }
+
+  // View change handler
+  const onViewChange = newView => {
+    changeView(newView)
+    emit('view-changed', newView)
+  }
+
+  // Watchers
+  watch(currentView, newView => {
+    emit('view-changed', newView)
+  })
 
 </script>
 

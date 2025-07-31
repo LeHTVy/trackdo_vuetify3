@@ -2,16 +2,16 @@ import { computed } from 'vue'
 import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
 import { useDialogManager } from '@/composables/common/useDialogManager'
 
-export function useProjectDetailsDialog(props, emit) {
+export function useProjectDetailsDialog (props, emit) {
   const themeColors = useThemeColors('modal')
   const dialogManager = useDialogManager()
 
   // Dialog state - use from props
   const isOpen = computed({
     get: () => props.modelValue,
-    set: (value) => {
+    set: value => {
       emit('update:modelValue', value)
-    }
+    },
   })
 
   // Computed properties for project data
@@ -61,25 +61,25 @@ export function useProjectDetailsDialog(props, emit) {
   })
 
   // Project status icon getter
-  const getProjectStatusIcon = (status) => {
+  const getProjectStatusIcon = status => {
     const statusIcons = {
       'Active': 'mdi-play-circle',
       'Completed': 'mdi-check-circle',
       'On Hold': 'mdi-pause-circle',
       'Cancelled': 'mdi-close-circle',
-      'Planning': 'mdi-lightbulb-outline'
+      'Planning': 'mdi-lightbulb-outline',
     }
     return statusIcons[status] || 'mdi-folder'
   }
 
   // Project status color getter
-  const getProjectStatusColor = (status) => {
+  const getProjectStatusColor = status => {
     const statusColors = {
       'Active': 'success',
       'Completed': 'primary',
       'On Hold': 'warning',
       'Cancelled': 'error',
-      'Planning': 'info'
+      'Planning': 'info',
     }
     return statusColors[status] || 'grey'
   }
@@ -88,23 +88,23 @@ export function useProjectDetailsDialog(props, emit) {
   const getPriorityColor = themeColors.getPriorityColor
 
   // Date formatter
-  const formatDate = (dateStr) => {
+  const formatDate = dateStr => {
     if (!dateStr) return ''
     const date = new Date(dateStr)
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     })
   }
 
   // Format budget
-  const formatBudget = (budget) => {
+  const formatBudget = budget => {
     if (!budget) return ''
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
     }).format(budget)
   }
 
@@ -155,6 +155,6 @@ export function useProjectDetailsDialog(props, emit) {
     formatBudget,
     closeDialog,
     editProject,
-    duplicateProject
+    duplicateProject,
   }
 }

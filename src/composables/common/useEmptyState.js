@@ -3,7 +3,7 @@
  * @param {string} type - Type of empty state ('today', 'upcoming', 'events', 'tasks')
  * @returns {Object} Empty state configuration and functions
  */
-export function useEmptyState(type = 'default') {
+export function useEmptyState (type = 'default') {
 
   /**
    * Get empty state configuration for different types
@@ -16,71 +16,71 @@ export function useEmptyState(type = 'default') {
         title: 'No events today',
         text: 'You have a free day! Enjoy your time.',
         actionText: 'Add Event',
-        actionIcon: 'mdi-plus'
+        actionIcon: 'mdi-plus',
       },
       upcoming: {
         icon: 'mdi-calendar-remove',
         title: 'No upcoming events',
         text: 'All caught up! No upcoming events scheduled.',
         actionText: 'Create Event',
-        actionIcon: 'mdi-calendar-plus'
+        actionIcon: 'mdi-calendar-plus',
       },
       events: {
         icon: 'mdi-calendar-blank-outline',
         title: 'No events found',
         text: 'Start by creating your first event.',
         actionText: 'Add Event',
-        actionIcon: 'mdi-plus'
+        actionIcon: 'mdi-plus',
       },
       tasks: {
         icon: 'mdi-clipboard-text-outline',
         title: 'No tasks found',
         text: 'All tasks completed! Time to relax.',
         actionText: 'Add Task',
-        actionIcon: 'mdi-plus'
+        actionIcon: 'mdi-plus',
       },
       projects: {
         icon: 'mdi-folder-outline',
         title: 'No projects found',
         text: 'Create your first project to get started.',
         actionText: 'New Project',
-        actionIcon: 'mdi-folder-plus'
+        actionIcon: 'mdi-folder-plus',
       },
       search: {
         icon: 'mdi-magnify',
         title: 'No results found',
         text: 'Try adjusting your search criteria.',
         actionText: 'Clear Search',
-        actionIcon: 'mdi-close'
+        actionIcon: 'mdi-close',
       },
       filter: {
         icon: 'mdi-filter-remove',
         title: 'No items match your filters',
         text: 'Try removing some filters to see more results.',
         actionText: 'Clear Filters',
-        actionIcon: 'mdi-filter-off'
+        actionIcon: 'mdi-filter-off',
       },
       error: {
         icon: 'mdi-alert-circle-outline',
         title: 'Something went wrong',
         text: 'Unable to load data. Please try again.',
         actionText: 'Retry',
-        actionIcon: 'mdi-refresh'
+        actionIcon: 'mdi-refresh',
       },
       loading: {
         icon: 'mdi-loading',
         title: 'Loading...',
         text: 'Please wait while we fetch your data.',
         actionText: null,
-        actionIcon: null
+        actionIcon: null,
       },
       default: {
         icon: 'mdi-information-outline',
         title: 'No data available',
         text: 'There is no data to display at the moment.',
         actionText: 'Refresh',
-        actionIcon: 'mdi-refresh'
-      }
+        actionIcon: 'mdi-refresh',
+      },
     }
 
     return configs[type] || configs.default
@@ -144,7 +144,7 @@ export function useEmptyState(type = 'default') {
     const defaultConfig = getEmptyStateConfig()
     return {
       ...defaultConfig,
-      ...customConfig
+      ...customConfig,
     }
   }
 
@@ -161,16 +161,16 @@ export function useEmptyState(type = 'default') {
     const configs = {
       events: getCustomEmptyState({
         title: 'No events scheduled',
-        text: 'Your calendar is empty. Start by adding your first event.'
+        text: 'Your calendar is empty. Start by adding your first event.',
       }),
       tasks: getCustomEmptyState({
         title: 'No tasks assigned',
-        text: 'All tasks completed! You\'re all caught up.'
+        text: 'All tasks completed! You\'re all caught up.',
       }),
       projects: getCustomEmptyState({
         title: 'No projects created',
-        text: 'Start organizing your work by creating your first project.'
-      })
+        text: 'Start organizing your work by creating your first project.',
+      }),
     }
 
     return configs[dataType] || getEmptyStateConfig()
@@ -193,7 +193,7 @@ export function useEmptyState(type = 'default') {
         title: 'No results match your filters',
         text: 'Try adjusting your search criteria or removing some filters.',
         actionText: 'Clear Filters',
-        actionIcon: 'mdi-filter-off'
+        actionIcon: 'mdi-filter-off',
       })
     }
 
@@ -212,7 +212,7 @@ export function useEmptyState(type = 'default') {
         title: `No results for "${searchQuery}"`,
         text: 'Try different keywords or check your spelling.',
         actionText: 'Clear Search',
-        actionIcon: 'mdi-close'
+        actionIcon: 'mdi-close',
       })
     }
 
@@ -235,6 +235,6 @@ export function useEmptyState(type = 'default') {
     // Specialized empty state functions
     getDataEmptyState,
     getFilteredEmptyState,
-    getSearchEmptyState
+    getSearchEmptyState,
   }
 }

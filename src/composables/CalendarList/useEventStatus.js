@@ -1,25 +1,23 @@
 import {
   getDaysBetween,
-  isThisWeek,
   isNextWeek,
-  getWeekNumber,
-  getWeekYear,
+  isThisWeek,
+  isValidDate,
   safeCreateDate,
-  isValidDate
 } from '@/utils/dateUtils.js'
 
 /**
  * Composable for calculating event status based on timing
  * @returns {Object}
  */
-export function useEventStatus() {
+export function useEventStatus () {
 
   /**
    * Calculate event status for today's events
    * @param {Object} event - Event object with start and end dates
    * @returns {Object} Status object with text and color
    */
-  const getTodayEventStatus = (event) => {
+  const getTodayEventStatus = event => {
     const now = new Date()
     const startDate = new Date(event.start)
     const endDate = new Date(event.end)
@@ -38,7 +36,7 @@ export function useEventStatus() {
    * @param {Object} event - Event object with start and end dates
    * @returns {Object} Status object with text and color
    */
-  const getUpcomingEventStatus = (event) => {
+  const getUpcomingEventStatus = event => {
     // Validate input
     if (!isValidDate(event.start)) {
       return { text: 'Invalid', color: 'error' }
@@ -110,7 +108,7 @@ export function useEventStatus() {
    * @param {Object} event - Event object
    * @returns {boolean} True if event is overdue
    */
-  const isEventOverdue = (event) => {
+  const isEventOverdue = event => {
     const now = new Date()
     const endDate = new Date(event.end)
     return now > endDate
@@ -121,7 +119,7 @@ export function useEventStatus() {
    * @param {Object} event - Event object
    * @returns {boolean} True if event is currently active
    */
-  const isEventActive = (event) => {
+  const isEventActive = event => {
     const now = new Date()
     const startDate = new Date(event.start)
     const endDate = new Date(event.end)
@@ -133,7 +131,7 @@ export function useEventStatus() {
    * @param {Object} event - Event object
    * @returns {boolean} True if event is upcoming
    */
-  const isEventUpcoming = (event) => {
+  const isEventUpcoming = event => {
     const now = new Date()
     const startDate = new Date(event.start)
     return startDate > now
@@ -144,7 +142,7 @@ export function useEventStatus() {
    * @param {Object} event - Event object
    * @returns {string} Urgency level ('high', 'medium', 'low')
    */
-  const getEventUrgency = (event) => {
+  const getEventUrgency = event => {
     const today = new Date()
     const startDate = new Date(event.start)
     const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
@@ -170,7 +168,7 @@ export function useEventStatus() {
   const getStatusTypes = () => {
     return [
       'completed', 'ongoing', 'upcoming', 'today', 'tomorrow',
-      'soon', 'this week', 'next week', 'this month', 'next month', 'later'
+      'soon', 'this week', 'next week', 'this month', 'next month', 'later',
     ]
   }
 
@@ -185,6 +183,6 @@ export function useEventStatus() {
     isEventActive,
     isEventUpcoming,
     getEventUrgency,
-    getStatusTypes
+    getStatusTypes,
   }
 }

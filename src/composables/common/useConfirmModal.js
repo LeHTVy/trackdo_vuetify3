@@ -1,7 +1,7 @@
-import { ref, reactive, computed } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useConfirmModalConfig } from './useConfirmModalConfig'
 
-export function useConfirmModal() {
+export function useConfirmModal () {
   const isOpen = ref(false)
   const loading = ref(false)
 
@@ -11,7 +11,7 @@ export function useConfirmModal() {
     message: '',
     details: '',
     confirmText: '',
-    cancelText: 'Cancel'
+    cancelText: 'Cancel',
   })
 
   // Use config composable
@@ -37,7 +37,7 @@ export function useConfirmModal() {
         details: '',
         confirmText: '',
         cancelText: 'Cancel',
-        ...configOptions
+        ...configOptions,
       })
 
       isOpen.value = true
@@ -80,7 +80,7 @@ export function useConfirmModal() {
       message: `Are you sure you want to delete "${itemName}"?`,
       details: details || 'This action cannot be undone.',
       confirmText: 'Delete',
-      cancelText: 'Cancel'
+      cancelText: 'Cancel',
     })
   }
 
@@ -91,7 +91,7 @@ export function useConfirmModal() {
       message: `Are you sure you want to update "${itemName}"?`,
       details,
       confirmText: 'Update',
-      cancelText: 'Cancel'
+      cancelText: 'Cancel',
     })
   }
 
@@ -102,7 +102,7 @@ export function useConfirmModal() {
       message,
       details,
       confirmText: 'Proceed',
-      cancelText: 'Cancel'
+      cancelText: 'Cancel',
     })
   }
 
@@ -122,6 +122,6 @@ export function useConfirmModal() {
     closeModal,
     confirmDelete,
     confirmUpdate,
-    confirmAction
+    confirmAction,
   }
 }

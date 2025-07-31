@@ -1,6 +1,6 @@
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 
-export function useProjectFilters(projects) {
+export function useProjectFilters (projects) {
   // Filter state
   const filter = ref('all')
 
@@ -9,7 +9,7 @@ export function useProjectFilters(projects) {
     { value: 'all', label: 'All', icon: 'mdi-view-grid' },
     { value: 'Active', label: 'Active', icon: 'mdi-play-circle' },
     { value: 'Completed', label: 'Completed', icon: 'mdi-check-circle' },
-    { value: 'On Hold', label: 'On Hold', icon: 'mdi-pause-circle' }
+    { value: 'On Hold', label: 'On Hold', icon: 'mdi-pause-circle' },
   ]
 
   // Filtered projects computed property
@@ -21,7 +21,7 @@ export function useProjectFilters(projects) {
   })
 
   // Filter methods
-  const setFilter = (newFilter) => {
+  const setFilter = newFilter => {
     filter.value = newFilter
   }
 
@@ -36,7 +36,7 @@ export function useProjectFilters(projects) {
       all: allProjects.length,
       active: allProjects.filter(p => p.status === 'Active').length,
       completed: allProjects.filter(p => p.status === 'Completed').length,
-      onHold: allProjects.filter(p => p.status === 'On Hold').length
+      onHold: allProjects.filter(p => p.status === 'On Hold').length,
     }
   })
 
@@ -51,6 +51,6 @@ export function useProjectFilters(projects) {
 
     // Methods
     setFilter,
-    resetFilter
+    resetFilter,
   }
 }

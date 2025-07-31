@@ -1,10 +1,9 @@
-import { ref, nextTick } from 'vue'
-import { useUniversalDialog, DialogTypes } from './useUniversalDialog'
+import { DialogTypes, useUniversalDialog } from './useUniversalDialog'
 import logger from '@/services/logger'
 
 const dialogLogger = logger.createLogger('DialogManager')
 
-export function useDialogManager() {
+export function useDialogManager () {
   // Use universal dialog system
   const eventDialogManager = useUniversalDialog('event-dialog')
   const eventDetailsDialogManager = useUniversalDialog('event-details-dialog')
@@ -40,12 +39,12 @@ export function useDialogManager() {
     return eventDetailsDialogManager.closeDialog()
   }
 
-  const showEventDetails = async (event) => {
+  const showEventDetails = async event => {
     dialogLogger.debug('Showing event details', event)
     return eventDetailsDialogManager.openDialog(event, { type: DialogTypes.DETAILS })
   }
 
-  const showEventMenu = async (event) => {
+  const showEventMenu = async event => {
     return showEventDetails(event)
   }
 
@@ -77,7 +76,7 @@ export function useDialogManager() {
     return projectDetailsDialogManager.closeDialog()
   }
 
-  const showProjectDetails = async (project) => {
+  const showProjectDetails = async project => {
     dialogLogger.debug('Showing project details', project)
     return projectDetailsDialogManager.openDialog(project, { type: DialogTypes.DETAILS })
   }
@@ -95,7 +94,7 @@ export function useDialogManager() {
       eventDialogManager.closeDialog(),
       eventDetailsDialogManager.closeDialog(),
       projectDialogManager.closeDialog(),
-      projectDetailsDialogManager.closeDialog()
+      projectDetailsDialogManager.closeDialog(),
     ])
   }
 
@@ -136,6 +135,6 @@ export function useDialogManager() {
 
     // Common methods
     closeAllDialogs,
-    hasOpenDialog
+    hasOpenDialog,
   }
 }

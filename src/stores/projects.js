@@ -159,7 +159,7 @@ export const useProjectsStore = defineStore('projects', () => {
           text: `Project "${project.title || project.name}" has been completed`,
           time: timeAgo,
           icon: 'mdi-check-circle',
-          color: 'success'
+          color: 'success',
         })
       } else if (project.status === 'Active') {
         if (project.progress > 80) {
@@ -168,7 +168,7 @@ export const useProjectsStore = defineStore('projects', () => {
             text: `Project "${project.title || project.name}" is ${project.progress}% complete`,
             time: timeAgo,
             icon: 'mdi-progress-check',
-            color: 'info'
+            color: 'info',
           })
         } else if (project.progress > 0) {
           activities.push({
@@ -176,7 +176,7 @@ export const useProjectsStore = defineStore('projects', () => {
             text: `Project "${project.title || project.name}" progress updated to ${project.progress}%`,
             time: timeAgo,
             icon: 'mdi-chart-line',
-            color: 'primary'
+            color: 'primary',
           })
         } else {
           activities.push({
@@ -184,7 +184,7 @@ export const useProjectsStore = defineStore('projects', () => {
             text: `Project "${project.title || project.name}" has been started`,
             time: timeAgo,
             icon: 'mdi-play-circle',
-            color: 'success'
+            color: 'success',
           })
         }
       } else if (project.status === 'On Hold') {
@@ -193,7 +193,7 @@ export const useProjectsStore = defineStore('projects', () => {
           text: `Project "${project.title || project.name}" has been put on hold`,
           time: timeAgo,
           icon: 'mdi-pause-circle',
-          color: 'warning'
+          color: 'warning',
         })
       } else if (project.status === 'Planning') {
         activities.push({
@@ -201,7 +201,7 @@ export const useProjectsStore = defineStore('projects', () => {
           text: `Project "${project.title || project.name}" is in planning phase`,
           time: timeAgo,
           icon: 'mdi-clipboard-text',
-          color: 'info'
+          color: 'info',
         })
       } else {
         activities.push({
@@ -209,7 +209,7 @@ export const useProjectsStore = defineStore('projects', () => {
           text: `Project "${project.title || project.name}" was created`,
           time: timeAgo,
           icon: 'mdi-plus-circle',
-          color: 'primary'
+          color: 'primary',
         })
       }
     })
@@ -220,14 +220,14 @@ export const useProjectsStore = defineStore('projects', () => {
         text: 'No recent activity',
         time: '',
         icon: 'mdi-clock-outline',
-        color: 'grey'
+        color: 'grey',
       })
     }
 
     return activities
   })
 
-  const getTimeAgo = (date) => {
+  const getTimeAgo = date => {
     const now = new Date()
     const diffInMs = now - date
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
@@ -269,11 +269,11 @@ export const useProjectsStore = defineStore('projects', () => {
         projects.value = userProjects.map(project => ({
           ...project,
           id: project._id || project.id,
-          _id: project._id || project.id
+          _id: project._id || project.id,
         }))
         storeLogger.success('User projects loaded from MongoDB', {
           count: projects.value.length,
-          userId: currentUserId
+          userId: currentUserId,
         })
       } else {
         storeLogger.warn('Failed to load from MongoDB', result.error)
@@ -295,7 +295,7 @@ export const useProjectsStore = defineStore('projects', () => {
       // Add userId to project data
       const projectWithUser = {
         ...projectData,
-        userId: authStore.currentUser?.id || authStore.currentUser?._id
+        userId: authStore.currentUser?.id || authStore.currentUser?._id,
       }
 
       const { mongoService } = await import('@/services/mongodb.js')
@@ -305,7 +305,7 @@ export const useProjectsStore = defineStore('projects', () => {
         const newProject = {
           ...result.data,
           id: result.data._id || result.data.id,
-          _id: result.data._id || result.data.id
+          _id: result.data._id || result.data.id,
         }
         projects.value.push(newProject)
         storeLogger.success('Project created in MongoDB', { title: newProject.title, id: newProject._id })
@@ -339,7 +339,7 @@ export const useProjectsStore = defineStore('projects', () => {
           const updatedProject = {
             ...result.data,
             id: result.data._id || result.data.id,
-            _id: result.data._id || result.data.id
+            _id: result.data._id || result.data.id,
           }
           projects.value[index] = updatedProject
           storeLogger.success('Project updated in MongoDB', { title: updatedProject.title, id: projectId })

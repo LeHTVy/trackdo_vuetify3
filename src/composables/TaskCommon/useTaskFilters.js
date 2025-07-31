@@ -1,11 +1,11 @@
-import { ref, computed, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 /**
  * Task Filtering and Sorting Utilities
  * @param {Ref} tasksRef - Reactive reference to tasks array
  * @returns {Object} Filtering and sorting utilities
  */
-export function useTaskFilters(tasksRef) {
+export function useTaskFilters (tasksRef) {
   // Filter states
   const searchQuery = ref('')
   const selectedStatus = ref([])
@@ -21,14 +21,14 @@ export function useTaskFilters(tasksRef) {
     { value: 'todo', title: 'To Do', color: 'info', icon: 'mdi-circle-outline' },
     { value: 'in-progress', title: 'In Progress', color: 'warning', icon: 'mdi-clock-outline' },
     { value: 'completed', title: 'Completed', color: 'success', icon: 'mdi-check-circle' },
-    { value: 'cancelled', title: 'Cancelled', color: 'error', icon: 'mdi-cancel' }
+    { value: 'cancelled', title: 'Cancelled', color: 'error', icon: 'mdi-cancel' },
   ]
 
   const priorityOptions = [
     { value: 'low', title: 'Low', color: 'blue-grey', icon: 'mdi-arrow-down' },
     { value: 'medium', title: 'Medium', color: 'orange', icon: 'mdi-minus' },
     { value: 'high', title: 'High', color: 'deep-orange', icon: 'mdi-arrow-up' },
-    { value: 'critical', title: 'Critical', color: 'red', icon: 'mdi-alert' }
+    { value: 'critical', title: 'Critical', color: 'red', icon: 'mdi-alert' },
   ]
 
   const sortOptions = [
@@ -36,7 +36,7 @@ export function useTaskFilters(tasksRef) {
     { value: 'priority', title: 'Priority' },
     { value: 'title', title: 'Title' },
     { value: 'createdAt', title: 'Created Date' },
-    { value: 'updatedAt', title: 'Updated Date' }
+    { value: 'updatedAt', title: 'Updated Date' },
   ]
 
   // Get unique projects from tasks
@@ -51,17 +51,17 @@ export function useTaskFilters(tasksRef) {
 
     return [
       { value: 'all', title: 'All Projects' },
-      ...projects.map(project => ({ value: project, title: project }))
+      ...projects.map(project => ({ value: project, title: project })),
     ]
   })
 
   // Priority weight for sorting
-  const getPriorityWeight = (priority) => {
+  const getPriorityWeight = priority => {
     const weights = {
       'critical': 4,
       'high': 3,
       'medium': 2,
-      'low': 1
+      'low': 1,
     }
     return weights[priority?.toLowerCase()] || 0
   }
@@ -170,7 +170,7 @@ export function useTaskFilters(tasksRef) {
       pending,
       inProgress,
       overdue,
-      completionRate: total > 0 ? Math.round((completed / total) * 100) : 0
+      completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
     }
   })
 
@@ -200,7 +200,7 @@ export function useTaskFilters(tasksRef) {
   }
 
   // Set sort by field
-  const setSortBy = (field) => {
+  const setSortBy = field => {
     if (sortBy.value === field) {
       toggleSortOrder()
     } else {
@@ -234,6 +234,6 @@ export function useTaskFilters(tasksRef) {
     // Methods
     clearFilters,
     toggleSortOrder,
-    setSortBy
+    setSortBy,
   }
 }

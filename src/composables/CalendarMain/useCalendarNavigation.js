@@ -1,6 +1,6 @@
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 
-export function useCalendarNavigation(initialDate = new Date(), initialView = 'monthly') {
+export function useCalendarNavigation (initialDate = new Date(), initialView = 'monthly') {
   const currentDate = ref(initialDate)
   const calendarType = ref(initialView)
   const viewTypes = ['monthly', 'weekly']
@@ -68,7 +68,7 @@ export function useCalendarNavigation(initialDate = new Date(), initialView = 'm
    * Change calendar view type
    * @param {string} viewType
    */
-  const changeView = (viewType) => {
+  const changeView = viewType => {
     if (viewTypes.includes(viewType)) {
       calendarType.value = viewType
     }
@@ -78,7 +78,7 @@ export function useCalendarNavigation(initialDate = new Date(), initialView = 'm
    * Navigate to specific date
    * @param {Date|string} date
    */
-  const goToDate = (date) => {
+  const goToDate = date => {
     currentDate.value = new Date(date)
   }
 
@@ -86,7 +86,7 @@ export function useCalendarNavigation(initialDate = new Date(), initialView = 'm
    * Navigate by specific number of periods
    * @param {number} periods
    */
-  const navigateByPeriods = (periods) => {
+  const navigateByPeriods = periods => {
     const newDate = new Date(currentDate.value)
 
     switch (calendarType.value) {
@@ -118,7 +118,7 @@ export function useCalendarNavigation(initialDate = new Date(), initialView = 'm
       dayShort: date.toLocaleDateString('en-US', { weekday: 'short' }),
       fullDate: date.toLocaleDateString('en-US'),
       isoDate: date.toISOString().split('T')[0],
-      timestamp: date.getTime()
+      timestamp: date.getTime(),
     }
   }
 
@@ -228,6 +228,6 @@ export function useCalendarNavigation(initialDate = new Date(), initialView = 'm
     canNavigateNext,
 
     // Information getters
-    getCurrentDateInfo
+    getCurrentDateInfo,
   }
 }

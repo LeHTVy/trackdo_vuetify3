@@ -1,6 +1,6 @@
-import { ref, reactive } from 'vue'
+import { reactive, ref } from 'vue'
 
-export function useEventForm() {
+export function useEventForm () {
   const editedIndex = ref(-1)
   const defaultEvent = {
     name: '',
@@ -79,7 +79,7 @@ export function useEventForm() {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     }
   }
 
@@ -95,7 +95,7 @@ export function useEventForm() {
       ...editedEvent,
       end: endDate,
       title: eventTitle,
-      name: eventTitle
+      name: eventTitle,
     }
   }
 
@@ -123,6 +123,6 @@ export function useEventForm() {
     validateForm,
     getFormData,
     isEditMode,
-    hasChanges
+    hasChanges,
   }
 }

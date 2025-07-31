@@ -1,6 +1,6 @@
 import { useAsyncOperation } from './useAsyncOperation'
 
-export function useBaseOperations(store, entityName = 'item') {
+export function useBaseOperations (store, entityName = 'item') {
   const { loading, error, execute, executeMultiple, clearError, setError } = useAsyncOperation()
 
   /**
@@ -26,7 +26,7 @@ export function useBaseOperations(store, entityName = 'item') {
       return {
         success: true,
         data: result,
-        message: options.successMessage || `${entityName} created successfully`
+        message: options.successMessage || `${entityName} created successfully`,
       }
     }, options.errorMessage || `Unable to create ${entityName}`)
   }
@@ -64,7 +64,7 @@ export function useBaseOperations(store, entityName = 'item') {
       return {
         success: true,
         data: result,
-        message: options.successMessage || `${entityName} updated successfully`
+        message: options.successMessage || `${entityName} updated successfully`,
       }
     }, options.errorMessage || `Unable to update ${entityName}`)
   }
@@ -93,7 +93,7 @@ export function useBaseOperations(store, entityName = 'item') {
       return {
         success: true,
         data: result,
-        message: options.successMessage || `${entityName} deleted successfully`
+        message: options.successMessage || `${entityName} deleted successfully`,
       }
     }, options.errorMessage || `Unable to delete ${entityName}`)
   }
@@ -112,7 +112,7 @@ export function useBaseOperations(store, entityName = 'item') {
       return {
         success: true,
         data: result,
-        message: options.successMessage || `${entityName}s loaded successfully`
+        message: options.successMessage || `${entityName}s loaded successfully`,
       }
     }, options.errorMessage || `Unable to fetch ${entityName}s`)
   }
@@ -137,14 +137,14 @@ export function useBaseOperations(store, entityName = 'item') {
         _id: undefined,
         // Add copy suffix if title/name exists
         ...(item.title && { title: `${item.title} (Copy)` }),
-        ...(item.name && { name: `${item.name} (Copy)` })
+        ...(item.name && { name: `${item.name} (Copy)` }),
       }
 
       // Create the duplicate
       return await createItem(duplicatedData, {
         ...options,
         successMessage: options.successMessage || `${entityName} duplicated successfully`,
-        errorMessage: options.errorMessage || `Unable to duplicate ${entityName}`
+        errorMessage: options.errorMessage || `Unable to duplicate ${entityName}`,
       })
     }, options.errorMessage || `Unable to duplicate ${entityName}`)
   }
@@ -186,7 +186,7 @@ export function useBaseOperations(store, entityName = 'item') {
       return {
         success: true,
         deletedCount: itemIds.length,
-        message: options.successMessage || `${itemIds.length} ${entityName}s deleted successfully`
+        message: options.successMessage || `${itemIds.length} ${entityName}s deleted successfully`,
       }
     }, options.errorMessage || `Unable to delete selected ${entityName}s`)
   }
@@ -203,7 +203,7 @@ export function useBaseOperations(store, entityName = 'item') {
 
       return {
         success: true,
-        message: options.successMessage || `${entityName}s refreshed successfully`
+        message: options.successMessage || `${entityName}s refreshed successfully`,
       }
     }, options.errorMessage || `Unable to refresh ${entityName}s`)
   }
@@ -224,6 +224,6 @@ export function useBaseOperations(store, entityName = 'item') {
 
     // Utilities
     clearError,
-    setError
+    setError,
   }
 }

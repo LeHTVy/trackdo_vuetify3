@@ -7,13 +7,13 @@
         <div class="search-section">
           <v-text-field
             v-model="searchQuery"
-            placeholder="Search tasks..."
-            variant="outlined"
-            density="comfortable"
-            prepend-inner-icon="mdi-magnify"
-            clearable
-            hide-details
             class="search-input"
+            clearable
+            density="comfortable"
+            hide-details
+            placeholder="Search tasks..."
+            prepend-inner-icon="mdi-magnify"
+            variant="outlined"
           />
         </div>
 
@@ -21,20 +21,20 @@
         <div class="filter-section">
           <v-chip-group
             v-model="selectedStatus"
+            class="filter-chips"
             filter
             multiple
-            class="filter-chips"
           >
             <v-chip
               v-for="status in statusOptions"
               :key="status.value"
-              :value="status.value"
-              :color="status.color"
-              variant="outlined"
-              size="small"
               class="filter-chip"
+              :color="status.color"
+              size="small"
+              :value="status.value"
+              variant="outlined"
             >
-              <v-icon start :icon="status.icon" size="small" />
+              <v-icon :icon="status.icon" size="small" start />
               {{ status.title }}
             </v-chip>
           </v-chip-group>
@@ -44,20 +44,20 @@
         <div class="filter-section">
           <v-chip-group
             v-model="selectedPriority"
+            class="filter-chips"
             filter
             multiple
-            class="filter-chips"
           >
             <v-chip
               v-for="priority in priorityOptions"
               :key="priority.value"
-              :value="priority.value"
-              :color="priority.color"
-              variant="outlined"
-              size="small"
               class="filter-chip"
+              :color="priority.color"
+              size="small"
+              :value="priority.value"
+              variant="outlined"
             >
-              <v-icon start :icon="priority.icon" size="small" />
+              <v-icon :icon="priority.icon" size="small" start />
               {{ priority.title }}
             </v-chip>
           </v-chip-group>
@@ -67,19 +67,19 @@
         <div class="sort-section">
           <v-select
             v-model="sortBy"
+            class="sort-select"
+            density="compact"
+            hide-details
             :items="sortOptions"
             label="Sort by"
             variant="outlined"
-            density="compact"
-            hide-details
-            class="sort-select"
           />
 
           <v-btn
-            :icon="sortOrder === 'asc' ? 'mdi-sort-ascending' : 'mdi-sort-descending'"
-            variant="outlined"
-            size="small"
             class="sort-btn"
+            :icon="sortOrder === 'asc' ? 'mdi-sort-ascending' : 'mdi-sort-descending'"
+            size="small"
+            variant="outlined"
             @click="toggleSortOrder"
           >
             <v-tooltip activator="parent" location="top">
@@ -92,10 +92,10 @@
         <div class="action-section">
           <v-btn
             v-if="hasActiveFilters"
-            variant="outlined"
-            size="small"
-            color="error"
             class="clear-btn"
+            color="error"
+            size="small"
+            variant="outlined"
             @click="clearFilters"
           >
             <v-icon start>mdi-filter-remove</v-icon>
@@ -108,10 +108,10 @@
       <div v-if="hasActiveFilters" class="filter-summary mt-3">
         <v-chip
           v-if="searchQuery"
-          size="x-small"
-          color="primary"
-          variant="tonal"
           closable
+          color="primary"
+          size="x-small"
+          variant="tonal"
           @click:close="searchQuery = ''"
         >
           Search: "{{ searchQuery }}"
@@ -120,10 +120,10 @@
         <v-chip
           v-for="status in selectedStatus"
           :key="`status-${status}`"
-          size="x-small"
-          :color="getStatusColor(status)"
-          variant="tonal"
           closable
+          :color="getStatusColor(status)"
+          size="x-small"
+          variant="tonal"
           @click:close="removeStatusFilter(status)"
         >
           {{ getStatusTitle(status) }}
@@ -132,10 +132,10 @@
         <v-chip
           v-for="priority in selectedPriority"
           :key="`priority-${priority}`"
-          size="x-small"
-          :color="getPriorityColor(priority)"
-          variant="tonal"
           closable
+          :color="getPriorityColor(priority)"
+          size="x-small"
+          variant="tonal"
           @click:close="removePriorityFilter(priority)"
         >
           {{ getPriorityTitle(priority) }}
@@ -146,123 +146,123 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+  import { computed } from 'vue'
 
-// Props
-const props = defineProps({
-  searchQuery: {
-    type: String,
-    default: ''
-  },
-  selectedStatus: {
-    type: Array,
-    default: () => []
-  },
-  selectedPriority: {
-    type: Array,
-    default: () => []
-  },
-  sortBy: {
-    type: String,
-    default: 'dueDate'
-  },
-  sortOrder: {
-    type: String,
-    default: 'asc'
-  },
-  statusOptions: {
-    type: Array,
-    default: () => []
-  },
-  priorityOptions: {
-    type: Array,
-    default: () => []
-  },
-  sortOptions: {
-    type: Array,
-    default: () => []
-  },
-  hasActiveFilters: {
-    type: Boolean,
-    default: false
+  // Props
+  const props = defineProps({
+    searchQuery: {
+      type: String,
+      default: '',
+    },
+    selectedStatus: {
+      type: Array,
+      default: () => [],
+    },
+    selectedPriority: {
+      type: Array,
+      default: () => [],
+    },
+    sortBy: {
+      type: String,
+      default: 'dueDate',
+    },
+    sortOrder: {
+      type: String,
+      default: 'asc',
+    },
+    statusOptions: {
+      type: Array,
+      default: () => [],
+    },
+    priorityOptions: {
+      type: Array,
+      default: () => [],
+    },
+    sortOptions: {
+      type: Array,
+      default: () => [],
+    },
+    hasActiveFilters: {
+      type: Boolean,
+      default: false,
+    },
+  })
+
+  // Emits
+  const emit = defineEmits([
+    'update:searchQuery',
+    'update:selectedStatus',
+    'update:selectedPriority',
+    'update:sortBy',
+    'update:sortOrder',
+    'clear-filters',
+    'toggle-sort-order',
+  ])
+
+  // Computed properties for v-model
+  const searchQuery = computed({
+    get: () => props.searchQuery,
+    set: value => emit('update:searchQuery', value),
+  })
+
+  const selectedStatus = computed({
+    get: () => props.selectedStatus,
+    set: value => emit('update:selectedStatus', value),
+  })
+
+  const selectedPriority = computed({
+    get: () => props.selectedPriority,
+    set: value => emit('update:selectedPriority', value),
+  })
+
+  const sortBy = computed({
+    get: () => props.sortBy,
+    set: value => emit('update:sortBy', value),
+  })
+
+  const sortOrder = computed({
+    get: () => props.sortOrder,
+    set: value => emit('update:sortOrder', value),
+  })
+
+  // Helper methods
+  const getStatusColor = status => {
+    const option = props.statusOptions.find(opt => opt.value === status)
+    return option?.color || 'primary'
   }
-})
 
-// Emits
-const emit = defineEmits([
-  'update:searchQuery',
-  'update:selectedStatus',
-  'update:selectedPriority',
-  'update:sortBy',
-  'update:sortOrder',
-  'clearFilters',
-  'toggleSortOrder'
-])
+  const getStatusTitle = status => {
+    const option = props.statusOptions.find(opt => opt.value === status)
+    return option?.title || status
+  }
 
-// Computed properties for v-model
-const searchQuery = computed({
-  get: () => props.searchQuery,
-  set: (value) => emit('update:searchQuery', value)
-})
+  const getPriorityColor = priority => {
+    const option = props.priorityOptions.find(opt => opt.value === priority)
+    return option?.color || 'primary'
+  }
 
-const selectedStatus = computed({
-  get: () => props.selectedStatus,
-  set: (value) => emit('update:selectedStatus', value)
-})
+  const getPriorityTitle = priority => {
+    const option = props.priorityOptions.find(opt => opt.value === priority)
+    return option?.title || priority
+  }
 
-const selectedPriority = computed({
-  get: () => props.selectedPriority,
-  set: (value) => emit('update:selectedPriority', value)
-})
+  const removeStatusFilter = status => {
+    const newStatus = props.selectedStatus.filter(s => s !== status)
+    emit('update:selectedStatus', newStatus)
+  }
 
-const sortBy = computed({
-  get: () => props.sortBy,
-  set: (value) => emit('update:sortBy', value)
-})
+  const removePriorityFilter = priority => {
+    const newPriority = props.selectedPriority.filter(p => p !== priority)
+    emit('update:selectedPriority', newPriority)
+  }
 
-const sortOrder = computed({
-  get: () => props.sortOrder,
-  set: (value) => emit('update:sortOrder', value)
-})
+  const clearFilters = () => {
+    emit('clear-filters')
+  }
 
-// Helper methods
-const getStatusColor = (status) => {
-  const option = props.statusOptions.find(opt => opt.value === status)
-  return option?.color || 'primary'
-}
-
-const getStatusTitle = (status) => {
-  const option = props.statusOptions.find(opt => opt.value === status)
-  return option?.title || status
-}
-
-const getPriorityColor = (priority) => {
-  const option = props.priorityOptions.find(opt => opt.value === priority)
-  return option?.color || 'primary'
-}
-
-const getPriorityTitle = (priority) => {
-  const option = props.priorityOptions.find(opt => opt.value === priority)
-  return option?.title || priority
-}
-
-const removeStatusFilter = (status) => {
-  const newStatus = props.selectedStatus.filter(s => s !== status)
-  emit('update:selectedStatus', newStatus)
-}
-
-const removePriorityFilter = (priority) => {
-  const newPriority = props.selectedPriority.filter(p => p !== priority)
-  emit('update:selectedPriority', newPriority)
-}
-
-const clearFilters = () => {
-  emit('clearFilters')
-}
-
-const toggleSortOrder = () => {
-  emit('toggleSortOrder')
-}
+  const toggleSortOrder = () => {
+    emit('toggle-sort-order')
+  }
 </script>
 
 <style scoped>

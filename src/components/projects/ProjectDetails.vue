@@ -2,15 +2,15 @@
   <!-- Project Details Dialog -->
   <v-dialog
     v-model="isOpen"
+    class="details-dialog"
     max-width="550px"
     transition="dialog-top-transition"
-    class="details-dialog"
   >
     <v-card v-if="selectedProject && projectTitle" class="details-card" elevation="16">
       <v-card-title class="details-header pa-6" :class="`bg-${getProjectStatusColor(selectedProject.status)}`">
         <div class="d-flex align-center">
-          <v-avatar size="36" color="white" class="mr-3">
-            <v-icon :icon="getProjectStatusIcon(selectedProject.status)" :color="getProjectStatusColor(selectedProject.status)"></v-icon>
+          <v-avatar class="mr-3" color="white" size="36">
+            <v-icon :color="getProjectStatusColor(selectedProject.status)" :icon="getProjectStatusIcon(selectedProject.status)" />
           </v-avatar>
           <div>
             <h3 class="text-h6 font-weight-bold text-white mb-1">{{ projectTitle }}</h3>
@@ -23,7 +23,7 @@
         <!-- Project Title -->
         <div class="mb-4">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-format-title" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-format-title" />
             <span class="text-subtitle2 font-weight-medium">Project Title</span>
           </div>
           <p class="text-body-1 ml-8">{{ projectTitle }}</p>
@@ -32,7 +32,7 @@
         <!-- Description -->
         <div v-if="hasDescription" class="mb-4">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-text" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-text" />
             <span class="text-subtitle2 font-weight-medium">Description</span>
           </div>
           <p class="text-body-1 ml-8">{{ projectDescription }}</p>
@@ -41,7 +41,7 @@
         <!-- Progress -->
         <div v-if="selectedProject.progress !== undefined" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-chart-line" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-chart-line" />
             <span class="text-subtitle2 font-weight-medium">Progress</span>
           </div>
           <div class="ml-8">
@@ -60,7 +60,7 @@
         <!-- Team Members -->
         <div v-if="selectedProject.team && selectedProject.team.length > 0" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-account-group" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-account-group" />
             <span class="text-subtitle2 font-weight-medium">Team Members</span>
           </div>
           <div class="ml-8">
@@ -68,8 +68,8 @@
               <v-chip
                 v-for="member in selectedProject.team"
                 :key="member"
-                size="small"
                 color="primary"
+                size="small"
                 variant="outlined"
               >
                 {{ member }}
@@ -81,7 +81,7 @@
         <!-- Created Date -->
         <div v-if="selectedProject.createdAt" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-calendar-plus" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-calendar-plus" />
             <span class="text-subtitle2 font-weight-medium">Created Date</span>
           </div>
           <p class="text-body-1 ml-8">{{ formatDate(selectedProject.createdAt) }}</p>
@@ -90,7 +90,7 @@
         <!-- Updated Date -->
         <div v-if="selectedProject.updatedAt" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-calendar-edit" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-calendar-edit" />
             <span class="text-subtitle2 font-weight-medium">Last Updated</span>
           </div>
           <p class="text-body-1 ml-8">{{ formatDate(selectedProject.updatedAt) }}</p>
@@ -99,7 +99,7 @@
         <!-- Start Date -->
         <div v-if="selectedProject.startDate" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-calendar-start" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-calendar-start" />
             <span class="text-subtitle2 font-weight-medium">Start Date</span>
           </div>
           <p class="text-body-1 ml-8">{{ formatDate(selectedProject.startDate) }}</p>
@@ -108,7 +108,7 @@
         <!-- End Date -->
         <div v-if="hasEndDate" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-calendar-end" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-calendar-end" />
             <span class="text-subtitle2 font-weight-medium">End Date</span>
           </div>
           <p class="text-body-1 ml-8">{{ formatDate(selectedProject.endDate) }}</p>
@@ -117,13 +117,13 @@
         <!-- Priority -->
         <div v-if="hasPriority" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-flag" :color="getPriorityColor(selectedProject.priority)" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPriorityColor(selectedProject.priority)" icon="mdi-flag" />
             <span class="text-subtitle2 font-weight-medium">Priority Level</span>
           </div>
           <v-chip
+            class="ml-8"
             :color="getPriorityColor(selectedProject.priority)"
             size="small"
-            class="ml-8"
             variant="elevated"
           >
             {{ selectedProject.priority }}
@@ -133,7 +133,7 @@
         <!-- Budget -->
         <div v-if="hasBudget" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-currency-usd" :color="getThemeColor('success')" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getThemeColor('success')" icon="mdi-currency-usd" />
             <span class="text-subtitle2 font-weight-medium">Budget</span>
           </div>
           <p class="text-body-1 ml-8 font-weight-medium">{{ formatBudget(selectedProject.budget) }}</p>
@@ -142,13 +142,13 @@
         <!-- Category -->
         <div v-if="hasCategory" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-tag" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-tag" />
             <span class="text-subtitle2 font-weight-medium">Category</span>
           </div>
           <v-chip
+            class="ml-8"
             color="primary"
             size="small"
-            class="ml-8"
             variant="outlined"
           >
             {{ selectedProject.category }}
@@ -158,7 +158,7 @@
         <!-- Team Members -->
         <div v-if="hasTeamMembers" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-account-group" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-account-group" />
             <span class="text-subtitle2 font-weight-medium">Team Members</span>
           </div>
           <div class="ml-8">
@@ -166,12 +166,12 @@
               <v-chip
                 v-for="(member, index) in selectedProject.teamMembers"
                 :key="index"
+                class="ma-1"
                 :color="getTeamMemberColor(index)"
                 size="small"
                 variant="tonal"
-                class="ma-1"
               >
-                <v-icon start icon="mdi-account"></v-icon>
+                <v-icon icon="mdi-account" start />
                 {{ member }}
               </v-chip>
             </div>
@@ -180,30 +180,30 @@
       </v-card-text>
 
       <v-card-actions class="pa-6 pt-0">
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn
+          class="action-btn mr-3"
           color="error"
           variant="outlined"
           @click="handleDeleteProject"
-          class="action-btn mr-3"
         >
-          <v-icon icon="mdi-delete" class="mr-1"></v-icon>
+          <v-icon class="mr-1" icon="mdi-delete" />
           Delete
         </v-btn>
         <v-btn
+          class="action-btn mr-3"
           :color="getPrimaryColor()"
           variant="elevated"
           @click="editProject"
-          class="action-btn mr-3"
         >
-          <v-icon icon="mdi-pencil" class="mr-1"></v-icon>
+          <v-icon class="mr-1" icon="mdi-pencil" />
           Edit
         </v-btn>
         <v-btn
+          class="action-btn"
           color="grey-darken-1"
           variant="text"
           @click="closeDialog"
-          class="action-btn"
         >
           Close
         </v-btn>
@@ -213,75 +213,74 @@
 </template>
 
 <script setup>
-import { useProjectDetailsDialog } from '@/composables/ProjectCommon/useProjectDetailsDialog'
+  import { useProjectDetailsDialog } from '@/composables/ProjectCommon/useProjectDetailsDialog'
 
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
-  },
-  selectedProject: {
-    type: Object,
-    default: null
-  }
-})
+  const props = defineProps({
+    modelValue: {
+      type: Boolean,
+      default: false,
+    },
+    selectedProject: {
+      type: Object,
+      default: null,
+    },
+  })
 
-const emit = defineEmits(['update:modelValue', 'delete-project', 'edit-project', 'duplicate-project', 'close'])
+  const emit = defineEmits(['update:modelValue', 'delete-project', 'edit-project', 'duplicate-project', 'close'])
 
-const {
-  // Theme colors
-  getPrimaryColor,
-  getThemeColor,
+  const {
+    // Theme colors
+    getPrimaryColor,
+    getThemeColor,
 
-  // State
-  isOpen,
+    // State
+    isOpen,
 
-  // Computed properties
-  projectTitle,
-  projectDescription,
-  projectStatus,
-  hasEndDate,
-  hasPriority,
-  hasDescription,
-  hasBudget,
-  hasCategory,
-  hasTeamMembers,
+    // Computed properties
+    projectTitle,
+    projectDescription,
+    projectStatus,
+    hasEndDate,
+    hasPriority,
+    hasDescription,
+    hasBudget,
+    hasCategory,
+    hasTeamMembers,
 
-  // Methods
-  getProjectStatusIcon,
-  getProjectStatusColor,
-  getPriorityColor,
-  formatDate,
-  formatBudget,
-  closeDialog,
-  editProject,
-  duplicateProject
-} = useProjectDetailsDialog(props, emit)
+    // Methods
+    getProjectStatusIcon,
+    getProjectStatusColor,
+    getPriorityColor,
+    formatDate,
+    formatBudget,
+    closeDialog,
+    editProject,
+  } = useProjectDetailsDialog(props, emit)
 
-// Team member colors
-const teamMemberColors = ['primary', 'secondary', 'accent', 'info', 'warning', 'success', 'error']
+  // Team member colors
+  const teamMemberColors = ['primary', 'secondary', 'accent', 'info', 'warning', 'success', 'error']
 
-// Get color for team member chip
-const getTeamMemberColor = (index) => {
-  return teamMemberColors[index % teamMemberColors.length]
-}
-
-const handleDeleteProject = () => {
-  console.log('Delete button clicked!')
-  console.log('Selected project:', props.selectedProject)
-
-  const project = props.selectedProject
-  if (!project) {
-    console.error('No project selected for deletion')
-    return
+  // Get color for team member chip
+  const getTeamMemberColor = index => {
+    return teamMemberColors[index % teamMemberColors.length]
   }
 
-  // Emit delete event directly - let parent handle confirmation
-  const projectId = project._id || project.id
-  console.log('ProjectDetails handleDeleteProject - ID:', projectId)
-  emit('delete-project', projectId)
-  closeDialog()
-}
+  const handleDeleteProject = () => {
+    console.log('Delete button clicked!')
+    console.log('Selected project:', props.selectedProject)
+
+    const project = props.selectedProject
+    if (!project) {
+      console.error('No project selected for deletion')
+      return
+    }
+
+    // Emit delete event directly - let parent handle confirmation
+    const projectId = project._id || project.id
+    console.log('ProjectDetails handleDeleteProject - ID:', projectId)
+    emit('delete-project', projectId)
+    closeDialog()
+  }
 </script>
 
 <style scoped>

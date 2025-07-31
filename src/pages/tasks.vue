@@ -5,11 +5,11 @@
 
     <!-- Stats Section -->
     <TasksStats
-      :total-tasks="tasksStore.totalTasks.length"
       :completed-tasks="tasksStore.completedTasks.length"
-      :pending-tasks="tasksStore.pendingTasks.length"
       :in-progress-tasks="tasksStore.inProgressTasks.length"
       :overdue-tasks="tasksStore.overdueTasks.length"
+      :pending-tasks="tasksStore.pendingTasks.length"
+      :total-tasks="tasksStore.totalTasks"
     />
 
     <!-- Main Content -->
@@ -17,14 +17,14 @@
       <!-- Filters and Search -->
       <TaskFilters
         v-model:search-query="searchQuery"
-        v-model:selected-status="selectedStatus"
         v-model:selected-priority="selectedPriority"
+        v-model:selected-status="selectedStatus"
         v-model:sort-by="sortBy"
         v-model:sort-order="sortOrder"
-        :status-options="statusOptions"
+        :has-active-filters="hasActiveFilters"
         :priority-options="priorityOptions"
         :sort-options="sortOptions"
-        :has-active-filters="hasActiveFilters"
+        :status-options="statusOptions"
         @clear-filters="clearFilters"
         @toggle-sort-order="toggleSortOrder"
       />
@@ -36,8 +36,8 @@
           <TasksList
             :tasks="filteredTasks"
             :tasks-store="tasksStore"
-            @edit-task="editTask"
             @delete-task="deleteTask"
+            @edit-task="editTask"
             @toggle-complete="toggleTaskComplete"
           />
         </div>
@@ -55,19 +55,19 @@
 
     <!-- Task Dialog -->
     <TaskDialog
-      :show-dialog="showTaskDialog"
       :editing-task="editingTask"
+      :show-dialog="showTaskDialog"
       @close="closeTaskDialog"
       @save="saveTask"
     />
 
     <!-- Draggable Floating Action Button -->
     <v-btn
-      fab
-      color="primary"
-      size="large"
       class="floating-add-btn"
       :class="{ 'dragging': isDragging }"
+      color="primary"
+      fab
+      size="large"
       :style="fabStyle"
       @click="openTaskDialog"
       @mousedown="startDrag"
@@ -82,105 +82,106 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useTasksStore } from '@/stores/tasks'
-import { useTaskColors, useTaskFormatting, useTaskFilters, useDraggableFab } from '@/composables'
-import TasksHeader from '@/components/tasks/TasksHeader.vue'
-import TasksStats from '@/components/tasks/TasksStats.vue'
-import TasksList from '@/components/tasks/TasksList.vue'
-import TaskDialog from '@/components/tasks/TaskDialog.vue'
-import TaskFilters from '@/components/tasks/TaskFilters.vue'
-import TaskProgress from '@/components/tasks/TaskProgress.vue'
-import TaskInsights from '@/components/tasks/TaskInsights.vue'
+  import { computed, onMounted, ref } from 'vue'
+  import { useTasksStore } from '@/stores/tasks'
+  import { useTaskColors } from '@/composables/TaskCommon/useTaskColors'
+  import { useTaskFilters } from '@/composables/TaskCommon/useTaskFilters'
+  import { useDraggableFab } from '@/composables/common/useDraggableFab'
+  import TasksHeader from '@/components/tasks/TasksHeader.vue'
+  import TasksStats from '@/components/tasks/TasksStats.vue'
+  import TasksList from '@/components/tasks/TasksList.vue'
+  import TaskDialog from '@/components/tasks/TaskDialog.vue'
+  import TaskFilters from '@/components/tasks/TaskFilters.vue'
+  import TaskProgress from '@/components/tasks/TaskProgress.vue'
+  import TaskInsights from '@/components/tasks/TaskInsights.vue'
 
-// Stores
-const tasksStore = useTasksStore()
+  // Stores
+  const tasksStore = useTasksStore()
 
-// Refs
-const showTaskDialog = ref(false)
-const editingTask = ref(null)
+  // Refs
+  const showTaskDialog = ref(false)
+  const editingTask = ref(null)
 
-// Use composables
-const { cssVars, applyCssVars, getPriorityColor } = useTaskColors('page')
-const { formatRelativeTime } = useTaskFormatting()
-const {
-  searchQuery,
-  selectedStatus,
-  selectedPriority,
-  sortBy,
-  sortOrder,
-  statusOptions,
-  priorityOptions,
-  sortOptions,
-  filteredTasks,
-  hasActiveFilters,
-  clearFilters,
-  toggleSortOrder
-} = useTaskFilters(computed(() => tasksStore.tasks))
+  // Use composables
+  const { cssVars, applyCssVars } = useTaskColors()
+  const {
+    searchQuery,
+    selectedStatus,
+    selectedPriority,
+    sortBy,
+    sortOrder,
+    statusOptions,
+    priorityOptions,
+    sortOptions,
+    filteredTasks,
+    hasActiveFilters,
+    clearFilters,
+    toggleSortOrder,
+  } = useTaskFilters(computed(() => tasksStore.tasks))
 
-// Draggable FAB
-const { isDragging, fabStyle, startDrag } = useDraggableFab({
-  storageKey: 'tasksFabPosition'
-})
+  // Draggable FAB
+  const { isDragging, fabStyle, startDrag } = useDraggableFab({
+    storageKey: 'tasksFabPosition',
+  })
 
-// Apply CSS variables
-applyCssVars()
+  // Apply CSS variables
+  applyCssVars()
 
-// Methods
-const openTaskDialog = (initialData = {}) => {
-  editingTask.value = null
-  showTaskDialog.value = true
-}
+  // Methods
+  const openTaskDialog = () => {
+    editingTask.value = null
+    showTaskDialog.value = true
+  }
 
-const editTask = (task) => {
-  editingTask.value = task
-  showTaskDialog.value = true
-}
+  const editTask = task => {
+    editingTask.value = task
+    showTaskDialog.value = true
+  }
 
-const closeTaskDialog = () => {
-  showTaskDialog.value = false
-  editingTask.value = null
-}
+  const closeTaskDialog = () => {
+    showTaskDialog.value = false
+    editingTask.value = null
+  }
 
-const saveTask = async (taskData) => {
-  try {
-    if (editingTask.value) {
-      const taskId = editingTask.value.id || editingTask.value._id
-      await tasksStore.updateTask(taskId, taskData)
-    } else {
-      await tasksStore.addTask(taskData)
+  const saveTask = async taskData => {
+    try {
+      if (editingTask.value) {
+        const taskId = editingTask.value.id || editingTask.value._id
+        await tasksStore.updateTask(taskId, taskData)
+      } else {
+        await tasksStore.addTask(taskData)
+      }
+      closeTaskDialog()
+    } catch (error) {
+      console.error('Error saving task:', error)
     }
-    closeTaskDialog()
-  } catch (error) {
-    console.error('Error saving task:', error)
   }
-}
 
-const deleteTask = async (taskId) => {
-  try {
-    await tasksStore.deleteTask(taskId)
-  } catch (error) {
-    console.error('Error deleting task:', error)
+  const deleteTask = async taskId => {
+    try {
+      await tasksStore.deleteTask(taskId)
+    } catch (error) {
+      console.error('Error deleting task:', error)
+    }
   }
-}
 
-const toggleTaskComplete = async (task) => {
-  try {
-    const taskId = task.id || task._id
-    const newStatus = task.status === 'completed' ? 'todo' : 'completed'
-    await tasksStore.updateTask(taskId, {
-      status: newStatus,
-      completed: newStatus === 'completed'
-    })
-  } catch (error) {
-    console.error('Error toggling task completion:', error)
+  const toggleTaskComplete = async task => {
+    try {
+      const taskId = task.id || task._id
+      const newStatus = task.status === 'completed' ? 'todo' : 'completed'
+      await tasksStore.updateTask(taskId, {
+        status: newStatus,
+        completed: newStatus === 'completed',
+      })
+    } catch (error) {
+      console.error('Error toggling task completion:', error)
+    }
   }
-}
 
-// Lifecycle
-onMounted(async () => {
-  await tasksStore.fetchTasks()
-})
+  // Lifecycle
+  onMounted(async () => {
+    await tasksStore.fetchTasks()
+  })
 </script>
 
 <style scoped>

@@ -13,7 +13,7 @@ export const useEventsStore = defineStore('events', {
 
   getters: {
     // Filter events by current user
-    getUserEvents: (state) => {
+    getUserEvents: state => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
       return state.events.filter(event =>
@@ -22,7 +22,7 @@ export const useEventsStore = defineStore('events', {
       )
     },
 
-    getEvents: (state) => {
+    getEvents: state => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
       return state.events.filter(event =>
@@ -31,7 +31,7 @@ export const useEventsStore = defineStore('events', {
       )
     },
 
-    getEventById: (state) => (id) => {
+    getEventById: state => id => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return null
       return state.events.find(event =>
@@ -41,7 +41,7 @@ export const useEventsStore = defineStore('events', {
     },
 
     // Enhanced getters using dateUtils
-    getTodayEvents: (state) => {
+    getTodayEvents: state => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
       const userEvents = state.events.filter(event =>
@@ -52,7 +52,7 @@ export const useEventsStore = defineStore('events', {
         .sort((a, b) => new Date(a.start) - new Date(b.start))
     },
 
-    getUpcomingEvents: (state) => {
+    getUpcomingEvents: state => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
       const userEvents = state.events.filter(event =>
@@ -64,7 +64,7 @@ export const useEventsStore = defineStore('events', {
         .slice(0, 5) // Limit to 5 upcoming events
     },
 
-    getEventsByDate: (state) => (date) => {
+    getEventsByDate: state => date => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
       const userEvents = state.events.filter(event =>
@@ -78,7 +78,7 @@ export const useEventsStore = defineStore('events', {
       }).sort((a, b) => new Date(a.start) - new Date(b.start))
     },
 
-    getEventsByDateRange: (state) => (startDate, endDate) => {
+    getEventsByDateRange: state => (startDate, endDate) => {
       const authStore = useAuthStore()
       if (!authStore.isAuthenticated) return []
       const userEvents = state.events.filter(event =>
@@ -92,11 +92,11 @@ export const useEventsStore = defineStore('events', {
         const eventEnd = new Date(event.end || event.start)
         return eventStart <= end && eventEnd >= start
       }).sort((a, b) => new Date(a.start) - new Date(b.start))
-    }
+    },
   },
 
   actions: {
-    async initializeStore() {
+    async initializeStore () {
       try {
         this.loading = true
         this.error = null
@@ -120,13 +120,13 @@ export const useEventsStore = defineStore('events', {
               const transformedEvent = {
                 ...event,
                 id: event.id || event._id,
-                _id: event._id || event.id
+                _id: event._id || event.id,
               }
               return transformedEvent
             })
           storeLogger.success('User events loaded from MongoDB', {
             count: this.events.length,
-            userId: currentUserId
+            userId: currentUserId,
           })
         } else {
           throw new Error(result.message || 'Failed to load events from MongoDB')
@@ -140,7 +140,7 @@ export const useEventsStore = defineStore('events', {
       }
     },
 
-    async addEvent(event) {
+    async addEvent (event) {
       try {
         this.loading = true
         this.error = null
@@ -149,7 +149,7 @@ export const useEventsStore = defineStore('events', {
         const authStore = useAuthStore()
         const eventWithUser = {
           ...event,
-          userId: authStore.currentUser?.id || authStore.currentUser?._id
+          userId: authStore.currentUser?.id || authStore.currentUser?._id,
         }
 
         const result = await mongoService.events.create(eventWithUser)
@@ -158,7 +158,7 @@ export const useEventsStore = defineStore('events', {
           const transformedEvent = {
             ...result.data,
             id: result.data.id || result.data._id,
-            _id: result.data._id || result.data.id
+            _id: result.data._id || result.data.id,
           }
           this.events.push(transformedEvent)
           storeLogger.success('Event added to MongoDB', { title: event.title || event.name })
@@ -175,7 +175,7 @@ export const useEventsStore = defineStore('events', {
       }
     },
 
-    async updateEvent(updatedEvent) {
+    async updateEvent (updatedEvent) {
       try {
         this.loading = true
         this.error = null
@@ -186,7 +186,7 @@ export const useEventsStore = defineStore('events', {
           keys: Object.keys(updatedEvent || {}),
           id: updatedEvent?.id,
           _id: updatedEvent?._id,
-          type: typeof updatedEvent
+          type: typeof updatedEvent,
         })
 
         const eventId = updatedEvent?.id || updatedEvent?._id
@@ -196,7 +196,7 @@ export const useEventsStore = defineStore('events', {
           extractedEventId: eventId,
           hasId: !!updatedEvent?.id,
           has_id: !!updatedEvent?._id,
-          idType: typeof eventId
+          idType: typeof eventId,
         })
 
         if (!eventId) {
@@ -210,7 +210,7 @@ export const useEventsStore = defineStore('events', {
           const transformedEvent = {
             ...result.data,
             id: result.data.id || result.data._id,
-            _id: result.data._id || result.data.id
+            _id: result.data._id || result.data.id,
           }
           const index = this.events.findIndex(e => (e.id === eventId) || (e._id === eventId))
           if (index !== -1) {
@@ -218,7 +218,7 @@ export const useEventsStore = defineStore('events', {
           }
           storeLogger.success('Event updated in MongoDB', {
             id: eventId,
-            title: updatedEvent.title || updatedEvent.name
+            title: updatedEvent.title || updatedEvent.name,
           })
           return true
         } else {
@@ -233,7 +233,7 @@ export const useEventsStore = defineStore('events', {
       }
     },
 
-    async deleteEvent(eventId) {
+    async deleteEvent (eventId) {
       try {
         this.loading = true
         this.error = null
@@ -261,7 +261,7 @@ export const useEventsStore = defineStore('events', {
       }
     },
 
-    clearError() {
+    clearError () {
       this.error = null
     },
   },

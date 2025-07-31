@@ -6,7 +6,7 @@ export const useSnackbarStore = defineStore('snackbar', () => {
   const snackbar = ref({
     show: false,
     message: '',
-    color: 'success'
+    color: 'success',
   })
 
   // Actions
@@ -16,7 +16,7 @@ export const useSnackbarStore = defineStore('snackbar', () => {
     snackbar.value = {
       show: true,
       message,
-      color
+      color,
     }
 
     // Force reactivity update
@@ -32,19 +32,19 @@ export const useSnackbarStore = defineStore('snackbar', () => {
     snackbar.value.show = false
   }
 
-  const showSuccessMessage = (message) => {
+  const showSuccessMessage = message => {
     showMessage(message, 'success')
   }
 
-  const showErrorMessage = (message) => {
+  const showErrorMessage = message => {
     showMessage(message, 'error')
   }
 
-  const showWarningMessage = (message) => {
+  const showWarningMessage = message => {
     showMessage(message, 'warning')
   }
 
-  const showInfoMessage = (message) => {
+  const showInfoMessage = message => {
     showMessage(message, 'info')
   }
 
@@ -58,6 +58,6 @@ export const useSnackbarStore = defineStore('snackbar', () => {
     showSuccessMessage,
     showErrorMessage,
     showWarningMessage,
-    showInfoMessage
+    showInfoMessage,
   }
 })

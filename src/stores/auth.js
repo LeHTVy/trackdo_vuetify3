@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import api from '@/services/api'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', () => {
   const currentUser = computed(() => user.value)
 
   // Actions
-  const login = async (credentials) => {
+  const login = async credentials => {
     isLoading.value = true
     try {
       const response = await api.post('/auth/login', credentials)
@@ -72,7 +72,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const register = async (userData) => {
+  const register = async userData => {
     isLoading.value = true
     try {
       const response = await api.post('/auth/register', userData)
@@ -192,6 +192,6 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
-    initializeAuth
+    initializeAuth,
   }
 })

@@ -1,21 +1,21 @@
 <template>
   <v-dialog
     v-model="isOpen"
+    class="day-events-modal"
     max-width="550"
     persistent
     transition="dialog-bottom-transition"
-    class="day-events-modal"
   >
     <v-card class="day-events-card" elevation="24">
       <!-- Header with gradient -->
       <v-card-title class="day-events-header pa-6">
         <div class="d-flex align-center">
           <v-avatar
+            class="mr-4 header-avatar"
             :color="getPrimaryColor()"
             size="40"
-            class="mr-4 header-avatar"
           >
-            <v-icon icon="mdi-calendar-multiple" color="white" size="20"></v-icon>
+            <v-icon color="white" icon="mdi-calendar-multiple" size="20" />
           </v-avatar>
           <div>
             <h2 class="text-h5 font-weight-bold text-white mb-1">{{ formatDate(selectedDate) }}</h2>
@@ -25,13 +25,13 @@
           </div>
         </div>
         <v-btn
-          icon="mdi-close"
-          variant="text"
-          size="small"
-          color="white"
           class="close-btn"
+          color="white"
+          icon="mdi-close"
+          size="small"
+          variant="text"
           @click="closeModal"
-        ></v-btn>
+        />
       </v-card-title>
 
       <v-card-text class="pa-0 day-events-content">
@@ -39,20 +39,20 @@
           <template v-for="(event, index) in events" :key="event.id || index">
             <v-list-item
               class="event-list-item"
-              @click="onEventClick(event)"
               :ripple="true"
+              @click="onEventClick(event)"
             >
-              <template v-slot:prepend>
+              <template #prepend>
                 <v-avatar
+                  class="mr-4 event-avatar"
                   :color="event.color || '#1976d2'"
                   size="44"
-                  class="mr-4 event-avatar"
                 >
                   <v-icon
-                    :icon="getEventTypeIcon(event.type)"
                     color="white"
+                    :icon="getEventTypeIcon(event.type)"
                     size="20"
-                  ></v-icon>
+                  />
                 </v-avatar>
               </template>
 
@@ -63,11 +63,11 @@
               <v-list-item-subtitle class="mt-2">
                 <div class="d-flex align-center mb-1">
                   <v-icon
+                    class="mr-2"
+                    :color="getPrimaryColor()"
                     icon="mdi-clock-outline"
                     size="16"
-                    :color="getPrimaryColor()"
-                    class="mr-2"
-                  ></v-icon>
+                  />
                   <span class="time-text">{{ formatEventTime(event) }}</span>
                 </div>
                 <div v-if="event.description || event.details" class="description-text">
@@ -75,33 +75,33 @@
                 </div>
               </v-list-item-subtitle>
 
-              <template v-slot:append>
+              <template #append>
                 <div class="d-flex flex-column align-center">
                   <v-btn
-                    icon="mdi-dots-vertical"
-                    variant="text"
-                    size="small"
                     class="menu-btn"
+                    icon="mdi-dots-vertical"
+                    size="small"
+                    variant="text"
                     @click.stop="onEventMenu(event)"
-                  ></v-btn>
+                  />
                 </div>
               </template>
             </v-list-item>
-            <v-divider v-if="index < events.length - 1" class="event-divider"></v-divider>
+            <v-divider v-if="index < events.length - 1" class="event-divider" />
           </template>
         </v-list>
       </v-card-text>
 
       <v-card-actions class="pa-6 pt-4">
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn
+          class="action-btn"
           :color="getPrimaryColor()"
+          size="large"
           variant="elevated"
           @click="closeModal"
-          class="action-btn"
-          size="large"
         >
-          <v-icon icon="mdi-close" class="mr-1"></v-icon>
+          <v-icon class="mr-1" icon="mdi-close" />
           Close
         </v-btn>
       </v-card-actions>
@@ -110,38 +110,38 @@
 </template>
 
 <script setup>
-import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
-import { useDayEventsModal } from '@/composables/DayEventsModal/useDayEventsModal'
+  import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
+  import { useDayEventsModal } from '@/composables/DayEventsModal/useDayEventsModal'
 
-// Props
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
-  },
-  selectedDate: {
-    type: Date,
-    default: () => new Date()
-  },
-  events: {
-    type: Array,
-    default: () => []
-  }
-})
+  // Props
+  const props = defineProps({
+    modelValue: {
+      type: Boolean,
+      default: false,
+    },
+    selectedDate: {
+      type: Date,
+      default: () => new Date(),
+    },
+    events: {
+      type: Array,
+      default: () => [],
+    },
+  })
 
-// Emits
-const emit = defineEmits(['update:modelValue', 'event-click', 'event-menu'])
+  // Emits
+  const emit = defineEmits(['update:modelValue', 'event-click', 'event-menu'])
 
-// Use composables
-const { getPrimaryColor, getEventTypeIcon } = useThemeColors('modal')
-const {
-  isOpen,
-  closeModal,
-  onEventClick,
-  onEventMenu,
-  formatDate,
-  formatEventTime
-} = useDayEventsModal(props, emit)
+  // Use composables
+  const { getPrimaryColor, getEventTypeIcon } = useThemeColors('modal')
+  const {
+    isOpen,
+    closeModal,
+    onEventClick,
+    onEventMenu,
+    formatDate,
+    formatEventTime,
+  } = useDayEventsModal(props, emit)
 </script>
 
 <style scoped>

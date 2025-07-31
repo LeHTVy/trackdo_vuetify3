@@ -1,4 +1,4 @@
-import { ref, computed, readonly, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, readonly, ref } from 'vue'
 
 /**
  * @param {Object} options - Configuration options
@@ -7,12 +7,12 @@ import { ref, computed, readonly, onMounted, onUnmounted } from 'vue'
  * @param {number} options.initialOffsetX - Initial offset from right edge (default: 80)
  * @param {number} options.initialOffsetY - Initial offset from bottom edge (default: 120)
  */
-export function useDraggableFab(options = {}) {
+export function useDraggableFab (options = {}) {
   const {
     storageKey = 'fabPosition',
     fabSize = 56,
     initialOffsetX = 80,
-    initialOffsetY = 120
+    initialOffsetY = 120,
   } = options
 
   const isDragging = ref(false)
@@ -38,7 +38,7 @@ export function useDraggableFab(options = {}) {
     }
   }
 
-  const startDrag = (event) => {
+  const startDrag = event => {
     event.preventDefault()
     isDragging.value = true
     const clientX = event.type === 'touchstart' ? event.touches[0].clientX : event.clientX
@@ -46,7 +46,7 @@ export function useDraggableFab(options = {}) {
 
     dragOffset.value = {
       x: clientX - fabPosition.value.x,
-      y: clientY - fabPosition.value.y
+      y: clientY - fabPosition.value.y,
     }
 
     // Add event listeners for drag
@@ -59,7 +59,7 @@ export function useDraggableFab(options = {}) {
     }
   }
 
-  const onDrag = (event) => {
+  const onDrag = event => {
     if (!isDragging.value) return
 
     event.preventDefault()
@@ -103,7 +103,7 @@ export function useDraggableFab(options = {}) {
     if (currentPos.x > maxX || currentPos.y > maxY) {
       fabPosition.value = {
         x: Math.min(currentPos.x, maxX),
-        y: Math.min(currentPos.y, maxY)
+        y: Math.min(currentPos.y, maxY),
       }
       localStorage.setItem(storageKey, JSON.stringify(fabPosition.value))
     }
@@ -126,7 +126,7 @@ export function useDraggableFab(options = {}) {
     left: fabPosition.value.x + 'px',
     top: fabPosition.value.y + 'px',
     zIndex: 1000,
-    cursor: isDragging.value ? 'grabbing' : 'grab'
+    cursor: isDragging.value ? 'grabbing' : 'grab',
   }))
 
   // Return reactive state and methods
@@ -143,6 +143,6 @@ export function useDraggableFab(options = {}) {
     resetPosition: () => {
       localStorage.removeItem(storageKey)
       initializePosition()
-    }
+    },
   }
 }

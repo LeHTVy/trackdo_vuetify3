@@ -190,7 +190,7 @@ trackdo/
 
 #### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/your-username/trackdo.git
+git clone https://github.com/LeHTVy/trackdo_vuetify3.git
 cd trackdo
 ```
 

@@ -5,7 +5,7 @@ import { computed } from 'vue'
  * @param {Object} tasksStore - The tasks store instance
  * @returns {Object} Progress-related computed properties and data
  */
-export function useTaskProgress(tasksStore) {
+export function useTaskProgress (tasksStore) {
   // Computed properties
   const completionPercentage = computed(() => {
     const total = tasksStore.totalTasks
@@ -20,29 +20,29 @@ export function useTaskProgress(tasksStore) {
       label: 'Completed',
       count: tasksStore.completedTasks.length,
       color: '#4caf50',
-      icon: 'mdi-check-circle'
+      icon: 'mdi-check-circle',
     },
     {
       key: 'in-progress',
       label: 'In Progress',
       count: tasksStore.inProgressTasks.length,
       color: '#ff9800',
-      icon: 'mdi-clock-outline'
+      icon: 'mdi-clock-outline',
     },
     {
       key: 'pending',
       label: 'Pending',
       count: tasksStore.pendingTasks.length,
       color: '#2196f3',
-      icon: 'mdi-pause-circle-outline'
+      icon: 'mdi-pause-circle-outline',
     },
     {
       key: 'overdue',
       label: 'Overdue',
       count: tasksStore.overdueTasks.length,
       color: '#f44336',
-      icon: 'mdi-alert-circle-outline'
-    }
+      icon: 'mdi-alert-circle-outline',
+    },
   ])
 
   const hasData = computed(() => tasksStore.totalTasks > 0)
@@ -53,13 +53,13 @@ export function useTaskProgress(tasksStore) {
     inProgress: tasksStore.inProgressTasks.length,
     pending: tasksStore.pendingTasks.length,
     overdue: tasksStore.overdueTasks.length,
-    completionRate: completionPercentage.value
+    completionRate: completionPercentage.value,
   }))
 
   return {
     completionPercentage,
     progressItems,
     hasData,
-    progressStats
+    progressStats,
   }
 }

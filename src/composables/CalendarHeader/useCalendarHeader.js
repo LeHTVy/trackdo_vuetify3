@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 
-export function useCalendarHeader(currentDate) {
+export function useCalendarHeader (currentDate) {
   const getCurrentDateInfo = () => {
     const date = currentDate.value || new Date()
     return {
@@ -8,7 +8,7 @@ export function useCalendarHeader(currentDate) {
       month: date.getMonth(),
       monthName: date.toLocaleDateString('en-US', { month: 'long' }),
       day: date.getDate(),
-      fullDate: date.toLocaleDateString('en-US')
+      fullDate: date.toLocaleDateString('en-US'),
     }
   }
 
@@ -22,13 +22,13 @@ export function useCalendarHeader(currentDate) {
     return today.toLocaleDateString('en-US', {
       weekday: 'long',
       day: 'numeric',
-      month: 'long'
+      month: 'long',
     })
   })
 
   return {
     getCurrentDateInfo,
     currentMonthYear,
-    todayFormatted
+    todayFormatted,
   }
 }

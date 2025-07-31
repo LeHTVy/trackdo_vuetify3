@@ -11,13 +11,13 @@
         :style="headerStyles"
       >
         <div class="d-flex align-center">
-          <v-icon :icon="titleIcon" class="mr-2"></v-icon>
+          <v-icon class="mr-2" :icon="titleIcon" />
           {{ title }}
           <v-chip
+            class="event-count-chip ml-2"
             :color="chipColor"
             size="small"
             variant="elevated"
-            class="event-count-chip ml-2"
           >
             {{ events.length }}
           </v-chip>
@@ -30,16 +30,16 @@
             <v-list-item
               class="event-item"
               :class="eventItemClasses"
-              @click="$emit('event-click', event)"
               :ripple="true"
+              @click="$emit('event-click', event)"
             >
-              <template v-slot:prepend>
+              <template #prepend>
                 <v-avatar
+                  class="mr-3 event-avatar"
                   :color="event.color || avatarColor"
                   size="40"
-                  class="mr-3 event-avatar"
                 >
-                  <v-icon icon="mdi-calendar" color="white" size="20"></v-icon>
+                  <v-icon color="white" icon="mdi-calendar" size="20" />
                 </v-avatar>
               </template>
 
@@ -50,11 +50,11 @@
               <v-list-item-subtitle class="mt-1 event-subtitle">
                 <div class="d-flex align-center">
                   <v-icon
+                    class="mr-1"
+                    :color="timeIconColor"
                     icon="mdi-clock-outline"
                     size="14"
-                    :color="timeIconColor"
-                    class="mr-1"
-                  ></v-icon>
+                  />
                   {{ formatEventTime(event) }}
                 </div>
                 <div v-if="event.details" class="text-truncate mt-1 event-details">
@@ -62,23 +62,23 @@
                 </div>
               </v-list-item-subtitle>
 
-              <template v-slot:append>
+              <template #append>
                 <div class="d-flex flex-column align-center event-actions">
                   <v-chip
+                    class="mb-1 status-chip"
                     :color="getEventStatus(event).color"
                     size="x-small"
                     variant="flat"
-                    class="mb-1 status-chip"
                   >
                     {{ getEventStatus(event).text }}
                   </v-chip>
                   <v-btn
-                    icon="mdi-dots-vertical"
-                    variant="text"
-                    size="small"
                     class="action-btn"
+                    icon="mdi-dots-vertical"
+                    size="small"
+                    variant="text"
                     @click.stop="$emit('event-menu', event)"
-                  ></v-btn>
+                  />
                 </div>
               </template>
             </v-list-item>
@@ -87,23 +87,23 @@
 
         <v-empty-state
           v-else
-          :icon="emptyIcon"
-          :title="emptyTitle"
-          :text="emptyText"
           class="my-8 empty-state"
-        ></v-empty-state>
+          :icon="emptyIcon"
+          :text="emptyText"
+          :title="emptyTitle"
+        />
       </v-card-text>
 
       <v-card-actions v-if="showActions" class="pa-4 list-actions">
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn
+          class="view-all-btn"
           :color="actionButtonColor"
           variant="text"
-          class="view-all-btn"
           @click="$emit('view-all')"
         >
           View All
-          <v-icon icon="mdi-arrow-right" class="ml-1"></v-icon>
+          <v-icon class="ml-1" icon="mdi-arrow-right" />
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -114,68 +114,68 @@
       class="my-4 custom-divider"
       :color="dividerColor"
       :thickness="6"
-    ></v-divider>
+    />
   </v-container>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useCalendarList } from '@/composables/CalendarList/useCalendarList.js'
-import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors.js'
+  import { computed } from 'vue'
+  import { useCalendarList } from '@/composables/CalendarList/useCalendarList.js'
+  import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors.js'
 
-// Props
-const props = defineProps({
-  events: {
-    type: Array,
-    default: () => []
-  },
-  type: {
-    type: String,
-    default: 'upcoming',
-    validator: value => ['upcoming', 'today'].includes(value)
-  },
-  showActions: {
-    type: Boolean,
-    default: true
-  }
-})
+  // Props
+  const props = defineProps({
+    events: {
+      type: Array,
+      default: () => [],
+    },
+    type: {
+      type: String,
+      default: 'upcoming',
+      validator: value => ['upcoming', 'today'].includes(value),
+    },
+    showActions: {
+      type: Boolean,
+      default: true,
+    },
+  })
 
-// Emits
-defineEmits(['event-click', 'event-menu', 'view-all'])
+  // Emits
+  defineEmits(['event-click', 'event-menu', 'view-all'])
 
-// Composables
-const calendarList = useCalendarList(props.type)
-const themeColors = useThemeColors(props.type)
+  // Composables
+  const calendarList = useCalendarList(props.type)
+  const themeColors = useThemeColors(props.type)
 
-// Computed properties
-const title = computed(() => calendarList.getTitle())
-const titleIcon = computed(() => calendarList.getTitleIcon())
-const emptyIcon = computed(() => calendarList.getEmptyIcon())
-const emptyTitle = computed(() => calendarList.getEmptyTitle())
-const emptyText = computed(() => calendarList.getEmptyText())
+  // Computed properties
+  const title = computed(() => calendarList.getTitle())
+  const titleIcon = computed(() => calendarList.getTitleIcon())
+  const emptyIcon = computed(() => calendarList.getEmptyIcon())
+  const emptyTitle = computed(() => calendarList.getEmptyTitle())
+  const emptyText = computed(() => calendarList.getEmptyText())
 
-// Styling computed properties
-const headerStyles = computed(() => themeColors.getHeaderStyles())
-const chipColor = computed(() => themeColors.getChipColor())
-const avatarColor = computed(() => themeColors.getAvatarColor())
-const timeIconColor = computed(() => themeColors.getTimeIconColor())
-const actionButtonColor = computed(() => themeColors.getActionButtonColor())
-const dividerColor = computed(() => themeColors.getDividerColor())
+  // Styling computed properties
+  const headerStyles = computed(() => themeColors.getHeaderStyles())
+  const chipColor = computed(() => themeColors.getChipColor())
+  const avatarColor = computed(() => themeColors.getAvatarColor())
+  const timeIconColor = computed(() => themeColors.getTimeIconColor())
+  const actionButtonColor = computed(() => themeColors.getActionButtonColor())
+  const dividerColor = computed(() => themeColors.getDividerColor())
 
-// CSS classes
-const listClasses = computed(() => calendarList.listClasses)
-const headerClasses = computed(() => calendarList.headerClasses)
-const eventItemClasses = computed(() => calendarList.eventItemClasses)
+  // CSS classes
+  const listClasses = computed(() => calendarList.listClasses)
+  const headerClasses = computed(() => calendarList.headerClasses)
+  const eventItemClasses = computed(() => calendarList.eventItemClasses)
 
-const containerClasses = computed(() => ({
-  'events-container-item': true,
-  'today-events-container': props.type === 'today',
-  'upcoming-events-container': props.type === 'upcoming'
-}))
+  const containerClasses = computed(() => ({
+    'events-container-item': true,
+    'today-events-container': props.type === 'today',
+    'upcoming-events-container': props.type === 'upcoming',
+  }))
 
-// Methods
-const formatEventTime = (event) => calendarList.formatEventTime(event)
-const getEventStatus = (event) => calendarList.getEventStatus(event)
+  // Methods
+  const formatEventTime = event => calendarList.formatEventTime(event)
+  const getEventStatus = event => calendarList.getEventStatus(event)
 </script>
 
 <style scoped>

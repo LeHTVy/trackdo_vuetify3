@@ -6,7 +6,7 @@ import { useTheme } from 'vuetify'
  * @param {string} componentType
  * @returns {Object}
  */
-export function useThemeColors(componentType = 'default') {
+export function useThemeColors (componentType = 'default') {
   const theme = useTheme()
   const colors = computed(() => theme.current.value.colors)
   const isDark = computed(() => theme.current.value.dark)
@@ -16,11 +16,11 @@ export function useThemeColors(componentType = 'default') {
 
     switch (componentType) {
       case 'today':
-        return { primary: primary, secondary: secondary, accent: primary }
+        return { primary, secondary, accent: primary }
       case 'upcoming':
         return { primary: secondary, secondary: primary, accent: secondary }
       default:
-        return { primary: primary, secondary: secondary, accent: primary }
+        return { primary, secondary, accent: primary }
     }
   })
 
@@ -29,7 +29,7 @@ export function useThemeColors(componentType = 'default') {
     work: 'mdi-briefcase',
     social: 'mdi-account-heart',
     milestone: 'mdi-flag-checkered',
-    deadline: 'mdi-clock-alert'
+    deadline: 'mdi-clock-alert',
   }
 
   const EVENT_COLORS = [
@@ -53,13 +53,13 @@ export function useThemeColors(componentType = 'default') {
     'this week': colors.value.primary,
     'this month': colors.value.secondary,
     'next month': colors.value.secondary,
-    later: colors.value.primary
+    later: colors.value.primary,
   }))
 
   const priorityColorMap = computed(() => ({
     Low: colors.value.success,
     Medium: colors.value.warning,
-    High: colors.value.error
+    High: colors.value.error,
   }))
 
   const eventTypeColorMap = computed(() => ({
@@ -67,7 +67,7 @@ export function useThemeColors(componentType = 'default') {
     work: colors.value.info,
     social: colors.value.secondary,
     milestone: colors.value.success,
-    deadline: colors.value.error
+    deadline: colors.value.error,
   }))
 
   const eventTypes = computed(() => [
@@ -87,24 +87,24 @@ export function useThemeColors(componentType = 'default') {
   const themeClasses = computed(() => ({
     'theme-dark': isDark.value,
     'theme-light': !isDark.value,
-    [`theme-${componentType}`]: true
+    [`theme-${componentType}`]: true,
   }))
 
   const getHeaderStyles = () => {
     if (componentType === 'today') {
       return {
         backgroundColor: componentColors.value.secondary,
-        color: componentColors.value.primary
+        color: componentColors.value.primary,
       }
     } else if (componentType === 'upcoming') {
       return {
         backgroundColor: componentColors.value.secondary,
-        color: componentColors.value.primary
+        color: componentColors.value.primary,
       }
     }
     return {
       backgroundColor: colors.value.surface,
-      color: colors.value.onSurface
+      color: colors.value.onSurface,
     }
   }
 
@@ -127,31 +127,31 @@ export function useThemeColors(componentType = 'default') {
     return `rgba(${hexToRgb(color)}, ${opacity})`
   }
 
-  const hexToRgb = (hex) => {
+  const hexToRgb = hex => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     return result
       ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
       : '0, 0, 0'
   }
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     return statusColorMap.value[status?.toLowerCase()] || colors.value.primary
   }
 
-  const getEventTypeIcon = (type) => {
+  const getEventTypeIcon = type => {
     return EVENT_TYPE_ICONS[type] || 'mdi-calendar'
   }
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = priority => {
     return priorityColorMap.value[priority] || colors.value.primary
   }
 
-  const getEventTypeColor = (type) => {
+  const getEventTypeColor = type => {
     return eventTypeColorMap.value[type] || colors.value.primary
   }
 
   const getPrimaryColor = () => colors.value.primary
-  const getThemeColor = (colorName) => colors.value[colorName] || colors.value.primary
+  const getThemeColor = colorName => colors.value[colorName] || colors.value.primary
   const getEventColors = () => EVENT_COLORS
   const getEventTypes = () => eventTypes.value
   const getPriorityLevels = () => priorityLevels.value
@@ -188,6 +188,6 @@ export function useThemeColors(componentType = 'default') {
     getPriorityLevels,
 
     // Utility
-    hexToRgb
+    hexToRgb,
   }
 }

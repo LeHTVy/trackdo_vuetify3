@@ -1,12 +1,12 @@
 import { computed } from 'vue'
 
-export function useConfirmModalConfig(type, title, message, confirmText) {
+export function useConfirmModalConfig (type, title, message, confirmText) {
   // Icon mapping
   const iconMap = {
     delete: 'mdi-delete-alert',
     update: 'mdi-update',
     warning: 'mdi-alert',
-    info: 'mdi-information'
+    info: 'mdi-information',
   }
 
   // Color mapping
@@ -14,7 +14,7 @@ export function useConfirmModalConfig(type, title, message, confirmText) {
     delete: 'error',
     update: 'primary',
     warning: 'warning',
-    info: 'info'
+    info: 'info',
   }
 
   // Default titles
@@ -22,7 +22,7 @@ export function useConfirmModalConfig(type, title, message, confirmText) {
     delete: 'Confirm Deletion',
     update: 'Confirm Update',
     warning: 'Warning',
-    info: 'Information'
+    info: 'Information',
   }
 
   // Default messages
@@ -30,7 +30,7 @@ export function useConfirmModalConfig(type, title, message, confirmText) {
     delete: 'Are you sure you want to delete this item? This action cannot be undone.',
     update: 'Are you sure you want to update this item?',
     warning: 'Please review the following information before proceeding.',
-    info: 'Please confirm to continue.'
+    info: 'Please confirm to continue.',
   }
 
   // Default confirm texts
@@ -38,7 +38,7 @@ export function useConfirmModalConfig(type, title, message, confirmText) {
     delete: 'Delete',
     update: 'Update',
     warning: 'Proceed',
-    info: 'OK'
+    info: 'OK',
   }
 
   // Computed properties
@@ -70,6 +70,6 @@ export function useConfirmModalConfig(type, title, message, confirmText) {
     confirmVariant,
     displayTitle,
     displayMessage,
-    displayConfirmText
+    displayConfirmText,
   }
 }

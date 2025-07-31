@@ -5,19 +5,19 @@
         <!-- Hero Section with Gradient Background -->
         <div class="hero-section">
           <div class="hero-background">
-            <div class="gradient-overlay"></div>
-            <div class="pattern-overlay"></div>
+            <div class="gradient-overlay" />
+            <div class="pattern-overlay" />
           </div>
 
           <div class="hero-content">
             <div class="header-icon">
               <v-avatar
-                size="64"
                 class="header-avatar"
                 color="avatar-bg"
                 elevation="8"
+                size="64"
               >
-                <v-icon icon="mdi-check-circle-outline" size="32" color="primary"></v-icon>
+                <v-icon color="primary" icon="mdi-check-circle-outline" size="32" />
               </v-avatar>
             </div>
 
@@ -26,24 +26,24 @@
 
               <v-divider
                 class="header-divider"
-                :thickness="5"
                 color="rgb(var(--v-theme-task-font))"
-              ></v-divider>
+                :thickness="5"
+              />
 
               <p class="task-subtitle">Organize and track your daily tasks efficiently</p>
 
               <!-- Stats Cards -->
               <div class="stats-row">
                 <div class="stat-item">
-                  <v-icon icon="mdi-clipboard-list" size="16" class="stat-icon"></v-icon>
+                  <v-icon class="stat-icon" icon="mdi-clipboard-list" size="16" />
                   <span class="stat-text">Task Organization</span>
                 </div>
                 <div class="stat-item">
-                  <v-icon icon="mdi-progress-check" size="16" class="stat-icon"></v-icon>
+                  <v-icon class="stat-icon" icon="mdi-progress-check" size="16" />
                   <span class="stat-text">Progress Tracking</span>
                 </div>
                 <div class="stat-item">
-                  <v-icon icon="mdi-clock-outline" size="16" class="stat-icon"></v-icon>
+                  <v-icon class="stat-icon" icon="mdi-clock-outline" size="16" />
                   <span class="stat-text">Time Management</span>
                 </div>
               </div>
@@ -56,18 +56,18 @@
 </template>
 
 <script setup>
-import { onMounted, watch } from 'vue'
-import { useTaskColors } from '@/composables'
+  import { onMounted, watch } from 'vue'
+  import { useTaskColors } from '@/composables'
 
-const { colors, applyCssVars } = useTaskColors()
+  const { colors, applyCssVars } = useTaskColors()
 
-onMounted(() => {
-  applyCssVars()
-})
+  onMounted(() => {
+    applyCssVars()
+  })
 
-watch(colors, () => {
-  applyCssVars()
-}, { deep: true })
+  watch(colors, () => {
+    applyCssVars()
+  }, { deep: true })
 </script>
 
 <style scoped>

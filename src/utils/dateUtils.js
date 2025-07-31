@@ -1,4 +1,4 @@
-export const isValidDate = (dateString) => {
+export const isValidDate = dateString => {
   if (!dateString) return false
   try {
     const date = new Date(dateString)
@@ -8,7 +8,7 @@ export const isValidDate = (dateString) => {
   }
 }
 
-export const safeCreateDate = (dateString) => {
+export const safeCreateDate = dateString => {
   try {
     const date = new Date(dateString)
     return Number.isNaN(date.getTime()) ? null : date
@@ -30,7 +30,7 @@ export const formatDate = (date, locale = 'en-US') => {
   }
 }
 
-export const formatDateISO = (date) => {
+export const formatDateISO = date => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date
     return dateObj.toISOString().split('T')[0]
@@ -80,11 +80,11 @@ export const formatEventDate = (event, locale = 'en-US') => {
   })
 }
 
-export const formatHour = (hour) => {
+export const formatHour = hour => {
   return `${hour.toString().padStart(2, '0')}:00`
 }
 
-export const isToday = (date) => {
+export const isToday = date => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date
     const today = new Date()
@@ -94,7 +94,7 @@ export const isToday = (date) => {
   }
 }
 
-export const isPast = (date) => {
+export const isPast = date => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date
     const today = new Date()
@@ -105,7 +105,7 @@ export const isPast = (date) => {
   }
 }
 
-export const isFuture = (date) => {
+export const isFuture = date => {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date
     const today = new Date()
@@ -162,14 +162,14 @@ export const getEndOfWeek = (date, startOfWeek = 1) => {
   }
 }
 
-export const isEventToday = (event) => {
+export const isEventToday = event => {
   if (!isValidDate(event.start)) return false
   const today = new Date().toISOString().split('T')[0]
   const eventDate = safeCreateDate(event.start)
   return eventDate && eventDate.toISOString().split('T')[0] === today
 }
 
-export const isEventUpcoming = (event) => {
+export const isEventUpcoming = event => {
   if (!isValidDate(event.start)) return false
   const now = new Date()
   const eventDate = safeCreateDate(event.start)
@@ -191,7 +191,7 @@ export const getEventsByDate = (events, targetDate) => {
   })
 }
 
-export const getWeekNumber = (date) => {
+export const getWeekNumber = date => {
   try {
     const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)
     if (!dateObj) return 0
@@ -210,7 +210,7 @@ export const getWeekNumber = (date) => {
   }
 }
 
-export const getWeekYear = (date) => {
+export const getWeekYear = date => {
   try {
     const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)
     if (!dateObj) return new Date().getFullYear()
@@ -224,7 +224,7 @@ export const getWeekYear = (date) => {
   }
 }
 
-export const isThisWeek = (date) => {
+export const isThisWeek = date => {
   try {
     const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)
     if (!dateObj) return false
@@ -241,7 +241,7 @@ export const isThisWeek = (date) => {
   }
 }
 
-export const isNextWeek = (date) => {
+export const isNextWeek = date => {
   try {
     const dateObj = typeof date === 'string' ? safeCreateDate(date) : new Date(date)
     if (!dateObj) return false

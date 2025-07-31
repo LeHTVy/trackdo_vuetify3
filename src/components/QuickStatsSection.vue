@@ -14,9 +14,9 @@
         :key="stat.id"
         class="text-center"
         cols="12"
-        sm="6"
-        md="4"
         lg="3"
+        md="4"
+        sm="6"
         xl="3"
       >
         <QuickStatCard

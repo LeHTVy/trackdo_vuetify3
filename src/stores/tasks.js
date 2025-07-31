@@ -132,7 +132,7 @@ export const useTasksStore = defineStore('tasks', () => {
         )
         storeLogger.success('User tasks loaded from MongoDB', {
           count: tasks.value.length,
-          userId: currentUserId
+          userId: currentUserId,
         })
       } else {
         storeLogger.warn('Failed to load from MongoDB', result.error)
@@ -154,7 +154,7 @@ export const useTasksStore = defineStore('tasks', () => {
       // Add userId to task data
       const taskWithUser = {
         ...taskData,
-        userId: authStore.currentUser?.id || authStore.currentUser?._id
+        userId: authStore.currentUser?.id || authStore.currentUser?._id,
       }
 
       const { mongoService } = await import('@/services/mongodb.js')

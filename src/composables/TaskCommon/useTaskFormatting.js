@@ -5,9 +5,9 @@ import { computed } from 'vue'
  * @param {Ref} tasksRef - Reactive reference to tasks array
  * @returns {Object} Formatting utilities and computed properties
  */
-export function useTaskFormatting(tasksRef) {
+export function useTaskFormatting (tasksRef) {
   // Date formatting
-  const formatDate = (date) => {
+  const formatDate = date => {
     if (!date) return ''
 
     try {
@@ -17,7 +17,7 @@ export function useTaskFormatting(tasksRef) {
       return dateObj.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
       })
     } catch (error) {
       console.error('Error formatting date:', error)
@@ -26,7 +26,7 @@ export function useTaskFormatting(tasksRef) {
   }
 
   // Time formatting
-  const formatTime = (date) => {
+  const formatTime = date => {
     if (!date) return ''
 
     try {
@@ -35,7 +35,7 @@ export function useTaskFormatting(tasksRef) {
 
       return dateObj.toLocaleTimeString('en-US', {
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
       })
     } catch (error) {
       console.error('Error formatting time:', error)
@@ -44,7 +44,7 @@ export function useTaskFormatting(tasksRef) {
   }
 
   // Relative time formatting
-  const formatRelativeTime = (date) => {
+  const formatRelativeTime = date => {
     if (!date) return ''
 
     try {
@@ -67,20 +67,20 @@ export function useTaskFormatting(tasksRef) {
   }
 
   // Priority formatting
-  const formatPriority = (priority) => {
+  const formatPriority = priority => {
     if (!priority) return 'Medium'
     return priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase()
   }
 
   // Status formatting
-  const formatStatus = (status) => {
+  const formatStatus = status => {
     if (!status) return 'To Do'
 
     const statusMap = {
       'todo': 'To Do',
       'in-progress': 'In Progress',
       'completed': 'Completed',
-      'cancelled': 'Cancelled'
+      'cancelled': 'Cancelled',
     }
 
     return statusMap[status] || status
@@ -101,7 +101,7 @@ export function useTaskFormatting(tasksRef) {
       completed: 0,
       pending: 0,
       overdue: 0,
-      inProgress: 0
+      inProgress: 0,
     }
 
     const today = new Date().toISOString().split('T')[0]
@@ -115,12 +115,12 @@ export function useTaskFormatting(tasksRef) {
         task.status !== 'completed' &&
         task.dueDate &&
         task.dueDate < today
-      ).length
+      ).length,
     }
   })
 
   // Check if task is overdue
-  const isTaskOverdue = (task) => {
+  const isTaskOverdue = task => {
     if (!task.dueDate || task.status === 'completed') return false
 
     const today = new Date().toISOString().split('T')[0]
@@ -128,7 +128,7 @@ export function useTaskFormatting(tasksRef) {
   }
 
   // Get task urgency level
-  const getTaskUrgency = (task) => {
+  const getTaskUrgency = task => {
     if (!task.dueDate) return 'none'
 
     const today = new Date()
@@ -145,7 +145,7 @@ export function useTaskFormatting(tasksRef) {
   }
 
   // Format task duration
-  const formatDuration = (estimatedHours) => {
+  const formatDuration = estimatedHours => {
     if (!estimatedHours || estimatedHours === 0) return 'No estimate'
 
     if (estimatedHours < 1) {
@@ -178,6 +178,6 @@ export function useTaskFormatting(tasksRef) {
 
     // Computed statistics
     getCompletionPercentage,
-    getTaskStats
+    getTaskStats,
   }
 }

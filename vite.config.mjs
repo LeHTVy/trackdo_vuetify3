@@ -59,9 +59,9 @@ export default defineConfig({
       'unplugin-vue-router/data-loaders/basic',
     ],
   },
-  define: { 
+  define: {
     'process.env': {},
-    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
   },
   resolve: {
     alias: {
@@ -78,7 +78,7 @@ export default defineConfig({
     ],
   },
   server: {
-    host: 'localhost', 
+    host: 'localhost',
     port: 5173,
   },
   css: {

@@ -1,21 +1,21 @@
 <template>
   <v-dialog
     v-model="dialog"
+    class="calendar-dialog"
     max-width="650px"
     persistent
     transition="dialog-bottom-transition"
-    class="calendar-dialog"
   >
     <v-card class="dialog-card" elevation="24">
       <!-- Header with gradient -->
       <v-card-title class="dialog-header pa-6">
         <div class="d-flex align-center">
           <v-avatar
+            class="mr-4 header-avatar"
             :color="getPrimaryColor()"
             size="40"
-            class="mr-4 header-avatar"
           >
-            <v-icon icon="mdi-calendar-plus" color="white" size="20"></v-icon>
+            <v-icon color="white" icon="mdi-calendar-plus" size="20" />
           </v-avatar>
           <div>
             <h2 class="text-h5 font-weight-bold text-white mb-1">{{ formTitle }}</h2>
@@ -27,123 +27,123 @@
       </v-card-title>
 
       <v-card-text class="pa-6">
-        <v-container fluid class="pa-0">
+        <v-container class="pa-0" fluid>
           <v-row>
             <!-- Event Title -->
             <v-col cols="12">
               <v-text-field
                 v-model="editedEvent.title"
-                label="Event Title"
-                variant="outlined"
+                class="input-field"
                 :color="getPrimaryColor()"
+                hide-details="auto"
+                label="Event Title"
+                prepend-inner-icon="mdi-format-title"
                 required
                 :rules="[v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Event title is required' : true]"
-                prepend-inner-icon="mdi-format-title"
-                class="input-field"
-                hide-details="auto"
-              ></v-text-field>
+                variant="outlined"
+              />
             </v-col>
 
             <!-- Event Description -->
             <v-col cols="12">
               <v-textarea
                 v-model="editedEvent.description"
-                label="Event Description"
-                variant="outlined"
-                :color="getPrimaryColor()"
-                rows="3"
                 auto-grow
-                prepend-inner-icon="mdi-text"
                 class="input-field"
+                :color="getPrimaryColor()"
                 hide-details="auto"
-              ></v-textarea>
+                label="Event Description"
+                prepend-inner-icon="mdi-text"
+                rows="3"
+                variant="outlined"
+              />
             </v-col>
 
             <!-- Date Fields -->
             <v-col cols="12" sm="6">
               <v-text-field
                 v-model="editedEvent.start"
+                class="input-field"
+                :color="getPrimaryColor()"
+                hide-details="auto"
                 label="Start Date"
+                prepend-inner-icon="mdi-calendar-start"
+                required
                 type="date"
                 variant="outlined"
-                :color="getPrimaryColor()"
-                required
-                prepend-inner-icon="mdi-calendar-start"
-                class="input-field"
-                hide-details="auto"
-              ></v-text-field>
+              />
             </v-col>
 
             <v-col cols="12" sm="6">
               <v-text-field
                 v-model="editedEvent.end"
+                class="input-field"
+                :color="getPrimaryColor()"
+                hide-details="auto"
                 label="End Date"
+                prepend-inner-icon="mdi-calendar-end"
+                required
                 type="date"
                 variant="outlined"
-                :color="getPrimaryColor()"
-                required
-                prepend-inner-icon="mdi-calendar-end"
-                class="input-field"
-                hide-details="auto"
-              ></v-text-field>
+              />
             </v-col>
 
             <!-- Time Fields -->
             <v-col cols="12" sm="6">
               <v-text-field
                 v-model="editedEvent.startTime"
+                class="input-field"
+                :color="getPrimaryColor()"
+                hide-details="auto"
                 label="Start Time"
+                prepend-inner-icon="mdi-clock-start"
                 type="time"
                 variant="outlined"
-                :color="getPrimaryColor()"
-                prepend-inner-icon="mdi-clock-start"
-                class="input-field"
-                hide-details="auto"
-              ></v-text-field>
+              />
             </v-col>
 
             <v-col cols="12" sm="6">
               <v-text-field
                 v-model="editedEvent.endTime"
+                class="input-field"
+                :color="getPrimaryColor()"
+                hide-details="auto"
                 label="End Time"
+                prepend-inner-icon="mdi-clock-end"
                 type="time"
                 variant="outlined"
-                :color="getPrimaryColor()"
-                prepend-inner-icon="mdi-clock-end"
-                class="input-field"
-                hide-details="auto"
-              ></v-text-field>
+              />
             </v-col>
 
             <!-- Event Type & Priority -->
             <v-col cols="12" sm="6">
               <v-select
                 v-model="editedEvent.type"
-                :items="eventTypes"
+                class="input-field"
+                :color="getPrimaryColor()"
+                hide-details="auto"
                 item-title="text"
                 item-value="value"
+                :items="eventTypes"
                 label="Event Type"
-                variant="outlined"
-                :color="getPrimaryColor()"
                 prepend-inner-icon="mdi-tag"
-                class="input-field"
-                hide-details="auto"
+                variant="outlined"
               >
-                <template v-slot:item="{ props, item }">
+                <template #item="{ props, item }">
                   <v-list-item v-bind="props">
-                    <template v-slot:prepend>
-                      <v-icon :icon="item.raw.icon" :color="item.raw.color"></v-icon>
+                    <template #prepend>
+                      <v-icon :color="item.raw.color" :icon="item.raw.icon" />
                     </template>
                   </v-list-item>
                 </template>
-                <template v-slot:selection="{ item }">
+                <template #selection="{ item }">
                   <v-chip
+                    class="mr-2 type-chip"
                     :color="item.raw.color"
                     size="small"
-                    class="mr-2 type-chip"
                     variant="elevated"
                   >
-                    <v-icon :icon="item.raw.icon" size="12" class="mr-1"></v-icon>
+                    <v-icon class="mr-1" :icon="item.raw.icon" size="12" />
                     {{ item.raw.text }}
                   </v-chip>
                 </template>
@@ -153,31 +153,31 @@
             <v-col cols="12" sm="6">
               <v-select
                 v-model="editedEvent.priority"
-                :items="priorityLevels"
+                class="input-field"
+                :color="getPrimaryColor()"
+                hide-details="auto"
                 item-title="text"
                 item-value="value"
+                :items="priorityLevels"
                 label="Priority"
-                variant="outlined"
-                :color="getPrimaryColor()"
                 prepend-inner-icon="mdi-flag"
-                class="input-field"
-                hide-details="auto"
+                variant="outlined"
               >
-                <template v-slot:item="{ props, item }">
+                <template #item="{ props, item }">
                   <v-list-item v-bind="props">
-                    <template v-slot:prepend>
-                      <v-icon icon="mdi-flag" :color="item.raw.color"></v-icon>
+                    <template #prepend>
+                      <v-icon :color="item.raw.color" icon="mdi-flag" />
                     </template>
                   </v-list-item>
                 </template>
-                <template v-slot:selection="{ item }">
+                <template #selection="{ item }">
                   <v-chip
+                    class="mr-2 priority-chip"
                     :color="item.raw.color"
                     size="small"
-                    class="mr-2 priority-chip"
                     variant="elevated"
                   >
-                    <v-icon icon="mdi-flag" size="12" class="mr-1"></v-icon>
+                    <v-icon class="mr-1" icon="mdi-flag" size="12" />
                     {{ item.raw.text }}
                   </v-chip>
                 </template>
@@ -188,33 +188,33 @@
             <v-col cols="12">
               <v-select
                 v-model="editedEvent.color"
-                :items="eventColors"
+                class="input-field"
+                :color="getPrimaryColor()"
+                hide-details="auto"
                 item-title="text"
                 item-value="value"
+                :items="eventColors"
                 label="Event Color"
-                variant="outlined"
-                :color="getPrimaryColor()"
                 prepend-inner-icon="mdi-palette"
-                class="input-field"
-                hide-details="auto"
+                variant="outlined"
               >
-                <template v-slot:item="{ props, item }">
+                <template #item="{ props, item }">
                   <v-list-item v-bind="props">
-                    <template v-slot:prepend>
-                      <v-avatar size="24" :color="item.raw.value">
-                        <v-icon icon="mdi-circle" size="16" color="white"></v-icon>
+                    <template #prepend>
+                      <v-avatar :color="item.raw.value" size="24">
+                        <v-icon color="white" icon="mdi-circle" size="16" />
                       </v-avatar>
                     </template>
                   </v-list-item>
                 </template>
-                <template v-slot:selection="{ item }">
+                <template #selection="{ item }">
                   <v-chip
+                    class="mr-2 color-chip"
                     :color="item.raw.value"
                     size="small"
-                    class="mr-2 color-chip"
                     variant="elevated"
                   >
-                    <v-icon icon="mdi-circle" size="12" class="mr-1"></v-icon>
+                    <v-icon class="mr-1" icon="mdi-circle" size="12" />
                     {{ item.raw.text }}
                   </v-chip>
                 </template>
@@ -226,28 +226,28 @@
 
       <!-- Actions -->
       <v-card-actions class="pa-6 pt-0">
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn
+          class="action-btn mr-3"
           color="grey-darken-1"
+          :disabled="actionLoading"
+          size="large"
           variant="outlined"
           @click="closeDialog"
-          :disabled="actionLoading"
-          class="action-btn mr-3"
-          size="large"
         >
-          <v-icon icon="mdi-close" class="mr-1"></v-icon>
+          <v-icon class="mr-1" icon="mdi-close" />
           Cancel
         </v-btn>
         <v-btn
+          class="action-btn"
           :color="getPrimaryColor()"
-          variant="elevated"
-          @click="saveEvent"
           :disabled="!isFormValid || actionLoading"
           :loading="actionLoading"
-          class="action-btn"
           size="large"
+          variant="elevated"
+          @click="saveEvent"
         >
-          <v-icon :icon="editedIndex === -1 ? 'mdi-plus' : 'mdi-content-save'" class="mr-1"></v-icon>
+          <v-icon class="mr-1" :icon="editedIndex === -1 ? 'mdi-plus' : 'mdi-content-save'" />
           {{ editedIndex === -1 ? 'Create Event' : 'Update Event' }}
         </v-btn>
       </v-card-actions>
@@ -258,167 +258,163 @@
   <EventDetailsDialog
     v-model="detailsDialog"
     :selected-event="selectedEvent"
-    @edit-event="editEvent"
     @close="detailsDialog = false"
+    @edit-event="editEvent"
   />
 
   <!-- Confirm Modal Component -->
   <ConfirmModal
     v-model="confirmModalOpen"
-    :type="confirmModalConfig.type"
-    :title="confirmModalConfig.title"
     :details="selectedEvent?.title ? `Event: ${selectedEvent.title}` : ''"
     :loading="confirmModalLoading"
-    @confirm="confirmModalConfirm"
+    :title="confirmModalConfig.title"
+    :type="confirmModalConfig.type"
     @cancel="confirmModalCancel"
+    @confirm="confirmModalConfirm"
   />
 </template>
 
 <script>
-import EventDetailsDialog from './EventDetailsDialog.vue'
-import ConfirmModal from '@/components/common/ConfirmModal.vue'
-import { useCalendarDialog } from '@/composables/CalendarDialog/useCalendarDialog'
-import { useEventActions } from '@/composables/CalendarDialog/useEventActions'
-import { useEventsStore } from '@/stores/events'
+  import EventDetailsDialog from './EventDetailsDialog.vue'
+  import ConfirmModal from '@/components/common/ConfirmModal.vue'
+  import { useCalendarDialog } from '@/composables/CalendarDialog/useCalendarDialog'
+  import { useEventActions } from '@/composables/CalendarDialog/useEventActions'
+  import { useEventsStore } from '@/stores/events'
 
-export default {
-  name: 'CalendarDialog',
-  components: {
-    EventDetailsDialog,
-    ConfirmModal
-  },
-  props: {
-    modelValue: {
-      type: Boolean,
-      default: false
+  export default {
+    name: 'CalendarDialog',
+    components: {
+      EventDetailsDialog,
+      ConfirmModal,
     },
-    detailsModelValue: {
-      type: Boolean,
-      default: false
+    props: {
+      modelValue: {
+        type: Boolean,
+        default: false,
+      },
+      detailsModelValue: {
+        type: Boolean,
+        default: false,
+      },
+      event: {
+        type: Object,
+        default: () => ({}),
+      },
+      selectedEvent: {
+        type: Object,
+        default: null,
+      },
+      editedIndex: {
+        type: Number,
+        default: -1,
+      },
+      loading: {
+        type: Boolean,
+        default: false,
+      },
     },
-    event: {
-      type: Object,
-      default: () => ({})
-    },
-    selectedEvent: {
-      type: Object,
-      default: null
-    },
-    editedIndex: {
-      type: Number,
-      default: -1
-    },
-    loading: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ['update:modelValue', 'update:detailsModelValue', 'save-event', 'edit-event', 'close'],
-  setup(props, { emit }) {
-    const eventsStore = useEventsStore()
+    emits: ['update:modelValue', 'update:detailsModelValue', 'save-event', 'edit-event', 'close'],
+    setup (props, { emit }) {
+      const eventsStore = useEventsStore()
 
-    // Using composables
-    const {
-      // Theme colors
-      getPrimaryColor,
-      getSecondaryColor,
-      getAccentColor,
-      getErrorColor,
-      getWarningColor,
-      getInfoColor,
-      getSuccessColor,
+      // Using composables
+      const {
+        // Theme colors
+        getPrimaryColor,
+        getSecondaryColor,
+        getAccentColor,
+        getErrorColor,
+        getWarningColor,
+        getInfoColor,
+        getSuccessColor,
 
-      // Form state
-      editedEvent,
-      dialog,
-      detailsDialog,
-      formTitle,
-      isFormValid,
+        // Form state
+        editedEvent,
+        dialog,
+        detailsDialog,
+        formTitle,
+        isFormValid,
 
-      // Options
-      eventTypes,
-      priorityLevels,
-      eventColors,
+        // Options
+        eventTypes,
+        priorityLevels,
+        eventColors,
 
-      // Form methods
-      validateForm,
-      getFormData,
+        // Form methods
+        validateForm,
+        getFormData,
 
-      // Dialog methods
-      closeDialog,
-      openDialog
-    } = useCalendarDialog(props, emit)
+        // Dialog methods
+        closeDialog,
+      } = useCalendarDialog(props, emit)
 
-    const {
-      loading: actionLoading,
-      error: actionError,
-      confirmModalOpen,
-      confirmModalLoading,
-      confirmModalConfig,
-      confirmModalConfirm,
-      confirmModalCancel,
-      saveEvent: saveEventAction,
-      deleteEvent: deleteEventAction,
-      editEvent: editEventAction
-    } = useEventActions(eventsStore)
+      const {
+        loading: actionLoading,
+        error: actionError,
+        confirmModalOpen,
+        confirmModalLoading,
+        confirmModalConfig,
+        confirmModalConfirm,
+        confirmModalCancel,
+      } = useEventActions(eventsStore)
 
-    const saveEvent = async () => {
-      const validation = validateForm()
+      const saveEvent = async () => {
+        const validation = validateForm()
 
-      if (!validation.isValid) {
-        console.error('Validation errors:', validation.errors)
-        return
+        if (!validation.isValid) {
+          console.error('Validation errors:', validation.errors)
+          return
+        }
+        const eventData = getFormData()
+        emit('save-event', eventData)
       }
-      const eventData = getFormData()
-      emit('save-event', eventData)
-    }
 
-    const editEvent = (event) => {
-      console.log('CalendarDialog editEvent called with:', event)
-      detailsDialog.value = false
-      emit('edit-event', event)
-    }
+      const editEvent = event => {
+        console.log('CalendarDialog editEvent called with:', event)
+        detailsDialog.value = false
+        emit('edit-event', event)
+      }
 
-    return {
-      // Theme colors
-      getPrimaryColor,
-      getSecondaryColor,
-      getAccentColor,
-      getErrorColor,
-      getWarningColor,
-      getInfoColor,
-      getSuccessColor,
+      return {
+        // Theme colors
+        getPrimaryColor,
+        getSecondaryColor,
+        getAccentColor,
+        getErrorColor,
+        getWarningColor,
+        getInfoColor,
+        getSuccessColor,
 
-      // Form state
-      editedEvent,
-      dialog,
-      detailsDialog,
-      formTitle,
-      isFormValid,
+        // Form state
+        editedEvent,
+        dialog,
+        detailsDialog,
+        formTitle,
+        isFormValid,
 
-      // Options
-      eventTypes,
-      priorityLevels,
-      eventColors,
+        // Options
+        eventTypes,
+        priorityLevels,
+        eventColors,
 
-      // Loading states
-      actionLoading,
-      actionError,
+        // Loading states
+        actionLoading,
+        actionError,
 
-      // Confirm modal properties
-      confirmModalOpen,
-      confirmModalLoading,
-      confirmModalConfig,
-      confirmModalConfirm,
-      confirmModalCancel,
+        // Confirm modal properties
+        confirmModalOpen,
+        confirmModalLoading,
+        confirmModalConfig,
+        confirmModalConfirm,
+        confirmModalCancel,
 
-      // Methods
-      closeDialog,
-      saveEvent,
-      editEvent
-    }
+        // Methods
+        closeDialog,
+        saveEvent,
+        editEvent,
+      }
+    },
   }
-}
 </script>
 
 <style scoped>

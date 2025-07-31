@@ -1,7 +1,5 @@
-import { ref } from 'vue'
-
-export function useCalendarEvents() {
-  const handleEventClick = ({ event, nativeEvent }, emit, dialogManager) => {
+export function useCalendarEvents () {
+  const handleEventClick = ({ event, nativeEvent }, emit) => {
     if (nativeEvent) {
       nativeEvent.stopPropagation()
     }
@@ -35,6 +33,6 @@ export function useCalendarEvents() {
     handleDateClick,
     handleShowMore,
     handleRangeChange,
-    editEvent
+    editEvent,
   }
 }

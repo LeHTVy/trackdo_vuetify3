@@ -1,6 +1,7 @@
-import { computed } from 'vue'
-
-export function useEventValidation() {
+/**
+ * Event validation composable
+ */
+export function useEventValidation () {
 
   const validateEventTitle = (title, name) => {
     const eventTitle = title || name
@@ -32,11 +33,11 @@ export function useEventValidation() {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     }
   }
 
-  const validateEventType = (type) => {
+  const validateEventType = type => {
     const validTypes = ['meeting', 'task', 'reminder', 'appointment', 'deadline', 'personal', 'work', 'holiday', 'birthday', 'other']
 
     if (!type) {
@@ -50,7 +51,7 @@ export function useEventValidation() {
     return { isValid: true, message: '' }
   }
 
-  const validateEventPriority = (priority) => {
+  const validateEventPriority = priority => {
     const validPriorities = ['High', 'Medium', 'Low']
 
     if (!priority) {
@@ -64,7 +65,7 @@ export function useEventValidation() {
     return { isValid: true, message: '' }
   }
 
-  const validateEventColor = (color) => {
+  const validateEventColor = color => {
     if (!color) {
       return { isValid: false, message: 'Event color is required' }
     }
@@ -78,7 +79,7 @@ export function useEventValidation() {
     return { isValid: true, message: '' }
   }
 
-  const validateCompleteEvent = (eventData) => {
+  const validateCompleteEvent = eventData => {
     const errors = []
 
     // Validate title
@@ -113,7 +114,7 @@ export function useEventValidation() {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     }
   }
 
@@ -121,26 +122,26 @@ export function useEventValidation() {
     return {
       title: [
         v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Event title is required' : true,
-        v => (v && v.length <= 100) ? true : 'Title must not exceed 100 characters'
+        v => (v && v.length <= 100) ? true : 'Title must not exceed 100 characters',
       ],
       description: [
-        v => !v || v.length <= 500 ? true : 'Description must not exceed 500 characters'
+        v => !v || v.length <= 500 ? true : 'Description must not exceed 500 characters',
       ],
       start: [
-        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Start date is required' : true
+        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Start date is required' : true,
       ],
       end: [
-        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'End date is required' : true
+        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'End date is required' : true,
       ],
       type: [
-        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Event type is required' : true
+        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Event type is required' : true,
       ],
       priority: [
-        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Priority level is required' : true
+        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Priority level is required' : true,
       ],
       color: [
-        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Color is required' : true
-      ]
+        v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Color is required' : true,
+      ],
     }
   }
 
@@ -151,6 +152,6 @@ export function useEventValidation() {
     validateEventPriority,
     validateEventColor,
     validateCompleteEvent,
-    getValidationRules
+    getValidationRules,
   }
 }

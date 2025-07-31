@@ -14,11 +14,11 @@
         <!-- Progress Chart -->
         <div class="chart-container">
           <v-progress-circular
+            class="progress-circle"
+            color="primary"
             :model-value="completionPercentage"
             :size="100"
             :width="8"
-            color="primary"
-            class="progress-circle"
           >
             <div class="progress-text">
               <div class="progress-percentage">{{ Math.round(completionPercentage) }}%</div>
@@ -36,9 +36,9 @@
           >
             <div class="item-header">
               <v-icon
+                class="item-icon"
                 :color="item.color"
                 size="18"
-                class="item-icon"
               >
                 {{ item.icon }}
               </v-icon>
@@ -58,7 +58,7 @@
     elevation="2"
   >
     <v-card-text class="text-center pa-6">
-      <v-icon size="48" color="grey-lighten-1">mdi-chart-donut</v-icon>
+      <v-icon color="grey-lighten-1" size="48">mdi-chart-donut</v-icon>
       <h4 class="text-grey-lighten-1 mt-2">No Tasks Yet</h4>
       <p class="text-grey-lighten-2 text-body-2 mt-1">Create your first task to see progress</p>
     </v-card-text>
@@ -66,26 +66,26 @@
 </template>
 
 <script setup>
-import { useTaskProgress } from '@/composables/TaskCommon/useTaskProgress'
+  import { useTaskProgress } from '@/composables/TaskCommon/useTaskProgress'
 
-// Props
-const props = defineProps({
-  tasksStore: {
-    type: Object,
-    required: true
-  }
-})
+  // Props
+  const props = defineProps({
+    tasksStore: {
+      type: Object,
+      required: true,
+    },
+  })
 
-const {
-  completionPercentage,
-  progressItems,
-  hasData,
-  progressStats
-} = useTaskProgress(props.tasksStore)
+  const {
+    completionPercentage,
+    progressItems,
+    hasData,
+    progressStats,
+  } = useTaskProgress(props.tasksStore)
 
-defineExpose({
-  progressStats
-})
+  defineExpose({
+    progressStats,
+  })
 </script>
 
 <style scoped>

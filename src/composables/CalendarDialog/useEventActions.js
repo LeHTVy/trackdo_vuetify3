@@ -2,7 +2,7 @@ import { useAsyncOperation } from '@/composables/common/useAsyncOperation'
 import { useConfirmModal } from '@/composables/common/useConfirmModal'
 import { useEventOperations } from '@/composables/CalendarCommon/useEventOperations'
 
-export function useEventActions(eventsStore) {
+export function useEventActions (eventsStore) {
   const { loading, error, execute, clearError, setError } = useAsyncOperation()
   const {
     isOpen: confirmModalOpen,
@@ -10,14 +10,14 @@ export function useEventActions(eventsStore) {
     modalConfig: confirmModalConfig,
     confirm: confirmModalConfirm,
     cancel: confirmModalCancel,
-    confirmDelete
+    confirmDelete,
   } = useConfirmModal()
   const {
     saveEvent: saveEventOperation,
     deleteEvent: deleteEventOperation,
     duplicateEvent: duplicateEventOperation,
     createDuplicatedEventData,
-    getEventTitle
+    getEventTitle,
   } = useEventOperations(eventsStore)
 
   const saveEvent = async (eventData, isEdit = false, selectedEvent = null) => {
@@ -30,7 +30,7 @@ export function useEventActions(eventsStore) {
     }, 'Unable to save event')
   }
 
-  const deleteEvent = async (event) => {
+  const deleteEvent = async event => {
     return execute(async () => {
       console.log('useEventActions deleteEvent called with:', event)
 
@@ -55,7 +55,7 @@ export function useEventActions(eventsStore) {
     }, 'Unable to delete event')
   }
 
-  const duplicateEvent = async (event) => {
+  const duplicateEvent = async event => {
     return execute(async () => {
       if (!event) {
         throw new Error('Event not found for duplication.')
@@ -85,7 +85,7 @@ export function useEventActions(eventsStore) {
     }, 'Unable to edit event')
   }
 
-  const editEvent = (event) => {
+  const editEvent = event => {
     if (!event) {
       console.warn('No event provided for editing')
       return
@@ -95,7 +95,7 @@ export function useEventActions(eventsStore) {
     return event
   }
 
-  const quickDuplicate = async (event) => {
+  const quickDuplicate = async event => {
     return execute(async () => {
       if (!event) {
         throw new Error('Event not found for quick duplication.')
@@ -104,7 +104,7 @@ export function useEventActions(eventsStore) {
       const duplicatedEventData = {
         ...createDuplicatedEventData(event),
         start: now.toISOString(),
-        end: new Date(now.getTime() + 60 * 60 * 1000).toISOString() // +1 hour
+        end: new Date(now.getTime() + 60 * 60 * 1000).toISOString(), // +1 hour
       }
 
       const result = await saveEventOperation(duplicatedEventData, false)
@@ -140,6 +140,6 @@ export function useEventActions(eventsStore) {
     clearError,
     setError,
     getEventTitle,
-    createDuplicatedEventData
+    createDuplicatedEventData,
   }
 }

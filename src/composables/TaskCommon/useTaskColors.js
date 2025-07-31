@@ -2,7 +2,7 @@ import { computed } from 'vue'
 import { useTheme } from 'vuetify'
 import { useTaskFormatting } from './useTaskFormatting'
 
-export function useTaskColors(componentType = 'default') {
+export function useTaskColors () {
   const { isTaskOverdue, getTaskUrgency } = useTaskFormatting()
   const theme = useTheme()
   const colors = computed(() => theme.current.value.colors)
@@ -13,7 +13,7 @@ export function useTaskColors(componentType = 'default') {
     todo: 'todo',
     'in-progress': 'in-progress',
     completed: 'completed',
-    cancelled: 'cancelled'
+    cancelled: 'cancelled',
   }
 
   // Task Priority Constants
@@ -21,7 +21,7 @@ export function useTaskColors(componentType = 'default') {
     low: 'low',
     medium: 'medium',
     high: 'high',
-    critical: 'critical'
+    critical: 'critical',
   }
 
   // Status color mapping using Vuetify theme colors
@@ -29,7 +29,7 @@ export function useTaskColors(componentType = 'default') {
     [TASK_STATUS_TYPES.todo]: colors.value.warning,
     [TASK_STATUS_TYPES['in-progress']]: colors.value.info,
     [TASK_STATUS_TYPES.completed]: colors.value.success,
-    [TASK_STATUS_TYPES.cancelled]: colors.value.error
+    [TASK_STATUS_TYPES.cancelled]: colors.value.error,
   }))
 
   // Priority color mapping using Vuetify theme colors
@@ -37,7 +37,7 @@ export function useTaskColors(componentType = 'default') {
     [TASK_PRIORITY_TYPES.low]: colors.value.success,
     [TASK_PRIORITY_TYPES.medium]: colors.value.warning,
     [TASK_PRIORITY_TYPES.high]: colors.value.error,
-    [TASK_PRIORITY_TYPES.critical]: colors.value.error
+    [TASK_PRIORITY_TYPES.critical]: colors.value.error,
   }))
 
   // Header styling functions
@@ -91,22 +91,22 @@ export function useTaskColors(componentType = 'default') {
     '--task-progress-bg': `rgb(var(--v-theme-task-progress-bg))`,
     '--task-progress-fill': `rgb(var(--v-theme-primary))`,
     '--task-text-primary': `rgb(var(--v-theme-title-text))`,
-    '--task-text-secondary': `rgb(var(--v-theme-subtitle-text))`
+    '--task-text-secondary': `rgb(var(--v-theme-subtitle-text))`,
   }))
 
   // Business logic functions
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     return statusColorMap.value[status?.toLowerCase()] || colors.value.warning
   }
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = priority => {
     return priorityColorMap.value[priority?.toLowerCase()] || colors.value.warning
   }
 
   // Theme color getters
   const getPrimaryColor = () => colors.value.primary
   const getSecondaryColor = () => colors.value.secondary
-  const getThemeColor = (colorName) => colors.value[colorName] || colors.value.primary
+  const getThemeColor = colorName => colors.value[colorName] || colors.value.primary
 
   // CSS Variables application
   const applyCssVars = () => {
@@ -117,7 +117,7 @@ export function useTaskColors(componentType = 'default') {
   }
 
   // Task card styling (from useTaskStyling)
-  const getTaskCardClass = (task) => {
+  const getTaskCardClass = task => {
     const classes = []
     if (task.status === 'completed') classes.push('completed')
     if (isTaskOverdue(task)) classes.push('overdue')
@@ -125,20 +125,20 @@ export function useTaskColors(componentType = 'default') {
   }
 
   // Date styling (from useTaskStyling)
-  const getDateColor = (task) => {
+  const getDateColor = task => {
     if (isTaskOverdue(task)) return 'error'
     if (getTaskUrgency(task) === 'today') return 'warning'
     if (getTaskUrgency(task) === 'tomorrow') return 'info'
     return 'primary'
   }
 
-  const getDateClass = (task) => {
+  const getDateClass = task => {
     if (isTaskOverdue(task)) return 'overdue-text'
     return ''
   }
 
   // Task urgency styling (from useTaskStyling)
-  const getUrgencyColor = (urgency) => {
+  const getUrgencyColor = urgency => {
     switch (urgency) {
       case 'overdue':
         return 'error'
@@ -156,7 +156,7 @@ export function useTaskColors(componentType = 'default') {
   }
 
   // Task status styling (from useTaskStyling)
-  const getTaskStatusClass = (task) => {
+  const getTaskStatusClass = task => {
     const classes = [`status-${task.status}`]
 
     if (task.status === 'completed') {
@@ -171,16 +171,16 @@ export function useTaskColors(componentType = 'default') {
   }
 
   // Priority styling (from useTaskStyling)
-  const getPriorityClass = (priority) => {
+  const getPriorityClass = priority => {
     return `priority-${priority?.toLowerCase() || 'medium'}`
   }
 
   // Combined task styling (from useTaskStyling)
-  const getTaskClasses = (task) => {
+  const getTaskClasses = task => {
     return [
       ...getTaskCardClass(task),
       ...getTaskStatusClass(task),
-      getPriorityClass(task.priority)
+      getPriorityClass(task.priority),
     ]
   }
 
@@ -209,6 +209,6 @@ export function useTaskColors(componentType = 'default') {
     getDateClass,
     getTaskStatusClass,
     getPriorityClass,
-    getUrgencyColor
+    getUrgencyColor,
   }
 }

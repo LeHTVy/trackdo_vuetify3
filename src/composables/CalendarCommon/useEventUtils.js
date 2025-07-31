@@ -1,6 +1,4 @@
-import { computed } from 'vue'
-
-export function useEventUtils(eventsStore) {
+export function useEventUtils (eventsStore) {
   const findEventById = (eventId, events = null) => {
     const eventsList = events || eventsStore.events
     return eventsList.find(e =>
@@ -28,7 +26,7 @@ export function useEventUtils(eventsStore) {
     return index !== -1 ? index : 0
   }
 
-  const getEventIdentifier = (event) => {
+  const getEventIdentifier = event => {
     return event?.id || event?._id || `${event?.title}-${event?.start}`
   }
 
@@ -36,6 +34,6 @@ export function useEventUtils(eventsStore) {
     findEventById,
     findEventByReference,
     findEventIndex,
-    getEventIdentifier
+    getEventIdentifier,
   }
 }

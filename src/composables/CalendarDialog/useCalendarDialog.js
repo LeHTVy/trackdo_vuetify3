@@ -1,39 +1,38 @@
-import { ref, computed, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { useEventForm } from '@/composables/CalendarDialog/useEventForm'
 import { useThemeColors } from '@/composables/CalendarCommon/useThemeColors'
 import { useDialogManager } from '@/composables/common/useDialogManager'
 
-export function useCalendarDialog(props, emit) {
+export function useCalendarDialog (props, emit) {
   const themeColors = useThemeColors('dialog')
   const dialogManager = useDialogManager()
 
   const {
     editedEvent,
-    editedIndex: formEditedIndex,
     resetForm,
     initializeNewEvent,
     initializeEditEvent,
     validateForm,
     getFormData,
-    isEditMode
+    isEditMode,
   } = useEventForm()
 
   // Dialog state management - use from dialogManager
   const dialog = computed({
-    get() {
+    get () {
       return props.modelValue || dialogManager.eventDialog.value
     },
-    set(value) {
+    set (value) {
       emit('update:modelValue', value)
       dialogManager.eventDialog.value = value
-    }
+    },
   })
 
   const detailsDialog = computed({
-    get() {
+    get () {
       return props.detailsModelValue || dialogManager.eventDetailsDialog.value
     },
-    set(value) {
+    set (value) {
       // Only emit if we have the prop
       if (props.detailsModelValue !== undefined) {
         emit('update:detailsModelValue', value)
@@ -42,7 +41,7 @@ export function useCalendarDialog(props, emit) {
       if (dialogManager.eventDetailsDialog.value !== value) {
         dialogManager.eventDetailsDialog.value = value
       }
-    }
+    },
   })
 
   // Form state
@@ -61,13 +60,13 @@ export function useCalendarDialog(props, emit) {
   const eventColors = computed(() => themeColors.getEventColors())
 
   // Watchers for form initialization
-  watch(() => props.event, (newEvent) => {
+  watch(() => props.event, newEvent => {
     if (newEvent && Object.keys(newEvent).length > 0) {
       initializeEditEvent(newEvent, props.editedIndex)
     }
   }, { deep: true, immediate: true })
 
-  watch(() => props.editedIndex, (newIndex) => {
+  watch(() => props.editedIndex, newIndex => {
     if (newIndex !== -1 && props.event && Object.keys(props.event).length > 0) {
       initializeEditEvent(props.event, newIndex)
     } else if (newIndex === -1) {
@@ -121,6 +120,6 @@ export function useCalendarDialog(props, emit) {
 
     // Dialog methods
     closeDialog,
-    openDialog
+    openDialog,
   }
 }

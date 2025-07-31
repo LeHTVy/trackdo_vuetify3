@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="main-content">
+  <v-container class="main-content" fluid>
     <v-row>
       <v-col cols="12" lg="8">
         <!-- Active Projects -->
@@ -10,43 +10,43 @@
               <v-btn-toggle
                 v-model="filter"
                 color="primary"
-                variant="outlined"
                 divided
                 mandatory
+                variant="outlined"
               >
-                <v-btn value="all" size="small">All</v-btn>
-                <v-btn value="Active" size="small">Active</v-btn>
-                <v-btn value="Completed" size="small">Completed</v-btn>
-                <v-btn value="On Hold" size="small">On Hold</v-btn>
+                <v-btn size="small" value="all">All</v-btn>
+                <v-btn size="small" value="Active">Active</v-btn>
+                <v-btn size="small" value="Completed">Completed</v-btn>
+                <v-btn size="small" value="On Hold">On Hold</v-btn>
               </v-btn-toggle>
             </div>
           </div>
           <!-- Projects Grid -->
           <div class="projects-grid">
             <v-card
-                v-for="project in filteredProjects"
-                :key="project.id"
-                class="project-card"
-                :class="`project-card--${project.status.toLowerCase().replace(' ', '-')}`"
-                elevation="0"
-                @click="showProjectDetails(project)"
-              >
+              v-for="project in filteredProjects"
+              :key="project.id"
+              class="project-card"
+              :class="`project-card--${project.status.toLowerCase().replace(' ', '-')}`"
+              elevation="0"
+              @click="showProjectDetails(project)"
+            >
               <div class="project-card-header">
                 <div class="project-info">
                   <h3 class="project-name">{{ project.title || project.name }}</h3>
                   <v-chip
+                    class="status-chip"
                     :color="getStatusColor(project.status)"
                     size="small"
                     variant="flat"
-                    class="status-chip"
                   >
                     {{ project.status }}
                   </v-chip>
                 </div>
                 <v-menu>
-                  <template #activator="{ props }">
+                  <template #activator="{ props: activatorProps }">
                     <v-btn
-                      v-bind="props"
+                      v-bind="activatorProps"
                       icon="mdi-dots-vertical"
                       size="small"
                       variant="text"
@@ -80,34 +80,34 @@
                   <span class="progress-value">{{ project.progress || 0 }}%</span>
                 </div>
                 <v-progress-linear
+                  class="progress-bar"
                   :color="getStatusColor(project.status)"
                   height="8"
                   :model-value="project.progress || 0"
                   rounded
-                  class="progress-bar"
                 />
               </div>
 
-              <div class="project-dates" v-if="project.startDate || project.endDate">
-                <div class="date-item" v-if="project.startDate">
-                  <v-icon size="16" color="primary">mdi-calendar-start</v-icon>
+              <div v-if="project.startDate || project.endDate" class="project-dates">
+                <div v-if="project.startDate" class="date-item">
+                  <v-icon color="primary" size="16">mdi-calendar-start</v-icon>
                   <span>{{ formatDate(project.startDate) }}</span>
                 </div>
-                <div class="date-item" v-if="project.endDate">
-                  <v-icon size="16" color="primary">mdi-calendar-end</v-icon>
+                <div v-if="project.endDate" class="date-item">
+                  <v-icon color="primary" size="16">mdi-calendar-end</v-icon>
                   <span>{{ formatDate(project.endDate) }}</span>
                 </div>
               </div>
 
-              <div class="project-budget" v-if="project.budget">
-                <v-icon size="16" color="success">mdi-currency-usd</v-icon>
+              <div v-if="project.budget" class="project-budget">
+                <v-icon color="success" size="16">mdi-currency-usd</v-icon>
                 <span class="budget-amount">${{ project.budget.toLocaleString() }}</span>
               </div>
             </v-card>
 
             <!-- Empty State -->
             <div v-if="filteredProjects.length === 0" class="empty-state">
-              <v-icon size="80" color="secondary">mdi-folder-multiple-outline</v-icon>
+              <v-icon color="secondary" size="80">mdi-folder-multiple-outline</v-icon>
               <h3 class="empty-title">No projects found</h3>
               <p class="empty-subtitle">
                 {{ filter === 'all' ? 'Create your first project to get started!' : 'No projects match the current filter.' }}
@@ -135,7 +135,7 @@
               Recent Activity
             </v-card-title>
             <v-card-text class="activity-content">
-              <div class="activity-item" v-for="activity in recentActivities" :key="activity.id">
+              <div v-for="activity in recentActivities" :key="activity.id" class="activity-item">
                 <div class="activity-icon" :class="`bg-${activity.color}`">
                   <v-icon :color="activity.color" size="16">{{ activity.icon }}</v-icon>
                 </div>
@@ -160,11 +160,11 @@
                   <span class="overall-value">{{ overallProgress }}%</span>
                 </div>
                 <v-progress-circular
-                  :value="overallProgress"
-                  :size="120"
-                  :width="8"
-                  color="primary"
                   class="overall-progress-circle"
+                  color="primary"
+                  :size="120"
+                  :value="overallProgress"
+                  :width="8"
                 >
                   <span class="progress-text">{{ overallProgress }}%</span>
                 </v-progress-circular>
@@ -180,22 +180,22 @@
   <ProjectDetails
     v-model="projectDetailsDialog"
     :selected-project="selectedProject"
-    @edit-project="handleEditProject"
-    @delete-project="handleDeleteProject"
     @close="closeProjectDetails"
+    @delete-project="handleDeleteProject"
+    @edit-project="handleEditProject"
   />
 
   <!-- Confirm Modal -->
   <ConfirmModal
     v-model="confirmModalOpen"
-    :title="confirmModalConfig.title"
-    :message="confirmModalConfig.message"
-    :details="confirmModalConfig.details"
-    :confirm-text="confirmModalConfig.confirmText"
     :cancel-text="confirmModalConfig.cancelText"
+    :confirm-text="confirmModalConfig.confirmText"
+    :details="confirmModalConfig.details"
     :loading="confirmModalLoading"
-    @confirm="confirmModalConfirm"
+    :message="confirmModalConfig.message"
+    :title="confirmModalConfig.title"
     @cancel="confirmModalCancel"
+    @confirm="confirmModalConfirm"
   />
 </template>
 
@@ -233,7 +233,7 @@
     projectDetailsDialog,
     selectedProject,
     showProjectDetails,
-    closeProjectDetailsDialog
+    closeProjectDetailsDialog,
   } = useDialogManager()
 
   const {
@@ -242,34 +242,34 @@
     confirmModalConfig,
     confirmModalConfirm,
     confirmModalCancel,
-    deleteProjectWithConfirm
+    deleteProjectWithConfirm,
   } = useProjectOperations()
 
   const {
     filter,
-    filteredProjects
+    filteredProjects,
   } = useProjectFilters(projectsRef)
 
   const {
     formatDate,
     getStatusColor,
-    overallProgress
+    overallProgress,
   } = useProjectFormatting(projectsRef)
 
 
-  const handleEditProject = (project) => {
+  const handleEditProject = project => {
     closeProjectDetailsDialog()
     emit('edit-project', project)
   }
 
-  const handleDeleteProjectWithConfirm = async (project) => {
+  const handleDeleteProjectWithConfirm = async project => {
     const success = await deleteProjectWithConfirm(project, props.projects)
     if (success) {
       emit('delete-project', project._id || project.id)
     }
   }
 
-  const handleDeleteProject = async (projectIdOrProject) => {
+  const handleDeleteProject = async projectIdOrProject => {
     closeProjectDetailsDialog()
 
     const project = typeof projectIdOrProject === 'string'

@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 
-export function useEventFilters(events) {
+export function useEventFilters (events) {
   const formattedEvents = computed(() => {
     if (!events.value || !Array.isArray(events.value)) return []
 
@@ -14,7 +14,7 @@ export function useEventFilters(events) {
         _id: eventId,
         title: event.name || event.title,
         start: new Date(event.start),
-        end: new Date(event.end)
+        end: new Date(event.end),
       }
     })
   })
@@ -44,7 +44,7 @@ export function useEventFilters(events) {
     }).sort((a, b) => new Date(a.start) - new Date(b.start)).slice(0, 5)
   })
 
-  const getEventsForDate = (date) => {
+  const getEventsForDate = date => {
     if (!events.value || !Array.isArray(events.value)) return []
 
     const dateStr = new Date(date).toISOString().substr(0, 10)
@@ -69,13 +69,13 @@ export function useEventFilters(events) {
     }).sort((a, b) => new Date(a.start) - new Date(b.start))
   }
 
-  const getEventsByColor = (color) => {
+  const getEventsByColor = color => {
     if (!events.value || !Array.isArray(events.value)) return []
 
     return events.value.filter(event => event.color === color)
   }
 
-  const searchEvents = (query) => {
+  const searchEvents = query => {
     if (!events.value || !Array.isArray(events.value) || !query) return []
 
     const searchTerm = query.toLowerCase()
@@ -96,6 +96,6 @@ export function useEventFilters(events) {
     getEventsForDate,
     getEventsForRange,
     getEventsByColor,
-    searchEvents
+    searchEvents,
   }
 }

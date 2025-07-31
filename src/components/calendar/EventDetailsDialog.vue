@@ -2,15 +2,15 @@
   <!-- Event Details Dialog -->
   <v-dialog
     v-model="isOpen"
+    class="details-dialog"
     max-width="550px"
     transition="dialog-top-transition"
-    class="details-dialog"
   >
     <v-card v-if="selectedEvent" class="details-card" elevation="16">
       <v-card-title class="details-header pa-6" :style="{ backgroundColor: selectedEvent.color }">
         <div class="d-flex align-center">
-          <v-avatar size="36" color="white" class="mr-3">
-            <v-icon :icon="getEventTypeIcon(selectedEvent.type)" :color="selectedEvent.color"></v-icon>
+          <v-avatar class="mr-3" color="white" size="36">
+            <v-icon :color="selectedEvent.color" :icon="getEventTypeIcon(selectedEvent.type)" />
           </v-avatar>
           <div>
             <h3 class="text-h6 font-weight-bold text-white mb-1">{{ eventTitle }}</h3>
@@ -22,7 +22,7 @@
       <v-card-text class="pa-6">
         <div v-if="hasDescription" class="mb-4">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-text" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-text" />
             <span class="text-subtitle2 font-weight-medium">Description</span>
           </div>
           <p class="text-body-1 ml-8">{{ eventDescription }}</p>
@@ -30,7 +30,7 @@
 
         <div class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-calendar-start" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-calendar-start" />
             <span class="text-subtitle2 font-weight-medium">Start Date</span>
           </div>
           <p class="text-body-1 ml-8">{{ formatDate(selectedEvent.start) }}</p>
@@ -38,7 +38,7 @@
 
         <div v-if="hasEndDate" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-calendar-end" :color="getPrimaryColor()" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPrimaryColor()" icon="mdi-calendar-end" />
             <span class="text-subtitle2 font-weight-medium">End Date</span>
           </div>
           <p class="text-body-1 ml-8">{{ formatDate(selectedEvent.end) }}</p>
@@ -46,13 +46,13 @@
 
         <div v-if="hasPriority" class="mb-3">
           <div class="d-flex align-center mb-2">
-            <v-icon icon="mdi-flag" :color="getPriorityColor(selectedEvent.priority)" class="mr-2"></v-icon>
+            <v-icon class="mr-2" :color="getPriorityColor(selectedEvent.priority)" icon="mdi-flag" />
             <span class="text-subtitle2 font-weight-medium">Priority Level</span>
           </div>
           <v-chip
+            class="ml-8"
             :color="getPriorityColor(selectedEvent.priority)"
             size="small"
-            class="ml-8"
             variant="elevated"
           >
             {{ selectedEvent.priority }}
@@ -61,30 +61,30 @@
       </v-card-text>
 
       <v-card-actions class="pa-6 pt-0">
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn
+          class="action-btn mr-3"
           color="error"
           variant="outlined"
           @click="deleteEvent"
-          class="action-btn mr-3"
         >
-          <v-icon icon="mdi-delete" class="mr-1"></v-icon>
+          <v-icon class="mr-1" icon="mdi-delete" />
           Delete
         </v-btn>
         <v-btn
+          class="action-btn mr-3"
           :color="getPrimaryColor()"
           variant="elevated"
           @click="editEvent"
-          class="action-btn mr-3"
         >
-          <v-icon icon="mdi-pencil" class="mr-1"></v-icon>
+          <v-icon class="mr-1" icon="mdi-pencil" />
           Edit
         </v-btn>
         <v-btn
+          class="action-btn"
           color="grey-darken-1"
           variant="text"
           @click="closeDialog"
-          class="action-btn"
         >
           Close
         </v-btn>
@@ -95,113 +95,113 @@
   <!-- Confirm Modal -->
   <ConfirmModal
     v-model="confirmModalOpen"
-    :type="confirmModalConfig.type"
-    :title="confirmModalConfig.title"
     :details="selectedEvent?.title ? `Event: ${selectedEvent.title}` : ''"
     :loading="confirmModalLoading"
-    @confirm="confirmModalConfirm"
+    :title="confirmModalConfig.title"
+    :type="confirmModalConfig.type"
     @cancel="confirmModalCancel"
+    @confirm="confirmModalConfirm"
   />
 </template>
 
 <script>
-import { useEventDetailsDialog } from '@/composables/CalendarDialog/useEventDetailsDialog'
-import ConfirmModal from '@/components/common/ConfirmModal.vue'
+  import { useEventDetailsDialog } from '@/composables/CalendarDialog/useEventDetailsDialog'
+  import ConfirmModal from '@/components/common/ConfirmModal.vue'
 
-export default {
-  name: 'EventDetailsDialog',
-  components: {
-    ConfirmModal
-  },
-  props: {
-    modelValue: {
-      type: Boolean,
-      default: false
+  export default {
+    name: 'EventDetailsDialog',
+    components: {
+      ConfirmModal,
     },
-    selectedEvent: {
-      type: Object,
-      default: null
-    }
-  },
-  emits: ['update:modelValue', 'edit-event', 'duplicate-event', 'close'],
-  setup(props, { emit }) {
-    const {
-      // Theme colors
-      getPrimaryColor,
-      getSecondaryColor,
-      getAccentColor,
-      getErrorColor,
-      getWarningColor,
-      getInfoColor,
-      getSuccessColor,
+    props: {
+      modelValue: {
+        type: Boolean,
+        default: false,
+      },
+      selectedEvent: {
+        type: Object,
+        default: null,
+      },
+    },
+    emits: ['update:modelValue', 'edit-event', 'duplicate-event', 'close'],
+    setup (props, { emit }) {
+      const {
+        // Theme colors
+        getPrimaryColor,
+        getSecondaryColor,
+        getAccentColor,
+        getErrorColor,
+        getWarningColor,
+        getInfoColor,
+        getSuccessColor,
 
-      // State
-      isOpen,
+        // State
+        isOpen,
 
-      // Confirm modal properties
-      confirmModalOpen,
-      confirmModalLoading,
-      confirmModalConfig,
-      confirmModalConfirm,
-      confirmModalCancel,
+        // Confirm modal properties
+        confirmModalOpen,
+        confirmModalLoading,
+        confirmModalConfig,
+        confirmModalConfirm,
+        confirmModalCancel,
 
-      // Computed properties
-      eventTitle,
-      eventDescription,
-      eventType,
-      hasEndDate,
-      hasPriority,
-      hasDescription,
+        // Computed properties
+        eventTitle,
+        eventDescription,
+        eventType,
+        hasEndDate,
+        hasPriority,
+        hasDescription,
 
-      // Methods
-      getEventTypeIcon,
-      getPriorityColor,
-      formatDate,
-      closeDialog,
-      deleteEvent,
-      editEvent,
-      duplicateEvent
-    } = useEventDetailsDialog(props, emit)
+        // Methods
+        getEventTypeIcon,
+        getPriorityColor,
+        formatDate,
+        closeDialog,
+        deleteEvent,
+        editEvent,
+        duplicateEvent,
+      } = useEventDetailsDialog(props, emit)
 
-    return {
-      // Theme colors
-      getPrimaryColor,
-      getSecondaryColor,
-      getAccentColor,
-      getErrorColor,
-      getWarningColor,
-      getInfoColor,
-      getSuccessColor,
+      return {
+        // Theme colors
+        getPrimaryColor,
+        getSecondaryColor,
+        getAccentColor,
+        getErrorColor,
+        getWarningColor,
+        getInfoColor,
+        getSuccessColor,
 
-      // State
-      isOpen,
+        // State
+        isOpen,
 
-      // Confirm modal properties
-      confirmModalOpen,
-      confirmModalLoading,
-      confirmModalConfig,
-      confirmModalConfirm,
-      confirmModalCancel,
+        // Confirm modal properties
+        confirmModalOpen,
+        confirmModalLoading,
+        confirmModalConfig,
+        confirmModalConfirm,
+        confirmModalCancel,
 
-      // Computed properties
-      eventTitle,
-      eventDescription,
-      eventType,
-      hasEndDate,
-      hasPriority,
-      hasDescription,
+        // Computed properties
+        eventTitle,
+        eventDescription,
+        eventType,
+        hasEndDate,
+        hasPriority,
+        hasDescription,
 
-      // Methods
-      getEventTypeIcon,
-      getPriorityColor,
-      formatDate,
-      closeDialog,
-      deleteEvent,
-      editEvent,
-      duplicateEvent
-    }
+        // Methods
+        getEventTypeIcon,
+        getPriorityColor,
+        formatDate,
+        closeDialog,
+        deleteEvent,
+        editEvent,
+        duplicateEvent,
+      }
+    },
   }
-}
 </script>
 
 <style scoped>

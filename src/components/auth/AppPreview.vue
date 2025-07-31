@@ -38,16 +38,16 @@
         <!-- Quick Actions -->
         <div class="quick-actions">
           <div class="action-item">
-            <v-icon size="20" color="primary">mdi-lock</v-icon>
+            <v-icon color="primary" size="20">mdi-lock</v-icon>
           </div>
           <div class="action-item">
-            <v-icon size="20" color="primary">mdi-format-list-bulleted</v-icon>
+            <v-icon color="primary" size="20">mdi-format-list-bulleted</v-icon>
           </div>
           <div class="action-item">
-            <v-icon size="20" color="success">mdi-folder</v-icon>
+            <v-icon color="success" size="20">mdi-folder</v-icon>
           </div>
           <div class="action-item">
-            <v-icon size="20" color="warning">mdi-chart-line</v-icon>
+            <v-icon color="warning" size="20">mdi-chart-line</v-icon>
           </div>
         </div>
 
@@ -56,7 +56,7 @@
           <!-- Event Calendar Card -->
           <div class="feature-card">
             <div class="card-icon">
-              <v-icon size="32" color="warning">mdi-calendar</v-icon>
+              <v-icon color="warning" size="32">mdi-calendar</v-icon>
             </div>
             <div class="card-content">
               <h3 class="card-title">Event Calendar</h3>
@@ -67,7 +67,7 @@
           <!-- Task Management Card -->
           <div class="feature-card">
             <div class="card-icon">
-              <v-icon size="32" color="success">mdi-format-list-checks</v-icon>
+              <v-icon color="success" size="32">mdi-format-list-checks</v-icon>
             </div>
             <div class="card-content">
               <h3 class="card-title">Task Management</h3>
@@ -78,7 +78,7 @@
           <!-- Project Organization Card -->
           <div class="feature-card">
             <div class="card-icon">
-              <v-icon size="32" color="info">mdi-folder-multiple</v-icon>
+              <v-icon color="info" size="32">mdi-folder-multiple</v-icon>
             </div>
             <div class="card-content">
               <h3 class="card-title">Project Organization</h3>
@@ -94,19 +94,19 @@
           </div>
           <div class="notes-list">
             <div class="note-item">
-              <v-icon size="16" color="success">mdi-check</v-icon>
+              <v-icon color="success" size="16">mdi-check</v-icon>
               <span>Stay organized with TrackDo</span>
             </div>
             <div class="note-item">
-              <v-icon size="16" color="warning">mdi-clock</v-icon>
+              <v-icon color="warning" size="16">mdi-clock</v-icon>
               <span>Never miss important events</span>
             </div>
             <div class="note-item">
-              <v-icon size="16" color="primary">mdi-rocket</v-icon>
+              <v-icon color="primary" size="16">mdi-rocket</v-icon>
               <span>Boost your productivity</span>
             </div>
             <div class="note-item">
-              <v-icon size="16" color="info">mdi-account-group</v-icon>
+              <v-icon color="info" size="16">mdi-account-group</v-icon>
               <span>Collaborate with your team</span>
             </div>
           </div>

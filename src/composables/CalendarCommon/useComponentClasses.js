@@ -2,10 +2,9 @@ import { computed } from 'vue'
 
 /**
  * @param {string} componentType - Type of component ('today', 'upcoming', etc.)
- * @param {Object} options - Additional options for class generation
  * @returns {Object} Computed CSS classes and class generation functions
  */
-export function useComponentClasses(componentType = 'default', options = {}) {
+export function useComponentClasses (componentType = 'default') {
 
   /**
    * Generate base component classes
@@ -13,7 +12,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
    */
   const baseClasses = computed(() => ({
     [`${componentType}-component`]: true,
-    'component-base': true
+    'component-base': true,
   }))
 
   /**
@@ -25,7 +24,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
     'upcoming-list': componentType === 'upcoming',
     'event-list': componentType.includes('event'),
     'task-list': componentType.includes('task'),
-    'project-list': componentType.includes('project')
+    'project-list': componentType.includes('project'),
   }))
 
   /**
@@ -37,7 +36,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
     'upcoming-header': componentType === 'upcoming',
     'list-header': true,
     'header-primary': componentType === 'today',
-    'header-secondary': componentType === 'upcoming'
+    'header-secondary': componentType === 'upcoming',
   }))
 
   /**
@@ -50,7 +49,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
     'event-item': componentType.includes('event'),
     'task-item': componentType.includes('task'),
     'project-item': componentType.includes('project'),
-    'list-item': true
+    'list-item': true,
   }))
 
   /**
@@ -62,7 +61,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
     'today-events-container': componentType === 'today',
     'upcoming-events-container': componentType === 'upcoming',
     'container-primary': componentType === 'today',
-    'container-secondary': componentType === 'upcoming'
+    'container-secondary': componentType === 'upcoming',
   }))
 
   /**
@@ -79,7 +78,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
       'is-active': state.active || false,
       'is-selected': state.selected || false,
       'is-expanded': state.expanded || false,
-      'is-collapsed': state.collapsed || false
+      'is-collapsed': state.collapsed || false,
     }
   }
 
@@ -95,7 +94,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
       'desktop-hidden': breakpoints.hideDesktop || false,
       'mobile-only': breakpoints.mobileOnly || false,
       'tablet-only': breakpoints.tabletOnly || false,
-      'desktop-only': breakpoints.desktopOnly || false
+      'desktop-only': breakpoints.desktopOnly || false,
     }
   }
 
@@ -108,7 +107,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
     return {
       'theme-light': theme === 'light',
       'theme-dark': theme === 'dark',
-      'theme-auto': theme === 'auto'
+      'theme-auto': theme === 'auto',
     }
   }
 
@@ -122,7 +121,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
       'size-small': size === 'small',
       'size-medium': size === 'medium',
       'size-large': size === 'large',
-      'size-extra-large': size === 'xl'
+      'size-extra-large': size === 'xl',
     }
   }
 
@@ -138,7 +137,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
       'variant-filled': variant === 'filled',
       'variant-text': variant === 'text',
       'variant-elevated': variant === 'elevated',
-      'variant-flat': variant === 'flat'
+      'variant-flat': variant === 'flat',
     }
   }
 
@@ -150,7 +149,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
   const getColorClasses = (color = 'primary') => {
     return {
       [`color-${color}`]: true,
-      'has-color': !!color
+      'has-color': !!color,
     }
   }
 
@@ -166,7 +165,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
       'animate-bounce': animations.bounce || false,
       'animate-pulse': animations.pulse || false,
       'animate-spin': animations.spin || false,
-      'no-animation': animations.disabled || false
+      'no-animation': animations.disabled || false,
     }
   }
 
@@ -182,7 +181,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
       ...headerClasses.value,
       ...itemClasses.value,
       ...containerClasses.value,
-      ...additionalClasses
+      ...additionalClasses,
     }
   }
 
@@ -200,7 +199,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
       'has-divider': props.showDivider || false,
       'is-clickable': props.clickable || false,
       'is-draggable': props.draggable || false,
-      'is-sortable': props.sortable || false
+      'is-sortable': props.sortable || false,
     }
   }
 
@@ -218,7 +217,7 @@ export function useComponentClasses(componentType = 'default', options = {}) {
       'full-height': utilities.fullHeight || false,
       'rounded': utilities.rounded || false,
       'shadow': utilities.shadow || false,
-      'border': utilities.border || false
+      'border': utilities.border || false,
     }
   }
 
@@ -242,6 +241,6 @@ export function useComponentClasses(componentType = 'default', options = {}) {
     getUtilityClasses,
 
     // Utility functions
-    getAllClasses
+    getAllClasses,
   }
 }

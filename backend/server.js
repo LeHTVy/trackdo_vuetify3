@@ -6,7 +6,6 @@ import morgan from 'morgan'
 import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
-import { title } from 'process'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -25,9 +24,9 @@ app.use(cors({
     'http://localhost:5174',
     'http://127.0.0.1:5173',
     'http://127.0.0.1:5174',
-    process.env.CORS_ORIGIN || 'http://localhost:5173'
+    process.env.CORS_ORIGIN || 'http://localhost:5173',
   ],
-  credentials: true
+  credentials: true,
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -55,7 +54,7 @@ const UserSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   lastLogin: Date,
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
 })
 
 const ProjectSchema = new mongoose.Schema({
@@ -75,12 +74,12 @@ const ProjectSchema = new mongoose.Schema({
     name: String,
     initials: String,
     color: String,
-    role: String
+    role: String,
   }],
   teamMembers: [String],
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
 })
 
 const TaskSchema = new mongoose.Schema({
@@ -99,7 +98,7 @@ const TaskSchema = new mongoose.Schema({
   actualHours: { type: Number, default: 0 },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
 })
 
 const EventSchema = new mongoose.Schema({
@@ -119,7 +118,7 @@ const EventSchema = new mongoose.Schema({
     enabled: { type: Boolean, default: false },
     frequency: { type: String, enum: ['daily', 'weekly', 'monthly', 'quarterly', 'yearly'] },
     interval: { type: Number, default: 1 },
-    endDate: String
+    endDate: String,
   },
   reminders: [String],
   projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
@@ -127,7 +126,7 @@ const EventSchema = new mongoose.Schema({
   status: { type: String, enum: ['confirmed', 'tentative', 'cancelled'], default: 'confirmed' },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
 })
 
 // Models
@@ -142,7 +141,7 @@ app.get('/api/health', (req, res) => {
     status: 'OK',
     message: 'TrackDo API is running',
     timestamp: new Date().toISOString(),
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
   })
 })
 
@@ -196,7 +195,7 @@ app.post('/api/auth/register', async (req, res) => {
       email,
       password, // TODO: Hash password with bcrypt
       firstName,
-      lastName
+      lastName,
     })
 
     const savedUser = await user.save()
@@ -210,7 +209,7 @@ app.post('/api/auth/register', async (req, res) => {
       firstName: savedUser.firstName,
       lastName: savedUser.lastName,
       avatar: savedUser.avatar,
-      role: savedUser.role
+      role: savedUser.role,
     }
 
     // Generate token (in production, use JWT)
@@ -218,7 +217,7 @@ app.post('/api/auth/register', async (req, res) => {
 
     res.status(201).json({
       user: userResponse,
-      token
+      token,
     })
   } catch (error) {
     console.error('Registration error:', error)
@@ -240,7 +239,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     // Find user by username or email
     const user = await User.findOne({
-      $or: [{ username }, { email: username }]
+      $or: [{ username }, { email: username }],
     })
 
     if (!user) {
@@ -270,7 +269,7 @@ app.post('/api/auth/login', async (req, res) => {
       firstName: user.firstName,
       lastName: user.lastName,
       avatar: user.avatar,
-      role: user.role
+      role: user.role,
     }
 
     // Generate token (in production, use JWT)
@@ -278,7 +277,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     res.json({
       user: userResponse,
-      token
+      token,
     })
   } catch (error) {
     console.error('Login error:', error)
@@ -354,7 +353,7 @@ app.delete('/api/projects/:id', async (req, res) => {
 app.get('/api/tasks', async (req, res) => {
   try {
     const { project, status } = req.query
-    let query = {}
+    const query = {}
     if (project) query.projectId = project
     if (status) query.status = status
 
@@ -426,13 +425,13 @@ app.delete('/api/tasks/:id', async (req, res) => {
 app.get('/api/events', async (req, res) => {
   try {
     const { start, end, project } = req.query
-    let query = {}
+    const query = {}
 
     if (start && end) {
       query.$or = [
         { start: { $gte: start, $lte: end } },
         { end: { $gte: start, $lte: end } },
-        { start: { $lte: start }, end: { $gte: end } }
+        { start: { $lte: start }, end: { $gte: end } },
       ]
     }
     if (project) query.projectId = project
@@ -494,7 +493,7 @@ app.use('*', (req, res) => {
 })
 
 // Error handler
-app.use((error, req, res, next) => {
+app.use((error, res) => {
   console.error(error.stack)
   res.status(500).json({ message: 'Something went wrong!' })
 })

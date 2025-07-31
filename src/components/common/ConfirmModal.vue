@@ -8,9 +8,9 @@
     <v-card class="confirm-modal">
       <v-card-title class="d-flex align-center">
         <v-icon
+          class="mr-3"
           :color="iconColor"
           :icon="icon"
-          class="mr-3"
           size="28"
         />
         <span class="text-h6">{{ displayTitle }}</span>
@@ -29,21 +29,21 @@
         <v-spacer />
 
         <v-btn
-          variant="outlined"
-          color="grey"
-          @click="handleCancel"
-          :disabled="loading"
           class="mr-2"
+          color="grey"
+          :disabled="loading"
+          variant="outlined"
+          @click="handleCancel"
         >
           {{ cancelText }}
         </v-btn>
 
         <v-btn
           :color="confirmColor"
+          :disabled="loading"
+          :loading="loading"
           :variant="confirmVariant"
           @click="handleConfirm"
-          :loading="loading"
-          :disabled="loading"
         >
           {{ displayConfirmText }}
         </v-btn>
@@ -53,79 +53,79 @@
 </template>
 
 <script setup>
-import { computed, toRefs } from 'vue'
-import { useConfirmModalConfig } from '@/composables/common/useConfirmModalConfig'
+  import { computed, toRefs } from 'vue'
+  import { useConfirmModalConfig } from '@/composables/common/useConfirmModalConfig'
 
-// Props
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
-  },
-  type: {
-    type: String,
-    default: 'delete',
-    validator: (value) => ['delete', 'update', 'warning', 'info'].includes(value)
-  },
-  title: {
-    type: String,
-    default: ''
-  },
-  message: {
-    type: String,
-    default: ''
-  },
-  details: {
-    type: String,
-    default: ''
-  },
-  confirmText: {
-    type: String,
-    default: ''
-  },
-  cancelText: {
-    type: String,
-    default: 'Cancel'
-  },
-  loading: {
-    type: Boolean,
-    default: false
+  // Props
+  const props = defineProps({
+    modelValue: {
+      type: Boolean,
+      default: false,
+    },
+    type: {
+      type: String,
+      default: 'delete',
+      validator: value => ['delete', 'update', 'warning', 'info'].includes(value),
+    },
+    title: {
+      type: String,
+      default: '',
+    },
+    message: {
+      type: String,
+      default: '',
+    },
+    details: {
+      type: String,
+      default: '',
+    },
+    confirmText: {
+      type: String,
+      default: '',
+    },
+    cancelText: {
+      type: String,
+      default: 'Cancel',
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  })
+
+  // Emits
+  const emit = defineEmits(['update:modelValue', 'confirm', 'cancel'])
+
+  // Convert props to refs for composable
+  const { type, title, message, confirmText } = toRefs(props)
+
+  // Use config composable for business logic
+  const {
+    icon,
+    iconColor,
+    confirmColor,
+    confirmVariant,
+    displayTitle,
+    displayMessage,
+    displayConfirmText,
+  } = useConfirmModalConfig(type, title, message, confirmText)
+
+  // Component logic
+  const isOpen = computed({
+    get: () => props.modelValue,
+    set: value => emit('update:modelValue', value),
+  })
+
+  const handleConfirm = () => {
+    emit('confirm')
   }
-})
 
-// Emits
-const emit = defineEmits(['update:modelValue', 'confirm', 'cancel'])
-
-// Convert props to refs for composable
-const { type, title, message, confirmText } = toRefs(props)
-
-// Use config composable for business logic
-const {
-  icon,
-  iconColor,
-  confirmColor,
-  confirmVariant,
-  displayTitle,
-  displayMessage,
-  displayConfirmText
-} = useConfirmModalConfig(type, title, message, confirmText)
-
-// Component logic
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-
-const handleConfirm = () => {
-  emit('confirm')
-}
-
-const handleCancel = () => {
-  if (!props.loading) {
-    emit('cancel')
-    isOpen.value = false
+  const handleCancel = () => {
+    if (!props.loading) {
+      emit('cancel')
+      isOpen.value = false
+    }
   }
-}
 </script>
 
 <style scoped>

@@ -1,6 +1,6 @@
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
-export function useWeatherData() {
+export function useWeatherData () {
   const weatherData = ref(null)
   const weatherLoading = ref(false)
   const weatherError = ref(null)
@@ -9,7 +9,7 @@ export function useWeatherData() {
   const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast'
   const DEFAULT_COORDINATES = {
     latitude: -25.85891,
-    longitude: 28.18577
+    longitude: 28.18577,
   }
   const REFRESH_INTERVAL = 10 * 60 * 1000
 
@@ -39,7 +39,7 @@ export function useWeatherData() {
           weatherCode: data.current.weather_code,
           windSpeed: data.current.wind_speed_10m,
           time: data.current.time,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         }
       } else {
         throw new Error('Invalid weather data format')
@@ -57,27 +57,27 @@ export function useWeatherData() {
    * Get weather icon based on weather code
    * @param {number} weatherCode
    */
-  const getWeatherIcon = (weatherCode) => {
+  const getWeatherIcon = weatherCode => {
     if (!weatherCode) return 'mdi-weather-partly-cloudy'
 
     // Weather code mapping (WMO codes)
     const iconMap = {
-      0: 'mdi-weather-sunny',           // Clear sky
-      1: 'mdi-weather-partly-cloudy',  // Mainly clear
-      2: 'mdi-weather-partly-cloudy',  // Partly cloudy
-      3: 'mdi-weather-cloudy',         // Overcast
-      45: 'mdi-weather-fog',           // Fog
-      48: 'mdi-weather-fog',           // Depositing rime fog
-      51: 'mdi-weather-rainy',         // Light drizzle
-      53: 'mdi-weather-rainy',         // Moderate drizzle
-      55: 'mdi-weather-rainy',         // Dense drizzle
-      61: 'mdi-weather-rainy',         // Slight rain
-      63: 'mdi-weather-rainy',         // Moderate rain
-      65: 'mdi-weather-pouring',       // Heavy rain
-      71: 'mdi-weather-snowy',         // Slight snow
-      73: 'mdi-weather-snowy',         // Moderate snow
-      75: 'mdi-weather-snowy-heavy',   // Heavy snow
-      95: 'mdi-weather-lightning',     // Thunderstorm
+      0: 'mdi-weather-sunny', // Clear sky
+      1: 'mdi-weather-partly-cloudy', // Mainly clear
+      2: 'mdi-weather-partly-cloudy', // Partly cloudy
+      3: 'mdi-weather-cloudy', // Overcast
+      45: 'mdi-weather-fog', // Fog
+      48: 'mdi-weather-fog', // Depositing rime fog
+      51: 'mdi-weather-rainy', // Light drizzle
+      53: 'mdi-weather-rainy', // Moderate drizzle
+      55: 'mdi-weather-rainy', // Dense drizzle
+      61: 'mdi-weather-rainy', // Slight rain
+      63: 'mdi-weather-rainy', // Moderate rain
+      65: 'mdi-weather-pouring', // Heavy rain
+      71: 'mdi-weather-snowy', // Slight snow
+      73: 'mdi-weather-snowy', // Moderate snow
+      75: 'mdi-weather-snowy-heavy', // Heavy snow
+      95: 'mdi-weather-lightning', // Thunderstorm
     }
 
     return iconMap[weatherCode] || 'mdi-weather-partly-cloudy'
@@ -87,7 +87,7 @@ export function useWeatherData() {
    * Get weather description based on weather code
    * @param {number} weatherCode
    */
-  const getWeatherDescription = (weatherCode) => {
+  const getWeatherDescription = weatherCode => {
     if (!weatherCode) return 'Unknown'
 
     const descriptionMap = {
@@ -138,6 +138,6 @@ export function useWeatherData() {
     getWeatherDescription,
 
     // Constants
-    REFRESH_INTERVAL
+    REFRESH_INTERVAL,
   }
 }

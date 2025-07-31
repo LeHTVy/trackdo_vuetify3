@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import logger from '@/services/logger'
 
-export function useEventHandler(context = 'EventHandler') {
+export function useEventHandler (context = 'EventHandler') {
   const contextLogger = logger.createLogger(context)
   const isProcessing = ref(false)
   const lastResult = ref(null)
@@ -22,7 +22,7 @@ export function useEventHandler(context = 'EventHandler') {
       onError,
       onFinally,
       validateBefore,
-      confirmBefore
+      confirmBefore,
     } = options
 
     // Prevent concurrent operations if specified
@@ -90,7 +90,7 @@ export function useEventHandler(context = 'EventHandler') {
       const errorResult = {
         success: false,
         error: error.message || 'Unknown error occurred',
-        originalError: error
+        originalError: error,
       }
 
       // Log error
@@ -128,7 +128,7 @@ export function useEventHandler(context = 'EventHandler') {
       actionName: 'form_submit',
       successMessage: 'Form submitted successfully',
       errorMessage: 'Form submission failed',
-      ...options
+      ...options,
     })
   }
 
@@ -142,7 +142,6 @@ export function useEventHandler(context = 'EventHandler') {
     const {
       itemName = 'item',
       confirmMessage,
-      confirmTitle = 'Confirm Delete'
     } = options
 
     return handleAsyncEvent(deleteOperation, {
@@ -153,7 +152,7 @@ export function useEventHandler(context = 'EventHandler') {
         // This would integrate with your confirm modal system
         return window.confirm(confirmMessage)
       } : undefined,
-      ...options
+      ...options,
     })
   }
 
@@ -170,7 +169,7 @@ export function useEventHandler(context = 'EventHandler') {
       actionName: 'create_item',
       successMessage: `${itemName} created successfully`,
       errorMessage: `Failed to create ${itemName}`,
-      ...options
+      ...options,
     })
   }
 
@@ -187,7 +186,7 @@ export function useEventHandler(context = 'EventHandler') {
       actionName: 'update_item',
       successMessage: `${itemName} updated successfully`,
       errorMessage: `Failed to update ${itemName}`,
-      ...options
+      ...options,
     })
   }
 
@@ -204,7 +203,7 @@ export function useEventHandler(context = 'EventHandler') {
       actionName: 'duplicate_item',
       successMessage: `${itemName} duplicated successfully`,
       errorMessage: `Failed to duplicate ${itemName}`,
-      ...options
+      ...options,
     })
   }
 
@@ -219,7 +218,7 @@ export function useEventHandler(context = 'EventHandler') {
       actionName: 'navigate',
       showLoading: false,
       logUserAction: true,
-      ...options
+      ...options,
     })
   }
 
@@ -234,7 +233,7 @@ export function useEventHandler(context = 'EventHandler') {
       actionName: 'file_upload',
       successMessage: 'File uploaded successfully',
       errorMessage: 'File upload failed',
-      ...options
+      ...options,
     })
   }
 
@@ -257,7 +256,7 @@ export function useEventHandler(context = 'EventHandler') {
 
         return await handleAsyncEvent(apiOperation, {
           actionName: 'api_call',
-          ...options
+          ...options,
         })
       } catch (error) {
         lastError = error
@@ -321,6 +320,6 @@ export function useEventHandler(context = 'EventHandler') {
 
     // Utility handlers
     createDebouncedHandler,
-    createThrottledHandler
+    createThrottledHandler,
   }
 }

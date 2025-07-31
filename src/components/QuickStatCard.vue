@@ -53,7 +53,7 @@
 <script setup>
 
   // Props
-  const props = defineProps({
+  defineProps({
     value: {
       type: [Number, String],
       required: true,

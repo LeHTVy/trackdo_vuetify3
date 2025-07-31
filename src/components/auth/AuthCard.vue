@@ -2,12 +2,12 @@
   <v-card class="auth-card" elevation="12">
     <!-- Tabs -->
     <v-tabs
-      :model-value="tab"
-      @update:model-value="switchTab"
+      centered
       class="auth-tabs"
       color="primary"
-      centered
       grow
+      :model-value="tab"
+      @update:model-value="switchTab"
     >
       <v-tab value="login">
         <v-icon class="mr-2">mdi-login</v-icon>
@@ -27,35 +27,35 @@
             <v-form ref="loginForm" :model-value="loginValid" @submit.prevent="handleLoginSubmit">
               <v-text-field
                 v-model="loginData.username"
-                :rules="usernameRules"
-                label="Username or Email"
-                prepend-inner-icon="mdi-account"
-                variant="outlined"
                 class="mb-3"
+                label="Username or Email"
                 :loading="authStore.isLoading"
+                prepend-inner-icon="mdi-account"
+                :rules="usernameRules"
+                variant="outlined"
               />
 
               <v-text-field
                 v-model="loginData.password"
+                :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                class="mb-4"
+                label="Password"
+                :loading="authStore.isLoading"
+                prepend-inner-icon="mdi-lock"
                 :rules="passwordRules"
                 :type="showPassword ? 'text' : 'password'"
-                label="Password"
-                prepend-inner-icon="mdi-lock"
-                :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 variant="outlined"
-                class="mb-4"
-                :loading="authStore.isLoading"
                 @click:append-inner="togglePasswordVisibility()"
               />
 
               <v-btn
-                type="submit"
-                color="primary"
-                size="large"
                 block
                 class="auth-btn mb-3"
-                :loading="authStore.isLoading"
+                color="primary"
                 :disabled="!loginValid"
+                :loading="authStore.isLoading"
+                size="large"
+                type="submit"
               >
                 <v-icon class="mr-2">mdi-login</v-icon>
                 Login
@@ -63,9 +63,9 @@
 
               <div class="text-center">
                 <v-btn
-                  variant="text"
                   color="primary"
                   size="small"
+                  variant="text"
                   @click="switchTab('signup')"
                 >
                   Don't have an account? Sign up now
@@ -81,88 +81,88 @@
             <v-form ref="signupForm" :model-value="signupValid" @submit.prevent="handleSignupSubmit">
               <!-- Name Fields with better spacing -->
               <v-row class="mb-2">
-                <v-col cols="12" sm="6" class="pb-2">
+                <v-col class="pb-2" cols="12" sm="6">
                   <v-text-field
                     v-model="signupData.firstName"
-                    :rules="firstNameRules"
-                    label="First Name"
-                    prepend-inner-icon="mdi-account"
-                    variant="outlined"
                     density="comfortable"
+                    label="First Name"
                     :loading="authStore.isLoading"
+                    prepend-inner-icon="mdi-account"
+                    :rules="firstNameRules"
+                    variant="outlined"
                   />
                 </v-col>
-                <v-col cols="12" sm="6" class="pb-2">
+                <v-col class="pb-2" cols="12" sm="6">
                   <v-text-field
                     v-model="signupData.lastName"
-                    :rules="lastNameRules"
-                    label="Last Name"
-                    prepend-inner-icon="mdi-account-outline"
-                    variant="outlined"
                     density="comfortable"
+                    label="Last Name"
                     :loading="authStore.isLoading"
+                    prepend-inner-icon="mdi-account-outline"
+                    :rules="lastNameRules"
+                    variant="outlined"
                   />
                 </v-col>
               </v-row>
 
               <v-text-field
                 v-model="signupData.username"
-                :rules="signupUsernameRules"
-                label="Username"
-                prepend-inner-icon="mdi-at"
-                variant="outlined"
-                density="comfortable"
                 class="mb-3"
+                density="comfortable"
+                label="Username"
                 :loading="authStore.isLoading"
+                prepend-inner-icon="mdi-at"
+                :rules="signupUsernameRules"
+                variant="outlined"
               />
 
               <v-text-field
                 v-model="signupData.email"
-                :rules="emailRules"
-                label="Email"
-                prepend-inner-icon="mdi-email"
-                variant="outlined"
-                density="comfortable"
                 class="mb-3"
+                density="comfortable"
+                label="Email"
                 :loading="authStore.isLoading"
+                prepend-inner-icon="mdi-email"
+                :rules="emailRules"
+                variant="outlined"
               />
 
               <v-text-field
                 v-model="signupData.password"
+                :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                class="mb-3"
+                density="comfortable"
+                label="Password"
+                :loading="authStore.isLoading"
+                prepend-inner-icon="mdi-lock"
                 :rules="signupPasswordRules"
                 :type="showPassword ? 'text' : 'password'"
-                label="Password"
-                prepend-inner-icon="mdi-lock"
-                :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 variant="outlined"
-                density="comfortable"
-                class="mb-3"
-                :loading="authStore.isLoading"
                 @click:append-inner="togglePasswordVisibility()"
               />
 
               <v-text-field
                 v-model="signupData.confirmPassword"
+                :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                class="mb-4"
+                density="comfortable"
+                label="Confirm Password"
+                :loading="authStore.isLoading"
+                prepend-inner-icon="mdi-lock-check"
                 :rules="confirmPasswordRules"
                 :type="showConfirmPassword ? 'text' : 'password'"
-                label="Confirm Password"
-                prepend-inner-icon="mdi-lock-check"
-                :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 variant="outlined"
-                density="comfortable"
-                class="mb-4"
-                :loading="authStore.isLoading"
                 @click:append-inner="togglePasswordVisibility('confirm')"
               />
 
               <v-btn
-                type="submit"
-                color="primary"
-                size="large"
                 block
                 class="auth-btn mb-3"
-                :loading="authStore.isLoading"
+                color="primary"
                 :disabled="!signupValid"
+                :loading="authStore.isLoading"
+                size="large"
+                type="submit"
               >
                 <v-icon class="mr-2">mdi-account-plus</v-icon>
                 Sign Up
@@ -170,9 +170,9 @@
 
               <div class="text-center">
                 <v-btn
-                  variant="text"
                   color="primary"
                   size="small"
+                  variant="text"
                   @click="switchTab('login')"
                 >
                   Already have an account? Login
@@ -187,169 +187,164 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useAuth } from '@/composables/common/useAuth'
-import { useAuthStore } from '@/stores/auth'
-import { useSnackbarStore } from '@/stores/snackbar'
+  import { computed } from 'vue'
+  import { useAuth } from '@/composables/common/useAuth'
+  import { useAuthStore } from '@/stores/auth'
+  import { useSnackbarStore } from '@/stores/snackbar'
 
-const authStore = useAuthStore()
-const snackbarStore = useSnackbarStore()
+  const authStore = useAuthStore()
+  const snackbarStore = useSnackbarStore()
 
-// Get state and methods from useAuth (excluding snackbar)
-const {
-  // State
-  tab,
-  showPassword,
-  showConfirmPassword,
-  loginData,
-  signupData,
+  // Get state and methods from useAuth (excluding snackbar)
+  const {
+    // State
+    tab,
+    showPassword,
+    showConfirmPassword,
+    loginData,
+    signupData,
 
-  // Validation
-  loginValidation,
-  signupValidation,
+    // Validation
+    loginValidation,
+    signupValidation,
 
-  // Methods
-  handleLogin,
-  handleSignup,
-  switchTab,
-  togglePasswordVisibility
-} = useAuth()
+    // Methods
+    handleLogin,
+    handleSignup,
+    switchTab,
+    togglePasswordVisibility,
+  } = useAuth()
 
-// Get snackbar from store
-const snackbar = computed(() => snackbarStore.snackbar)
-
-// Message methods from store
-const showErrorMessage = (message) => {
-  snackbarStore.showErrorMessage(message)
-}
-
-// Computed validation states
-const loginValid = computed(() => {
-  return loginValidation.validationState.value.isValid
-})
-
-const signupValid = computed(() => {
-  return signupValidation.validationState.value.isValid
-})
-
-const isLogin = computed(() => tab.value === 'login')
-
-// Enhanced validation rules with better error messages
-const usernameRules = computed(() => [
-  (value) => {
-    if (!value || value.trim() === '') return 'Username or email is required'
-    if (value.length < 3) return 'Username must be at least 3 characters'
-    return true
+  // Message methods from store
+  const showErrorMessage = message => {
+    snackbarStore.showErrorMessage(message)
   }
-])
 
-const passwordRules = computed(() => [
-  (value) => {
-    if (!value || value.trim() === '') return 'Password is required'
-    if (value.length < 6) return 'Password must be at least 6 characters'
-    return true
-  }
-])
+  // Computed validation states
+  const loginValid = computed(() => {
+    return loginValidation.validationState.value.isValid
+  })
 
-const firstNameRules = computed(() => [
-  (value) => {
-    if (!value || value.trim() === '') return 'First name is required'
-    if (value.length < 2) return 'First name must be at least 2 characters'
-    return true
-  }
-])
+  const signupValid = computed(() => {
+    return signupValidation.validationState.value.isValid
+  })
 
-const lastNameRules = computed(() => [
-  (value) => {
-    if (!value || value.trim() === '') return 'Last name is required'
-    if (value.length < 2) return 'Last name must be at least 2 characters'
-    return true
-  }
-])
+  // Enhanced validation rules with better error messages
+  const usernameRules = computed(() => [
+    value => {
+      if (!value || value.trim() === '') return 'Username or email is required'
+      if (value.length < 3) return 'Username must be at least 3 characters'
+      return true
+    },
+  ])
 
-const signupUsernameRules = computed(() => [
-  (value) => {
-    if (!value || value.trim() === '') return 'Username is required'
-    if (value.length < 3) return 'Username must be at least 3 characters'
-    if (!/^[a-zA-Z0-9_]+$/.test(value)) return 'Username can only contain letters, numbers, and underscores'
-    return true
-  }
-])
+  const passwordRules = computed(() => [
+    value => {
+      if (!value || value.trim() === '') return 'Password is required'
+      if (value.length < 6) return 'Password must be at least 6 characters'
+      return true
+    },
+  ])
 
-const emailRules = computed(() => [
-  (value) => {
-    if (!value || value.trim() === '') return 'Email is required'
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailPattern.test(value)) return 'Please enter a valid email address'
-    return true
-  }
-])
+  const firstNameRules = computed(() => [
+    value => {
+      if (!value || value.trim() === '') return 'First name is required'
+      if (value.length < 2) return 'First name must be at least 2 characters'
+      return true
+    },
+  ])
 
-const signupPasswordRules = computed(() => [
-  (value) => {
-    if (!value || value.trim() === '') return 'Password is required'
-    if (value.length < 6) return 'Password must be at least 6 characters'
-    if (!/(?=.*[a-z])/.test(value)) return 'Password must contain at least one lowercase letter'
-    if (!/(?=.*[A-Z])/.test(value)) return 'Password must contain at least one uppercase letter'
-    if (!/(?=.*\d)/.test(value)) return 'Password must contain at least one number'
-    return true
-  }
-])
+  const lastNameRules = computed(() => [
+    value => {
+      if (!value || value.trim() === '') return 'Last name is required'
+      if (value.length < 2) return 'Last name must be at least 2 characters'
+      return true
+    },
+  ])
 
-const confirmPasswordRules = computed(() => [
-  (value) => {
-    if (!value || value.trim() === '') return 'Password confirmation is required'
-    if (value !== signupData.value.password) return 'Password confirmation does not match'
-    return true
-  }
-])
+  const signupUsernameRules = computed(() => [
+    value => {
+      if (!value || value.trim() === '') return 'Username is required'
+      if (value.length < 3) return 'Username must be at least 3 characters'
+      if (!/^[a-zA-Z0-9_]+$/.test(value)) return 'Username can only contain letters, numbers, and underscores'
+      return true
+    },
+  ])
 
-// Enhanced form submission handlers with better error handling
-const handleLoginSubmit = async () => {
-  console.log('🔄 AuthCard: Login form submitted')
+  const emailRules = computed(() => [
+    value => {
+      if (!value || value.trim() === '') return 'Email is required'
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailPattern.test(value)) return 'Please enter a valid email address'
+      return true
+    },
+  ])
 
-  try {
-    // Validate form first
-    if (!loginValid.value) {
-      showErrorMessage('Please fix validation errors before submitting')
-      return
+  const signupPasswordRules = computed(() => [
+    value => {
+      if (!value || value.trim() === '') return 'Password is required'
+      if (value.length < 6) return 'Password must be at least 6 characters'
+      if (!/(?=.*[a-z])/.test(value)) return 'Password must contain at least one lowercase letter'
+      if (!/(?=.*[A-Z])/.test(value)) return 'Password must contain at least one uppercase letter'
+      if (!/(?=.*\d)/.test(value)) return 'Password must contain at least one number'
+      return true
+    },
+  ])
+
+  const confirmPasswordRules = computed(() => [
+    value => {
+      if (!value || value.trim() === '') return 'Password confirmation is required'
+      if (value !== signupData.value.password) return 'Password confirmation does not match'
+      return true
+    },
+  ])
+
+  // Enhanced form submission handlers with better error handling
+  const handleLoginSubmit = async () => {
+    console.log('🔄 AuthCard: Login form submitted')
+
+    try {
+      // Validate form first
+      if (!loginValid.value) {
+        showErrorMessage('Please fix validation errors before submitting')
+        return
+      }
+
+      // Call the useAuth handleLogin method
+      const result = await handleLogin()
+      console.log('🔄 AuthCard: Login result:', result)
+
+      if (!result.success) {
+        console.log('❌ AuthCard: Login failed, error should be shown by useAuth')
+      }
+    } catch (error) {
+      console.log('💥 AuthCard: Login error:', error)
+      showErrorMessage('An unexpected error occurred during login')
     }
-
-    // Call the useAuth handleLogin method
-    const result = await handleLogin()
-    console.log('🔄 AuthCard: Login result:', result)
-
-    if (!result.success) {
-      console.log('❌ AuthCard: Login failed, error should be shown by useAuth')
-    }
-  } catch (error) {
-    console.log('💥 AuthCard: Login error:', error)
-    showErrorMessage('An unexpected error occurred during login')
   }
-}
 
-const handleSignupSubmit = async () => {
-  console.log('🔄 AuthCard: Signup form submitted')
+  const handleSignupSubmit = async () => {
+    console.log('🔄 AuthCard: Signup form submitted')
 
-  try {
-    // Validate form first
-    if (!signupValid.value) {
-      showErrorMessage('Please fix validation errors before submitting')
-      return
+    try {
+      // Validate form first
+      if (!signupValid.value) {
+        showErrorMessage('Please fix validation errors before submitting')
+        return
+      }
+
+      // Call the useAuth handleSignup method
+      const result = await handleSignup()
+      console.log('🔄 AuthCard: Signup result:', result)
+
+      if (!result.success) {
+        console.log('❌ AuthCard: Signup failed, error should be shown by useAuth')
+      }
+    } catch (error) {
+      console.log('💥 AuthCard: Signup error:', error)
+      showErrorMessage('An unexpected error occurred during registration')
     }
-
-    // Call the useAuth handleSignup method
-    const result = await handleSignup()
-    console.log('🔄 AuthCard: Signup result:', result)
-
-    if (!result.success) {
-      console.log('❌ AuthCard: Signup failed, error should be shown by useAuth')
-    }
-  } catch (error) {
-    console.log('💥 AuthCard: Signup error:', error)
-    showErrorMessage('An unexpected error occurred during registration')
   }
-}
 </script>
 
 <style scoped>

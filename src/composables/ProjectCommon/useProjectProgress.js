@@ -1,9 +1,9 @@
-import { ref, watch, computed } from 'vue'
+import { computed, watch } from 'vue'
 
-export function useProjectProgress(formData, onStatusChange) {
+export function useProjectProgress (formData, onStatusChange) {
   // Progress validation rules
   const progressRules = [
-    (value) => {
+    value => {
       if (value === null || value === undefined || value === '') {
         return 'Progress is required'
       }
@@ -15,11 +15,11 @@ export function useProjectProgress(formData, onStatusChange) {
         return 'Progress must be between 0 and 100'
       }
       return true
-    }
+    },
   ]
 
   // Format progress input to ensure it's within 0-100 range
-  const formatProgress = (value) => {
+  const formatProgress = value => {
     if (value === null || value === undefined || value === '') {
       return 0
     }
@@ -37,7 +37,7 @@ export function useProjectProgress(formData, onStatusChange) {
   // Watch for progress changes and auto-complete
   watch(
     () => formData.value?.progress,
-    (newProgress) => {
+    newProgress => {
       if (newProgress !== null && newProgress !== undefined) {
         const progress = Number(newProgress)
 
@@ -69,7 +69,7 @@ export function useProjectProgress(formData, onStatusChange) {
   })
 
   // Method to validate progress input
-  const validateProgressInput = (event) => {
+  const validateProgressInput = event => {
     const value = event.target.value
 
     // Allow empty value for clearing
@@ -102,7 +102,7 @@ export function useProjectProgress(formData, onStatusChange) {
   }
 
   // Method to handle progress blur (when user leaves the field)
-  const handleProgressBlur = (event) => {
+  const handleProgressBlur = event => {
     const value = event.target.value
     if (value !== '') {
       const formatted = formatProgress(value)
@@ -116,6 +116,6 @@ export function useProjectProgress(formData, onStatusChange) {
     formatProgress,
     isProgressValid,
     validateProgressInput,
-    handleProgressBlur
+    handleProgressBlur,
   }
 }

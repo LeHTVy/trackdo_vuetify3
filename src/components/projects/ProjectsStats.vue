@@ -1,7 +1,14 @@
 <template>
-  <v-container fluid class="stats-section">
+  <v-container class="stats-section" fluid>
     <v-row class="stats-grid justify-center">
-      <v-col cols="12" sm="6" md="3" lg="2" v-for="(stat, index) in stats" :key="stat.label">
+      <v-col
+        v-for="(stat, index) in stats"
+        :key="stat.label"
+        cols="12"
+        lg="2"
+        md="3"
+        sm="6"
+      >
         <v-card
           class="stat-card"
           :class="`stat-card--${stat.type}`"
@@ -17,11 +24,11 @@
             <div class="stat-number">{{ stat.value }}</div>
             <div class="stat-label">{{ stat.label }}</div>
             <v-progress-linear
+              class="stat-progress"
               :color="stat.color"
               height="4"
               :model-value="stat.progress"
               rounded
-              class="stat-progress"
             />
           </v-card-text>
         </v-card>

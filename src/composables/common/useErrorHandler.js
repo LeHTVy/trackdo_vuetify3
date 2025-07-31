@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-export function useErrorHandler() {
+export function useErrorHandler () {
   const lastError = ref(null)
 
   const handleAsyncError = async (operation, errorMessage = 'Operation failed') => {
@@ -29,6 +29,6 @@ export function useErrorHandler() {
   return {
     lastError,
     handleAsyncError,
-    clearError
+    clearError,
   }
 }

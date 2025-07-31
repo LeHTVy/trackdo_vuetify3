@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useProjectsStore } from '@/stores/projects'
 import { useBaseOperations } from '@/composables/common/useBaseOperations'
 import { useEventHandler } from '@/composables/common/useEventHandler'
@@ -7,7 +7,7 @@ import logger from '@/services/logger'
 
 const projectLogger = logger.createLogger('ProjectOperations')
 
-export function useProjectOperations() {
+export function useProjectOperations () {
   const projectsStore = useProjectsStore()
   const baseOps = useBaseOperations(projectsStore, 'project')
   const eventHandler = useEventHandler('ProjectOperations')
@@ -17,7 +17,7 @@ export function useProjectOperations() {
     modalConfig: confirmModalConfig,
     confirmDelete,
     confirm: confirmModalConfirm,
-    cancel: confirmModalCancel
+    cancel: confirmModalCancel,
   } = useConfirmModal()
   const projects = computed(() => projectsStore.projects)
   const recentActivities = computed(() => projectsStore.recentActivities)
@@ -26,10 +26,10 @@ export function useProjectOperations() {
       return baseOps.fetchItems({
         fetchMethod: 'fetchProjects',
         successMessage: 'Projects loaded successfully',
-        errorMessage: 'Failed to fetch projects'
+        errorMessage: 'Failed to fetch projects',
       })
     }, {
-      actionName: 'fetch_projects'
+      actionName: 'fetch_projects',
     })
   }
 
@@ -42,7 +42,7 @@ export function useProjectOperations() {
         return baseOps.updateItem(projectData, projectId, {
           updateMethod: 'updateProject',
           successMessage: 'Project updated successfully',
-          errorMessage: 'Failed to update project'
+          errorMessage: 'Failed to update project',
         })
       } else {
         projectLogger.debug('Creating new project', { title: projectData.title })
@@ -50,12 +50,12 @@ export function useProjectOperations() {
         return baseOps.createItem(projectData, {
           createMethod: 'addProject',
           successMessage: 'Project created successfully',
-          errorMessage: 'Failed to create project'
+          errorMessage: 'Failed to create project',
         })
       }
     }, {
       actionName: editingProject ? 'update_project' : 'create_project',
-      itemName: projectData.title || 'Project'
+      itemName: projectData.title || 'Project',
     })
   }
 
@@ -70,11 +70,11 @@ export function useProjectOperations() {
       return baseOps.deleteItem(projectId, {
         deleteMethod: 'deleteProject',
         successMessage: 'Project deleted successfully',
-        errorMessage: 'Failed to delete project'
+        errorMessage: 'Failed to delete project',
       })
     }, {
       itemName: 'Project',
-      confirmMessage: skipConfirm ? undefined : 'Are you sure you want to delete this project? This action cannot be undone.'
+      confirmMessage: skipConfirm ? undefined : 'Are you sure you want to delete this project? This action cannot be undone.',
     })
   }
 
@@ -112,28 +112,28 @@ export function useProjectOperations() {
     }
   }
 
-  const viewProject = (project) => {
+  const viewProject = project => {
     projectLogger.debug('View project', { title: project.title || project.name })
     // TODO: Implement project view logic
   }
 
-  const duplicateProject = async (project) => {
+  const duplicateProject = async project => {
     return eventHandler.handleDuplicate(async () => {
       return baseOps.duplicateItem(project, {
         createMethod: 'addProject',
-        duplicateTransform: (originalProject) => ({
+        duplicateTransform: originalProject => ({
           ...originalProject,
           title: `${originalProject.title} (Copy)`,
           status: 'Active',
           progress: 0,
           startDate: '',
-          endDate: ''
+          endDate: '',
         }),
         successMessage: 'Project duplicated successfully',
-        errorMessage: 'Failed to duplicate project'
+        errorMessage: 'Failed to duplicate project',
       })
     }, {
-      itemName: project.title || 'Project'
+      itemName: project.title || 'Project',
     })
   }
 
@@ -147,7 +147,7 @@ export function useProjectOperations() {
     startDate: '',
     endDate: '',
     priority: 'Medium',
-    category: 'General'
+    category: 'General',
   })
 
   return {
@@ -177,6 +177,6 @@ export function useProjectOperations() {
 
     // Utilities
     clearError: baseOps.clearError,
-    setError: baseOps.setError
+    setError: baseOps.setError,
   }
 }

@@ -8,7 +8,7 @@
     <v-card-text class="insights-content">
       <!-- No insights message -->
       <div v-if="!hasInsights" class="no-insights">
-        <v-icon size="48" color="grey-lighten-1">mdi-information-outline</v-icon>
+        <v-icon color="grey-lighten-1" size="48">mdi-information-outline</v-icon>
         <p class="text-grey-lighten-1 mt-2">No insights available</p>
       </div>
 
@@ -25,7 +25,7 @@
             :key="event.id || event._id"
             class="event-item"
           >
-            <div class="event-indicator" :style="{ backgroundColor: getEventColor(event) }"></div>
+            <div class="event-indicator" :style="{ backgroundColor: getEventColor(event) }" />
             <div class="event-content">
               <div class="event-title">{{ event.title }}</div>
               <div class="event-time">{{ formatEventTime(event) }}</div>
@@ -50,10 +50,10 @@
             <div class="project-header">
               <div class="project-title">{{ project.title || project.name }}</div>
               <v-chip
+                class="project-status"
                 :color="getProjectStatusColor(project.status)"
                 size="x-small"
                 variant="flat"
-                class="project-status"
               >
                 {{ project.status }}
               </v-chip>
@@ -82,17 +82,17 @@
             <div class="project-header">
               <div class="project-title">{{ project.title || project.name }}</div>
               <v-chip
+                class="project-priority"
                 :color="getPriorityColor(project.priority)"
                 size="x-small"
                 variant="flat"
-                class="project-priority"
               >
                 {{ project.priority }}
               </v-chip>
             </div>
             <div class="project-meta">
               <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: project.progress + '%' }"></div>
+                <div class="progress-fill" :style="{ width: project.progress + '%' }" />
               </div>
               <span class="project-progress">{{ project.progress }}%</span>
             </div>
@@ -112,40 +112,40 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-import { useEventsStore } from '@/stores/events'
-import { useProjectsStore } from '@/stores/projects'
-import { useTaskInsights } from '@/composables/TaskCommon/useTaskInsights'
+  import { onMounted } from 'vue'
+  import { useEventsStore } from '@/stores/events'
+  import { useProjectsStore } from '@/stores/projects'
+  import { useTaskInsights } from '@/composables/TaskCommon/useTaskInsights'
 
-// Initialize stores
-const eventsStore = useEventsStore()
-const projectsStore = useProjectsStore()
+  // Initialize stores
+  const eventsStore = useEventsStore()
+  const projectsStore = useProjectsStore()
 
-// Use composable
-const {
-  todayEvents,
-  recentProjects,
-  highCompletionProjects,
-  hasInsights,
-  formatEventTime,
-  formatRelativeTime,
-  getEventColor,
-  getProjectStatusColor,
-  getPriorityColor
-} = useTaskInsights()
+  // Use composable
+  const {
+    todayEvents,
+    recentProjects,
+    highCompletionProjects,
+    hasInsights,
+    formatEventTime,
+    formatRelativeTime,
+    getEventColor,
+    getProjectStatusColor,
+    getPriorityColor,
+  } = useTaskInsights()
 
-onMounted(async () => {
-  try {
-    if (eventsStore.events.length === 0) {
-      await eventsStore.initializeStore()
+  onMounted(async () => {
+    try {
+      if (eventsStore.events.length === 0) {
+        await eventsStore.initializeStore()
+      }
+      if (projectsStore.projects.length === 0) {
+        await projectsStore.initializeStore()
+      }
+    } catch (error) {
+      console.error('Error initializing stores in TaskInsights:', error)
     }
-    if (projectsStore.projects.length === 0) {
-      await projectsStore.initializeStore()
-    }
-  } catch (error) {
-    console.error('Error initializing stores in TaskInsights:', error)
-  }
-})
+  })
 </script>
 
 <style scoped>

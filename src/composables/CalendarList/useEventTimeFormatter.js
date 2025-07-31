@@ -1,14 +1,13 @@
 import {
-  getDaysBetween,
   addDays,
-  formatEventTime as utilsFormatEventTime,
-  formatEventDate as utilsFormatEventDate,
+  getDaysBetween,
   isToday,
+  isValidDate,
   safeCreateDate,
-  isValidDate
+  formatEventTime as utilsFormatEventTime,
 } from '@/utils/dateUtils.js'
 
-export function useEventTimeFormatter() {
+export function useEventTimeFormatter () {
 
   const formatTodayEventTime = (event, locale = 'en-US') => {
     if (!isValidDate(event.start)) {
@@ -50,12 +49,12 @@ export function useEventTimeFormatter() {
 
         if (diffDays <= 7) {
           dateText = startDate.toLocaleDateString(locale, {
-            weekday: 'long'
+            weekday: 'long',
           })
         } else {
           dateText = startDate.toLocaleDateString(locale, {
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
           })
         }
       }
@@ -77,7 +76,7 @@ export function useEventTimeFormatter() {
     }
   }
 
-  const formatEventDuration = (event, locale = 'en-US') => {
+  const formatEventDuration = event => {
     if (!isValidDate(event.start)) {
       return 'Invalid duration'
     }
@@ -123,7 +122,7 @@ export function useEventTimeFormatter() {
 
     const startDateStr = startDate.toLocaleDateString(locale, {
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     })
 
     if (!event.end || event.end === event.start || !isValidDate(event.end)) {
@@ -137,7 +136,7 @@ export function useEventTimeFormatter() {
 
     const endDateStr = endDate.toLocaleDateString(locale, {
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     })
 
     if (startDate.toDateString() === endDate.toDateString()) {
@@ -147,7 +146,7 @@ export function useEventTimeFormatter() {
     return `${startDateStr} - ${endDateStr}`
   }
 
-  const formatRelativeTime = (event, locale = 'en-US') => {
+  const formatRelativeTime = event => {
     if (!isValidDate(event.start)) {
       return 'Invalid time'
     }
@@ -188,7 +187,7 @@ export function useEventTimeFormatter() {
     }
   }
 
-  const isAllDayEvent = (event) => {
+  const isAllDayEvent = event => {
     if (!isValidDate(event.start)) {
       return false
     }
@@ -219,8 +218,8 @@ export function useEventTimeFormatter() {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        timeZoneName: 'short'
-      }
+        timeZoneName: 'short',
+      },
     }
   }
 
@@ -237,6 +236,6 @@ export function useEventTimeFormatter() {
 
     // Helper functions
     isAllDayEvent,
-    getTimeFormatOptions
+    getTimeFormatOptions,
   }
 }

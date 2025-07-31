@@ -1,16 +1,14 @@
-import { ref, computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { useValidation, validationSchemas } from '@/composables/common/useValidation'
-import { useEventHandler } from '@/composables/common/useEventHandler'
 import { authLogger } from '@/services/logger'
 
-export function useAuth() {
+export function useAuth () {
   const router = useRouter()
   const authStore = useAuthStore()
   const snackbarStore = useSnackbarStore()
-  const eventHandler = useEventHandler('Auth')
 
   // Reactive data
   const tab = ref('login')
@@ -19,7 +17,7 @@ export function useAuth() {
 
   const loginData = ref({
     username: '',
-    password: ''
+    password: '',
   })
 
   const signupData = ref({
@@ -28,7 +26,7 @@ export function useAuth() {
     username: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   })
 
   const snackbar = computed(() => snackbarStore.snackbar)
@@ -36,9 +34,9 @@ export function useAuth() {
   const signupValidation = useValidation(signupData, {
     ...validationSchemas.auth.signup,
     confirmPassword: [
-      (value) => (value === null || value === undefined || value === '' || (typeof value === 'string' && value.trim() === '')) ? 'Password confirmation is required' : true,
-      (value) => value === signupData.value.password ? true : 'Password confirmation does not match'
-    ]
+      value => (value === null || value === undefined || value === '' || (typeof value === 'string' && value.trim() === '')) ? 'Password confirmation is required' : true,
+      value => value === signupData.value.password ? true : 'Password confirmation does not match',
+    ],
   })
 
   // Computed
@@ -59,19 +57,19 @@ export function useAuth() {
     snackbarStore.hideMessage()
   }
 
-  const showSuccessMessage = (message) => {
+  const showSuccessMessage = message => {
     snackbarStore.showSuccessMessage(message)
   }
 
-  const showErrorMessage = (message) => {
+  const showErrorMessage = message => {
     snackbarStore.showErrorMessage(message)
   }
 
-  const showWarningMessage = (message) => {
+  const showWarningMessage = message => {
     snackbarStore.showWarningMessage(message)
   }
 
-  const showInfoMessage = (message) => {
+  const showInfoMessage = message => {
     snackbarStore.showInfoMessage(message)
   }
 
@@ -83,7 +81,7 @@ export function useAuth() {
       username: '',
       email: '',
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
     }
     showPassword.value = false
     showConfirmPassword.value = false
@@ -156,8 +154,6 @@ export function useAuth() {
         showErrorMessage(errorMessage)
         authLogger.error('Login failed', { error: result.error, username: loginData.value.username })
 
-        // Don't auto-redirect on error - let user read the error message
-        // User can manually retry or fix the issue
         console.log('❌ Login failed - staying on auth page for user to retry')
         return result
       }
@@ -192,13 +188,13 @@ export function useAuth() {
         showSuccessMessage('Account created successfully! Logging you in...')
         authLogger.success('User registered successfully', {
           username: signupData.value.username,
-          email: signupData.value.email
+          email: signupData.value.email,
         })
 
         try {
           const loginResult = await authStore.login({
             username: signupData.value.username,
-            password: signupData.value.password
+            password: signupData.value.password,
           })
 
           if (loginResult.success) {
@@ -213,7 +209,7 @@ export function useAuth() {
               username: '',
               email: '',
               password: '',
-              confirmPassword: ''
+              confirmPassword: '',
             }
 
             // Immediate redirect after auto-login
@@ -235,7 +231,7 @@ export function useAuth() {
               username: '',
               email: '',
               password: '',
-              confirmPassword: ''
+              confirmPassword: '',
             }
           }
         } catch (loginError) {
@@ -249,7 +245,7 @@ export function useAuth() {
             username: '',
             email: '',
             password: '',
-            confirmPassword: ''
+            confirmPassword: '',
           }
         }
 
@@ -276,7 +272,7 @@ export function useAuth() {
         authLogger.error('Signup failed', {
           error: result.error,
           username: signupData.value.username,
-          email: signupData.value.email
+          email: signupData.value.email,
         })
 
         console.log('❌ Signup failed - staying on auth page for user to retry')
@@ -291,7 +287,7 @@ export function useAuth() {
     }
   }
 
-  const switchTab = (newTab) => {
+  const switchTab = newTab => {
     tab.value = newTab
   }
 
@@ -362,6 +358,6 @@ export function useAuth() {
     switchTab,
     togglePasswordVisibility,
     checkAuthAndRedirect,
-    reloadUserData
+    reloadUserData,
   }
 }

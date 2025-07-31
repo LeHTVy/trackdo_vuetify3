@@ -11,39 +11,39 @@
       :projects="projects"
       :recent-activities="recentActivities"
       @add-project="showAddDialog = true"
-      @edit-project="handleEditProject"
       @delete-project="handleDeleteProject"
+      @edit-project="handleEditProject"
       @view-project="viewProject"
     />
 
     <!-- Project Dialog -->
     <ProjectDialog
-      :show-dialog="showAddDialog"
       :editing-project="editingProject"
       :initial-data="getInitialProjectData()"
+      :show-dialog="showAddDialog"
       @close="closeDialog"
       @save="handleSaveProject"
     />
 
     <!-- Draggable Floating Action Button -->
     <v-btn
-      fab
-      color="primary"
-      size="large"
       class="floating-add-btn"
       :class="{ 'dragging': isDragging }"
+      color="primary"
+      fab
+      size="large"
       :style="fabStyle"
       @click="handleNewProject"
       @mousedown="startDrag"
       @touchstart="startDrag"
     >
-      <v-icon icon="mdi-plus" size="24"></v-icon>
+      <v-icon icon="mdi-plus" size="24" />
     </v-btn>
   </div>
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { onMounted, ref } from 'vue'
   import { useDraggableFab } from '@/composables/common/useDraggableFab'
   import { useProjectOperations } from '@/composables'
   import ProjectsHeader from '@/components/projects/ProjectsHeader.vue'
@@ -53,15 +53,13 @@
 
   // Use project operations composable
   const {
-    loading,
-    error,
     projects,
     recentActivities,
     fetchProjects,
     saveProject,
     deleteProjectWithConfirm,
     viewProject,
-    getInitialProjectData
+    getInitialProjectData,
   } = useProjectOperations()
 
   // Dialog state
@@ -70,7 +68,7 @@
 
   // Draggable FAB
   const { isDragging, fabStyle, startDrag } = useDraggableFab({
-    storageKey: 'projectsFabPosition'
+    storageKey: 'projectsFabPosition',
   })
 
   // Methods
@@ -82,16 +80,16 @@
     }
   }
 
-  const handleEditProject = (project) => {
+  const handleEditProject = project => {
     editingProject.value = project
     showAddDialog.value = true
   }
 
-  const handleDeleteProject = async (projectId) => {
+  const handleDeleteProject = async projectId => {
     await deleteProjectWithConfirm(projectId, projects.value)
   }
 
-  const handleSaveProject = async (projectData) => {
+  const handleSaveProject = async projectData => {
     try {
       await saveProject(projectData, editingProject.value)
       closeDialog()

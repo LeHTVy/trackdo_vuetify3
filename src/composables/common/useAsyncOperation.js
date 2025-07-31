@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-export function useAsyncOperation() {
+export function useAsyncOperation () {
   const loading = ref(false)
   const error = ref(null)
 
@@ -66,13 +66,13 @@ export function useAsyncOperation() {
           success: false,
           error: error.value,
           results: successes.map(r => r.value),
-          failures: failures.map(r => r.reason)
+          failures: failures.map(r => r.reason),
         }
       }
 
       return {
         success: true,
-        results: successes.map(r => r.value)
+        results: successes.map(r => r.value),
       }
     } catch (err) {
       setError(err, errorMessage)
@@ -91,6 +91,6 @@ export function useAsyncOperation() {
     execute,
     executeMultiple,
     clearError,
-    setError
+    setError,
   }
 }

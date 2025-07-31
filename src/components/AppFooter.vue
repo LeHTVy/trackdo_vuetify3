@@ -153,20 +153,20 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
+  import { computed } from 'vue'
+  import { useAuthStore } from '@/stores/auth'
+  import { useRouter } from 'vue-router'
 
-const authStore = useAuthStore()
-const router = useRouter()
+  const authStore = useAuthStore()
+  const router = useRouter()
 
-const currentYear = computed(() => new Date().getFullYear())
-const isAuthenticated = computed(() => authStore.isAuthenticated)
+  const currentYear = computed(() => new Date().getFullYear())
+  const isAuthenticated = computed(() => authStore.isAuthenticated)
 
-const showAuthRequired = (pageName) => {
-  console.log(`${pageName} requires authentication`)
-  router.push('/auth')
-}
+  const showAuthRequired = pageName => {
+    console.log(`${pageName} requires authentication`)
+    router.push('/auth')
+  }
 </script>
 
 <style scoped>

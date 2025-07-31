@@ -4,7 +4,7 @@ import { useEventsStore } from '@/stores/events'
 import { useProjectsStore } from '@/stores/projects'
 import { useTasksStore } from '@/stores/tasks'
 
-export function useQuickStatsSection() {
+export function useQuickStatsSection () {
   const authStore = useAuthStore()
   const tasksStore = useTasksStore()
   const projectsStore = useProjectsStore()
@@ -106,6 +106,6 @@ export function useQuickStatsSection() {
     overallProgressRate,
 
     // Final stats array
-    stats
+    stats,
   }
 }

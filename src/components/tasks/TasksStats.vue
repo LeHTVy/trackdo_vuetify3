@@ -4,18 +4,18 @@
       <v-col
         v-for="stat in stats"
         :key="stat.label"
-        cols="12"
-        sm="6"
-        md="3"
         class="pa-2"
+        cols="12"
+        md="3"
+        sm="6"
       >
         <div class="stat-card" @click="stat.onClick">
           <div class="stat-content">
             <div class="stat-icon-wrapper">
               <v-icon
+                class="stat-icon"
                 :icon="stat.icon"
                 size="28"
-                class="stat-icon"
               />
             </div>
             <div class="stat-info">
@@ -36,77 +36,77 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useTaskColors, useTaskFormatting } from '@/composables'
+  import { computed } from 'vue'
+  import { useTaskColors } from '@/composables'
 
-const props = defineProps({
-  totalTasks: {
-    type: Number,
-    default: 0,
-  },
-  completedTasks: {
-    type: Number,
-    default: 0,
-  },
-  pendingTasks: {
-    type: Number,
-    default: 0,
-  },
-  overdueTasks: {
-    type: Number,
-    default: 0,
-  },
-  inProgressTasks: {
-    type: Number,
-    default: 0,
-  }
-})
+  const props = defineProps({
+    totalTasks: {
+      type: Number,
+      default: 0,
+    },
+    completedTasks: {
+      type: Number,
+      default: 0,
+    },
+    pendingTasks: {
+      type: Number,
+      default: 0,
+    },
+    overdueTasks: {
+      type: Number,
+      default: 0,
+    },
+    inProgressTasks: {
+      type: Number,
+      default: 0,
+    },
+  })
 
-const emit = defineEmits(['filter-change'])
+  const emit = defineEmits(['filter-change'])
 
-// Use composables
-const { cssVars, applyCssVars } = useTaskColors('stats')
+  // Use composables
+  const { cssVars, applyCssVars } = useTaskColors('stats')
 
-// Apply CSS variables
-applyCssVars()
+  // Apply CSS variables
+  applyCssVars()
 
-// Calculate completion percentage
-const completionPercentage = computed(() => {
-  if (props.totalTasks === 0) return 0
-  return Math.round((props.completedTasks / props.totalTasks) * 100)
-})
+  // Calculate completion percentage
+  const completionPercentage = computed(() => {
+    if (props.totalTasks === 0) return 0
+    return Math.round((props.completedTasks / props.totalTasks) * 100)
+  })
 
-// Stats configuration
-const stats = computed(() => [
-  {
-    icon: 'mdi-format-list-checks',
-    label: 'Total Tasks',
-    value: props.totalTasks,
-    percentage: 100,
-    onClick: () => emit('filter-change', { status: 'all' })
-  },
-  {
-    icon: 'mdi-check-circle',
-    label: 'Completed',
-    value: props.completedTasks,
-    percentage: completionPercentage.value,
-    onClick: () => emit('filter-change', { status: 'completed' })
-  },
-  {
-    icon: 'mdi-progress-clock',
-    label: 'In Progress',
-    value: props.inProgressTasks,
-    percentage: props.totalTasks > 0 ? Math.round((props.inProgressTasks / props.totalTasks) * 100) : 0,
-    onClick: () => emit('filter-change', { status: 'in-progress' })
-  },
-  {
-    icon: 'mdi-alert-circle',
-    label: 'Overdue',
-    value: props.overdueTasks,
-    percentage: props.totalTasks > 0 ? Math.round((props.overdueTasks / props.totalTasks) * 100) : 0,
-    onClick: () => emit('filter-change', { status: 'overdue' })
-  }
-])
+  // Stats configuration
+  const stats = computed(() => [
+    {
+      icon: 'mdi-format-list-checks',
+      label: 'Total Tasks',
+      value: props.totalTasks,
+      percentage: 100,
+      onClick: () => emit('filter-change', { status: 'all' }),
+    },
+    {
+      icon: 'mdi-check-circle',
+      label: 'Completed',
+      value: props.completedTasks,
+      percentage: completionPercentage.value,
+      onClick: () => emit('filter-change', { status: 'completed' }),
+    },
+    {
+      icon: 'mdi-progress-clock',
+      label: 'In Progress',
+      value: props.inProgressTasks,
+      percentage: props.totalTasks > 0 ? Math.round((props.inProgressTasks / props.totalTasks) * 100) : 0,
+      onClick: () => emit('filter-change', { status: 'in-progress' }),
+    },
+    {
+      icon: 'mdi-alert-circle',
+      label: 'Overdue',
+      value: props.overdueTasks,
+      percentage: props.totalTasks > 0 ? Math.round((props.overdueTasks / props.totalTasks) * 100) : 0,
+      onClick: () => emit('filter-change', { status: 'overdue' }),
+    },
+  ])
 </script>
 
 <style scoped>

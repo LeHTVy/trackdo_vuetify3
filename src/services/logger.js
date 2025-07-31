@@ -7,14 +7,14 @@ const LOG_LEVELS = {
   WARN: 1,
   INFO: 2,
   DEBUG: 3,
-  TRACE: 4
+  TRACE: 4,
 }
 
 // Current log level (can be configured)
 const currentLogLevel = isDevelopment ? LOG_LEVELS.TRACE : LOG_LEVELS.ERROR
 
 class Logger {
-  constructor() {
+  constructor () {
     this.context = 'TrackDo'
   }
 
@@ -23,7 +23,7 @@ class Logger {
    * @param {string} context - Context name (e.g., component name, service name)
    * @returns {Logger} Logger instance
    */
-  createLogger(context) {
+  createLogger (context) {
     const logger = new Logger()
     logger.context = context
     return logger
@@ -36,7 +36,7 @@ class Logger {
    * @param {any} data - Additional data
    * @returns {Array} Formatted log arguments
    */
-  formatMessage(level, message, data) {
+  formatMessage (level, message, data) {
     const timestamp = new Date().toISOString()
     const prefix = `[${timestamp}] [${level}] [${this.context}]`
 
@@ -51,7 +51,7 @@ class Logger {
    * @param {number} level - Log level to check
    * @returns {boolean} Should log
    */
-  shouldLog(level) {
+  shouldLog (level) {
     return level <= currentLogLevel
   }
 
@@ -60,7 +60,7 @@ class Logger {
    * @param {string} message - Error message
    * @param {any} error - Error object or additional data
    */
-  error(message, error) {
+  error (message, error) {
     if (this.shouldLog(LOG_LEVELS.ERROR)) {
       const args = this.formatMessage('ERROR', `❌ ${message}`, error)
       console.error(...args)
@@ -77,7 +77,7 @@ class Logger {
    * @param {string} message - Warning message
    * @param {any} data - Additional data
    */
-  warn(message, data) {
+  warn (message, data) {
     if (this.shouldLog(LOG_LEVELS.WARN)) {
       const args = this.formatMessage('WARN', `⚠️ ${message}`, data)
       console.warn(...args)
@@ -89,7 +89,7 @@ class Logger {
    * @param {string} message - Info message
    * @param {any} data - Additional data
    */
-  info(message, data) {
+  info (message, data) {
     if (this.shouldLog(LOG_LEVELS.INFO)) {
       const args = this.formatMessage('INFO', `ℹ️ ${message}`, data)
       console.log(...args)
@@ -101,7 +101,7 @@ class Logger {
    * @param {string} message - Success message
    * @param {any} data - Additional data
    */
-  success(message, data) {
+  success (message, data) {
     if (this.shouldLog(LOG_LEVELS.INFO)) {
       const args = this.formatMessage('SUCCESS', `✅ ${message}`, data)
       console.log(...args)
@@ -113,7 +113,7 @@ class Logger {
    * @param {string} message - Debug message
    * @param {any} data - Additional data
    */
-  debug(message, data) {
+  debug (message, data) {
     if (this.shouldLog(LOG_LEVELS.DEBUG)) {
       const args = this.formatMessage('DEBUG', `🐛 ${message}`, data)
       console.log(...args)
@@ -125,7 +125,7 @@ class Logger {
    * @param {string} message - Trace message
    * @param {any} data - Additional data
    */
-  trace(message, data) {
+  trace (message, data) {
     if (this.shouldLog(LOG_LEVELS.TRACE)) {
       const args = this.formatMessage('TRACE', `🔍 ${message}`, data)
       console.log(...args)
@@ -138,7 +138,7 @@ class Logger {
    * @param {number} startTime - Start time (performance.now())
    * @param {any} data - Additional data
    */
-  performance(operation, startTime, data) {
+  performance (operation, startTime, data) {
     if (this.shouldLog(LOG_LEVELS.DEBUG)) {
       const duration = performance.now() - startTime
       const args = this.formatMessage('PERF', `⏱️ ${operation} took ${duration.toFixed(2)}ms`, data)
@@ -153,7 +153,7 @@ class Logger {
    * @param {any} data - Request/response data
    * @param {number} duration - Request duration
    */
-  api(method, url, data, duration) {
+  api (method, url, data, duration) {
     if (this.shouldLog(LOG_LEVELS.DEBUG)) {
       const message = duration
         ? `🌐 ${method} ${url} (${duration}ms)`
@@ -168,7 +168,7 @@ class Logger {
    * @param {string} action - User action
    * @param {any} data - Action data
    */
-  userAction(action, data) {
+  userAction (action, data) {
     if (this.shouldLog(LOG_LEVELS.INFO)) {
       const args = this.formatMessage('USER', `👤 ${action}`, data)
       console.log(...args)
@@ -181,7 +181,7 @@ class Logger {
    * @param {string} action - Action name
    * @param {any} data - Action data
    */
-  storeAction(store, action, data) {
+  storeAction (store, action, data) {
     if (this.shouldLog(LOG_LEVELS.DEBUG)) {
       const args = this.formatMessage('STORE', `🗃️ ${store}.${action}`, data)
       console.log(...args)
@@ -194,7 +194,7 @@ class Logger {
    * @param {string} to - Next route
    * @param {any} data - Navigation data
    */
-  navigation(from, to, data) {
+  navigation (from, to, data) {
     if (this.shouldLog(LOG_LEVELS.DEBUG)) {
       const args = this.formatMessage('NAV', `🧭 ${from} → ${to}`, data)
       console.log(...args)
@@ -207,7 +207,7 @@ class Logger {
    * @param {string} lifecycle - Lifecycle event
    * @param {any} data - Additional data
    */
-  lifecycle(component, lifecycle, data) {
+  lifecycle (component, lifecycle, data) {
     if (this.shouldLog(LOG_LEVELS.TRACE)) {
       const args = this.formatMessage('LIFECYCLE', `🔄 ${component}.${lifecycle}`, data)
       console.log(...args)
@@ -219,7 +219,7 @@ class Logger {
    * @param {string} groupName - Group name
    * @param {Function} fn - Function to execute within group
    */
-  group(groupName, fn) {
+  group (groupName, fn) {
     if (this.shouldLog(LOG_LEVELS.DEBUG)) {
       console.group(`📁 ${groupName}`)
       try {
@@ -237,7 +237,7 @@ class Logger {
    * @param {string} title - Table title
    * @param {Array|Object} data - Data to display in table
    */
-  table(title, data) {
+  table (title, data) {
     if (this.shouldLog(LOG_LEVELS.DEBUG)) {
       console.log(`📊 ${title}`)
       console.table(data)
@@ -253,7 +253,7 @@ export { Logger, LOG_LEVELS }
 export default logger
 
 // Convenience exports for common use cases
-export const createLogger = (context) => logger.createLogger(context)
+export const createLogger = context => logger.createLogger(context)
 
 // Specialized loggers for different parts of the application
 export const authLogger = logger.createLogger('Auth')

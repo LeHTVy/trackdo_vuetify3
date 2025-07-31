@@ -19,17 +19,17 @@
         @click="$emit('edit', task)"
       >
         <!-- Completion Overlay -->
-        <div v-if="isTaskCompleted(task)" class="completion-overlay"></div>
+        <div v-if="isTaskCompleted(task)" class="completion-overlay" />
 
         <!-- Task Header -->
         <div class="task-header">
           <div class="task-checkbox" @click.stop>
             <v-checkbox
-              :model-value="task.status === 'completed'"
               color="success"
-              hide-details
               density="compact"
+              hide-details
               :loading="isTaskToggling(task)"
+              :model-value="task.status === 'completed'"
               @update:model-value="handleToggleCompletion(task)"
             />
           </div>
@@ -45,17 +45,17 @@
           </div>
           <div class="task-actions" @click.stop>
             <v-btn
+              color="primary"
               icon="mdi-pencil"
               size="small"
               variant="text"
-              color="primary"
               @click="$emit('edit-task', task)"
             />
             <v-btn
+              color="error"
               icon="mdi-delete"
               size="small"
               variant="text"
-              color="error"
               @click="handleDeleteTask(task)"
             />
           </div>
@@ -75,11 +75,11 @@
         <div class="task-footer">
           <div class="task-meta">
             <div v-if="task.dueDate" class="task-due-date">
-              <v-icon size="16" :color="getDateColor(task)">mdi-calendar</v-icon>
+              <v-icon :color="getDateColor(task)" size="16">mdi-calendar</v-icon>
               <span :class="getDateClass(task)">{{ formatDate(task.dueDate) }}</span>
             </div>
             <div v-if="task.project" class="task-project">
-              <v-icon size="16" color="primary">mdi-folder</v-icon>
+              <v-icon color="primary" size="16">mdi-folder</v-icon>
               <span>{{ task.project }}</span>
             </div>
           </div>
@@ -102,7 +102,7 @@
     <!-- Empty State -->
     <div v-else class="empty-state">
       <div class="empty-icon">
-        <v-icon size="64" color="grey-lighten-2">mdi-format-list-checks</v-icon>
+        <v-icon color="grey-lighten-2" size="64">mdi-format-list-checks</v-icon>
       </div>
       <h3 class="empty-title">No tasks found</h3>
       <p class="empty-subtitle">
@@ -120,110 +120,105 @@
     <!-- Delete Confirmation Modal -->
     <ConfirmModal
       v-model="showDeleteModal"
-      type="delete"
-      :title="`Delete Task`"
       :details="taskToDelete?.title ? `Task: ${taskToDelete.title}` : ''"
       :loading="deletingTask"
-      @confirm="confirmDelete"
+      :title="`Delete Task`"
+      type="delete"
       @cancel="cancelDelete"
+      @confirm="confirmDelete"
     />
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { useTaskColors, useTaskFormatting, useTaskFilters, useTaskCompletion } from '@/composables'
-import ConfirmModal from '@/components/common/ConfirmModal.vue'
+  import { computed, ref } from 'vue'
+  import { useTaskColors, useTaskCompletion, useTaskFilters, useTaskFormatting } from '@/composables'
+  import ConfirmModal from '@/components/common/ConfirmModal.vue'
 
-const props = defineProps({
-  tasks: {
-    type: Array,
-    default: () => [],
-  },
-  tasksStore: {
-    type: Object,
-    required: true
+  const props = defineProps({
+    tasks: {
+      type: Array,
+      default: () => [],
+    },
+    tasksStore: {
+      type: Object,
+      required: true,
+    },
+  })
+
+  const emit = defineEmits([
+    'edit',
+    'edit-task',
+    'delete',
+    'delete-task',
+    'toggle-complete',
+    'filter-change',
+  ])
+
+  // Refs for delete modal
+  const showDeleteModal = ref(false)
+  const taskToDelete = ref(null)
+  const deletingTask = ref(false)
+
+  // Use composables
+  const { cssVars, applyCssVars, getStatusColor, getPriorityColor } = useTaskColors('list')
+  const { formatDate, formatPriority, formatStatus, isTaskOverdue } = useTaskFormatting(computed(() => props.tasks))
+  const { getTaskCardClass, getDateColor, getDateClass } = useTaskColors()
+  const {
+    filteredTasks,
+    hasActiveFilters,
+    clearFilters,
+  } = useTaskFilters(computed(() => props.tasks))
+
+  // Task completion composable
+  const {
+    toggleTaskCompletion,
+    isTaskToggling,
+    getTaskCompletionClasses,
+    getTaskCompletionStyles,
+    isTaskCompleted,
+  } = useTaskCompletion(props.tasksStore)
+
+  // Apply CSS variables
+  applyCssVars()
+
+  // Handle task completion toggle
+  const handleToggleCompletion = async task => {
+    try {
+      await toggleTaskCompletion(task)
+      emit('toggle-complete', task)
+    } catch (error) {
+      console.error('Error toggling task completion:', error)
+    }
   }
-})
 
-const emit = defineEmits([
-  'edit',
-  'edit-task',
-  'delete',
-  'delete-task',
-  'toggle-complete',
-  'filter-change',
-])
-
-// Refs for delete modal
-const showDeleteModal = ref(false)
-const taskToDelete = ref(null)
-const deletingTask = ref(false)
-
-// Use composables
-const { cssVars, applyCssVars, getStatusColor, getPriorityColor } = useTaskColors('list')
-const { formatDate, formatPriority, formatStatus, isTaskOverdue } = useTaskFormatting(computed(() => props.tasks))
-const { getTaskCardClass, getDateColor, getDateClass, getTaskUrgency } = useTaskColors()
-const {
-  searchQuery,
-  selectedStatus,
-  selectedPriority,
-  statusOptions,
-  priorityOptions,
-  filteredTasks,
-  hasActiveFilters,
-  clearFilters
-} = useTaskFilters(computed(() => props.tasks))
-
-// Task completion composable
-const {
-  toggleTaskCompletion,
-  isTaskToggling,
-  getTaskCompletionClasses,
-  getTaskCompletionStyles,
-  isTaskCompleted
-} = useTaskCompletion(props.tasksStore)
-
-// Apply CSS variables
-applyCssVars()
-
-// Handle task completion toggle
-const handleToggleCompletion = async (task) => {
-  try {
-    await toggleTaskCompletion(task)
-    emit('toggle-complete', task)
-  } catch (error) {
-    console.error('Error toggling task completion:', error)
+  // Handle delete click
+  const handleDeleteTask = task => {
+    taskToDelete.value = task
+    showDeleteModal.value = true
   }
-}
 
-// Handle delete click
-const handleDeleteTask = (task) => {
-  taskToDelete.value = task
-  showDeleteModal.value = true
-}
+  // Confirm delete
+  const confirmDelete = async () => {
+    if (!taskToDelete.value) return
 
-// Confirm delete
-const confirmDelete = async () => {
-  if (!taskToDelete.value) return
+    try {
+      deletingTask.value = true
+      await emit('delete-task', taskToDelete.value.id || taskToDelete.value._id)
+      showDeleteModal.value = false
+      taskToDelete.value = null
+    } catch (error) {
+      console.error('Error deleting task:', error)
+    } finally {
+      deletingTask.value = false
+    }
+  }
 
-  try {
-    deletingTask.value = true
-    await emit('delete-task', taskToDelete.value.id || taskToDelete.value._id)
+  // Cancel delete
+  const cancelDelete = () => {
     showDeleteModal.value = false
     taskToDelete.value = null
-  } catch (error) {
-    console.error('Error deleting task:', error)
-  } finally {
-    deletingTask.value = false
   }
-}
-
-// Cancel delete
-const cancelDelete = () => {
-  showDeleteModal.value = false
-  taskToDelete.value = null
-}
 </script>
 
 <style scoped>

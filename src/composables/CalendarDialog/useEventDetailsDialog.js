@@ -5,38 +5,32 @@ import { useConfirmModal } from '@/composables/common/useConfirmModal'
 import { useEventOperations } from '@/composables/CalendarCommon/useEventOperations'
 import { useEventsStore } from '@/stores/events'
 
-export function useEventDetailsDialog(props, emit) {
+export function useEventDetailsDialog (props, emit) {
   const themeColors = useThemeColors('modal')
   const dialogManager = useDialogManager()
   const eventsStore = useEventsStore()
 
   const {
-    loading,
-    error,
-    clearError,
-    getEventTitle,
-    deleteEventWithoutConfirm
+    deleteEventWithoutConfirm,
   } = useEventOperations(eventsStore)
   const {
     isOpen: confirmModalOpen,
     loading: confirmModalLoading,
     modalConfig: confirmModalConfig,
     confirmDelete,
-    confirmUpdate,
-    confirmAction,
     confirm: confirmModalConfirm,
-    cancel: confirmModalCancel
+    cancel: confirmModalCancel,
   } = useConfirmModal()
 
   // Dialog state - use from dialogManager
   const isOpen = computed({
-    get() {
+    get () {
       return props.modelValue || dialogManager.eventDetailsDialog.value
     },
-    set(value) {
+    set (value) {
       emit('update:modelValue', value)
       dialogManager.eventDetailsDialog.value = value
-    }
+    },
   })
 
   // Event information getters - use selectedEvent from dialogManager
@@ -77,14 +71,14 @@ export function useEventDetailsDialog(props, emit) {
   const getPriorityColor = themeColors.getPriorityColor
 
   // Date formatter
-  const formatDate = (dateStr) => {
+  const formatDate = dateStr => {
     if (!dateStr) return ''
     const date = new Date(dateStr)
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     })
   }
 
@@ -169,6 +163,6 @@ export function useEventDetailsDialog(props, emit) {
     closeDialog,
     deleteEvent,
     editEvent,
-    duplicateEvent
+    duplicateEvent,
   }
 }

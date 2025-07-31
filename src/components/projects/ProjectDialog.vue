@@ -1,12 +1,12 @@
 <template>
   <v-dialog
-    :model-value="showDialog"
-    max-width="700px"
-    max-height="90vh"
-    persistent
-    transition="dialog-bottom-transition"
     class="project-dialog"
+    max-height="90vh"
+    max-width="700px"
+    :model-value="showDialog"
+    persistent
     scrollable
+    transition="dialog-bottom-transition"
     @update:model-value="$emit('close')"
   >
     <v-card class="dialog-project-card d-flex flex-column" elevation="24" style="height: 90vh;">
@@ -14,15 +14,15 @@
       <v-card-title class="dialog-header pa-6 flex-shrink-0">
         <div class="d-flex align-center">
           <v-avatar
+            class="mr-4 header-avatar"
             :color="getPrimaryColor()"
             size="40"
-            class="mr-4 header-avatar"
           >
             <v-icon
-              :icon="editingProject ? 'mdi-pencil' : 'mdi-folder-plus'"
               color="white"
+              :icon="editingProject ? 'mdi-pencil' : 'mdi-folder-plus'"
               size="20"
-            ></v-icon>
+            />
           </v-avatar>
           <div>
             <h2 class="text-h5 font-weight-bold text-white mb-1">
@@ -36,68 +36,68 @@
       </v-card-title>
 
       <v-card-text class="pa-6 flex-grow-1" style="overflow-y: auto;">
-        <v-container fluid class="pa-0">
+        <v-container class="pa-0" fluid>
           <v-form ref="form" v-model="valid">
             <v-row>
               <!-- Project Title -->
               <v-col cols="12">
                 <v-text-field
                   v-model="formData.title"
-                  label="Project Title"
-                  variant="outlined"
+                  class="input-field"
                   :color="getPrimaryColor()"
+                  hide-details="auto"
+                  label="Project Title"
+                  prepend-inner-icon="mdi-folder"
                   required
                   :rules="[rules.title]"
-                  prepend-inner-icon="mdi-folder"
-                  class="input-field"
-                  hide-details="auto"
-                ></v-text-field>
+                  variant="outlined"
+                />
               </v-col>
 
               <!-- Project Description -->
               <v-col cols="12">
                 <v-textarea
                   v-model="formData.description"
-                  label="Project Description"
-                  variant="outlined"
-                  :color="getPrimaryColor()"
-                  rows="3"
                   auto-grow
-                  prepend-inner-icon="mdi-text"
                   class="input-field"
+                  :color="getPrimaryColor()"
                   hide-details="auto"
-                ></v-textarea>
+                  label="Project Description"
+                  prepend-inner-icon="mdi-text"
+                  rows="3"
+                  variant="outlined"
+                />
               </v-col>
 
               <!-- Status & Progress -->
               <v-col cols="12" sm="6">
                 <v-select
                   v-model="formData.status"
-                  :items="statusOptions"
+                  class="input-field"
+                  :color="getPrimaryColor()"
+                  hide-details="auto"
                   item-title="title"
                   item-value="value"
+                  :items="statusOptions"
                   label="Project Status"
-                  variant="outlined"
-                  :color="getPrimaryColor()"
                   prepend-inner-icon="mdi-flag"
-                  class="input-field"
-                  hide-details="auto"
+                  variant="outlined"
                 >
-                  <template v-slot:item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template v-slot:prepend>
-                        <v-icon :icon="item.raw.icon" :color="item.raw.color"></v-icon>
+                  <template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
+                      <template #prepend>
+                        <v-icon :color="item.raw.color" :icon="item.raw.icon" />
                       </template>
                     </v-list-item>
                   </template>
-                  <template v-slot:selection="{ item }">
+                  <template #selection="{ item }">
                     <v-chip
+                      class="mr-2 status-chip"
                       :color="item.raw.color"
                       size="small"
-                      class="mr-2 status-chip"
                       variant="elevated"
                     >
-                      <v-icon :icon="item.raw.icon" size="12" class="mr-1"></v-icon>
+                      <v-icon class="mr-1" :icon="item.raw.icon" size="12" />
                       {{ item.raw.title }}
                     </v-chip>
                   </template>
@@ -107,94 +107,94 @@
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="formData.progress"
-                  label="Progress (%)"
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="1"
-                  variant="outlined"
-                  :color="getPrimaryColor()"
-                  prepend-inner-icon="mdi-percent"
                   class="input-field"
+                  :color="getPrimaryColor()"
+                  label="Progress (%)"
+                  max="100"
+                  min="0"
+                  prepend-inner-icon="mdi-percent"
                   :rules="[rules.progress]"
-                  @input="validateProgressInput"
-                  @blur="handleProgressBlur"
+                  step="1"
                   :suffix="`${formData.progress || 0}%`"
-                ></v-text-field>
+                  type="number"
+                  variant="outlined"
+                  @blur="handleProgressBlur"
+                  @input="validateProgressInput"
+                />
               </v-col>
 
               <!-- Date Fields -->
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="formData.startDate"
+                  class="input-field"
+                  :color="getPrimaryColor()"
                   label="Start Date"
+                  prepend-inner-icon="mdi-calendar-start"
+                  required
+                  :rules="[rules.startDate]"
                   type="date"
                   variant="outlined"
-                  :color="getPrimaryColor()"
-                  prepend-inner-icon="mdi-calendar-start"
-                  class="input-field"
-                  :rules="[rules.startDate]"
-                  required
-                ></v-text-field>
+                />
               </v-col>
 
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="formData.endDate"
+                  class="input-field"
+                  :color="getPrimaryColor()"
                   label="End Date"
+                  prepend-inner-icon="mdi-calendar-end"
+                  required
+                  :rules="[rules.endDate]"
                   type="date"
                   variant="outlined"
-                  :color="getPrimaryColor()"
-                  prepend-inner-icon="mdi-calendar-end"
-                  class="input-field"
-                  :rules="[rules.endDate]"
-                  required
-                ></v-text-field>
+                />
               </v-col>
 
               <!-- Budget & Priority -->
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="formData.budget"
+                  class="input-field"
+                  :color="getPrimaryColor()"
+                  hide-details="auto"
                   label="Budget (Optional)"
+                  prefix="$"
+                  prepend-inner-icon="mdi-currency-usd"
                   type="number"
                   variant="outlined"
-                  :color="getPrimaryColor()"
-                  prepend-inner-icon="mdi-currency-usd"
-                  class="input-field"
-                  hide-details="auto"
-                  prefix="$"
-                ></v-text-field>
+                />
               </v-col>
 
               <v-col cols="12" sm="6">
                 <v-select
                   v-model="formData.priority"
-                  :items="priorityOptions"
+                  class="input-field"
+                  :color="getPrimaryColor()"
+                  hide-details="auto"
                   item-title="title"
                   item-value="value"
+                  :items="priorityOptions"
                   label="Priority Level"
-                  variant="outlined"
-                  :color="getPrimaryColor()"
                   prepend-inner-icon="mdi-star"
-                  class="input-field"
-                  hide-details="auto"
+                  variant="outlined"
                 >
-                  <template v-slot:item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template v-slot:prepend>
-                        <v-icon icon="mdi-star" :color="item.raw.color"></v-icon>
+                  <template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
+                      <template #prepend>
+                        <v-icon :color="item.raw.color" icon="mdi-star" />
                       </template>
                     </v-list-item>
                   </template>
-                  <template v-slot:selection="{ item }">
+                  <template #selection="{ item }">
                     <v-chip
+                      class="mr-2 priority-chip"
                       :color="item.raw.color"
                       size="small"
-                      class="mr-2 priority-chip"
                       variant="elevated"
                     >
-                      <v-icon icon="mdi-star" size="12" class="mr-1"></v-icon>
+                      <v-icon class="mr-1" icon="mdi-star" size="12" />
                       {{ item.raw.title }}
                     </v-chip>
                   </template>
@@ -205,31 +205,31 @@
               <v-col cols="12">
                 <v-select
                   v-model="formData.category"
-                  :items="categoryOptions"
+                  class="input-field"
+                  :color="getPrimaryColor()"
+                  hide-details="auto"
                   item-title="title"
                   item-value="value"
+                  :items="categoryOptions"
                   label="Project Category"
-                  variant="outlined"
-                  :color="getPrimaryColor()"
                   prepend-inner-icon="mdi-tag"
-                  class="input-field"
-                  hide-details="auto"
+                  variant="outlined"
                 >
-                  <template v-slot:item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template v-slot:prepend>
-                        <v-icon :icon="item.raw.icon" :color="item.raw.color"></v-icon>
+                  <template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
+                      <template #prepend>
+                        <v-icon :color="item.raw.color" :icon="item.raw.icon" />
                       </template>
                     </v-list-item>
                   </template>
-                  <template v-slot:selection="{ item }">
+                  <template #selection="{ item }">
                     <v-chip
+                      class="mr-2 category-chip"
                       :color="item.raw.color"
                       size="small"
-                      class="mr-2 category-chip"
                       variant="elevated"
                     >
-                      <v-icon :icon="item.raw.icon" size="12" class="mr-1"></v-icon>
+                      <v-icon class="mr-1" :icon="item.raw.icon" size="12" />
                       {{ item.raw.title }}
                     </v-chip>
                   </template>
@@ -240,28 +240,28 @@
               <v-col cols="12">
                 <v-combobox
                   v-model="formData.teamMembers"
-                  label="Team Members"
-                  variant="outlined"
-                  :color="getPrimaryColor()"
-                  prepend-inner-icon="mdi-account-group"
-                  class="input-field"
-                  hide-details="auto"
-                  multiple
                   chips
+                  class="input-field"
                   closable-chips
+                  :color="getPrimaryColor()"
+                  hide-details="auto"
                   hint="Press Enter to add team members"
+                  label="Team Members"
+                  multiple
                   persistent-hint
+                  prepend-inner-icon="mdi-account-group"
                   :return-object="false"
+                  variant="outlined"
                 >
-                  <template v-slot:chip="{ props, item }">
+                  <template #chip="{ props: chipProps, item }">
                     <v-chip
-                      v-bind="props"
+                      v-bind="chipProps"
+                      class="mr-1 mb-1"
                       :color="getPrimaryColor()"
                       size="small"
                       variant="elevated"
-                      class="mr-1 mb-1"
                     >
-                      <v-icon icon="mdi-account" size="12" class="mr-1"></v-icon>
+                      <v-icon class="mr-1" icon="mdi-account" size="12" />
                       {{ typeof item === 'string' ? item : item.title || item.value || item }}
                     </v-chip>
                   </template>
@@ -274,28 +274,28 @@
 
       <!-- Actions -->
       <v-card-actions class="pa-6 pt-0 flex-shrink-0" style="border-top: 1px solid rgba(0,0,0,0.12);">
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn
+          class="action-btn mr-3"
           color="grey-darken-1"
+          :disabled="loading"
+          size="large"
           variant="outlined"
           @click="$emit('close')"
-          :disabled="loading"
-          class="action-btn mr-3"
-          size="large"
         >
-          <v-icon icon="mdi-close" class="mr-1"></v-icon>
+          <v-icon class="mr-1" icon="mdi-close" />
           Cancel
         </v-btn>
         <v-btn
+          class="action-btn"
           :color="getPrimaryColor()"
-          variant="elevated"
-          @click="saveProject"
           :disabled="!isFormValid || loading"
           :loading="loading"
-          class="action-btn"
           size="large"
+          variant="elevated"
+          @click="saveProject"
         >
-          <v-icon :icon="editingProject ? 'mdi-content-save' : 'mdi-plus'" class="mr-1"></v-icon>
+          <v-icon class="mr-1" :icon="editingProject ? 'mdi-content-save' : 'mdi-plus'" />
           {{ editingProject ? 'Update Project' : 'Create Project' }}
         </v-btn>
       </v-card-actions>
@@ -304,77 +304,76 @@
 </template>
 
 <script setup>
-import { onMounted, watch, toRef } from 'vue'
-import { useProjectDialog } from '@/composables'
+  import { onMounted, toRef, watch } from 'vue'
+  import { useProjectDialog } from '@/composables'
 
-const props = defineProps({
-  showDialog: {
-    type: Boolean,
-    default: false,
-  },
-  editingProject: {
-    type: Object,
-    default: null,
-  },
-  initialData: {
-    type: Object,
-    default: () => ({}),
-  },
-})
-
-const emit = defineEmits(['close', 'save'])
-
-// Use the project dialog composable
-const {
-  form,
-  valid,
-  loading,
-  formData,
-  statusOptions,
-  priorityOptions,
-  categoryOptions,
-  rules,
-  isFormValid,
-  formatProgress,
-  isProgressValid,
-  validateProgressInput,
-  handleProgressBlur,
-  resetForm,
-  validateAndSubmit,
-  getPrimaryColor,
-  applyCssVars
-} = useProjectDialog(toRef(props, 'editingProject'))
-
-// Watch for dialog changes
-watch(() => props.showDialog, newVal => {
-  if (newVal) {
-    resetForm(props.initialData, props.editingProject)
-  }
-})
-
-// Watch for editing project changes
-watch(() => props.editingProject, (newProject) => {
-  if (props.showDialog) {
-    resetForm(props.initialData, newProject)
-  }
-})
-
-// Apply CSS variables when component mounts
-onMounted(() => {
-  applyCssVars()
-})
-
-// Handle save with validation
-const saveProject = async () => {
-  await validateAndSubmit(async (projectData) => {
-    emit('save', projectData)
+  const props = defineProps({
+    showDialog: {
+      type: Boolean,
+      default: false,
+    },
+    editingProject: {
+      type: Object,
+      default: null,
+    },
+    initialData: {
+      type: Object,
+      default: () => ({}),
+    },
   })
-}
 
-// Handle close
-const closeDialog = () => {
-  emit('close')
-}
+  const emit = defineEmits(['close', 'save'])
+
+  // Use the project dialog composable
+  const {
+    form,
+    valid,
+    loading,
+    formData,
+    statusOptions,
+    priorityOptions,
+    categoryOptions,
+    rules,
+    isFormValid,
+    validateProgressInput,
+    handleProgressBlur,
+    resetForm,
+    validateAndSubmit,
+    getPrimaryColor,
+    applyCssVars,
+  } = useProjectDialog(toRef(props, 'editingProject'))
+
+  // Watch for dialog changes
+  watch(() => props.showDialog, newVal => {
+    if (newVal) {
+      resetForm(props.initialData, props.editingProject)
+    }
+  })
+
+  // Watch for editing project changes
+  watch(() => props.editingProject, newProject => {
+    if (props.showDialog) {
+      resetForm(props.initialData, newProject)
+    }
+  })
+
+  // Apply CSS variables when component mounts
+  onMounted(() => {
+    applyCssVars()
+  })
+
+  // Handle save with validation
+  const saveProject = async () => {
+    console.log('saveProject called')
+    console.log('isFormValid:', isFormValid.value)
+    console.log('loading:', loading.value)
+    console.log('formData:', formData.value)
+    
+    await validateAndSubmit(async projectData => {
+      console.log('validateAndSubmit callback called with:', projectData)
+      emit('save', projectData)
+    })
+  }
 </script>
 
 <style scoped>

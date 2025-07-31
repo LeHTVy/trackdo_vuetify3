@@ -1,38 +1,38 @@
 import { computed } from 'vue'
 
-export function useProjectFormatting(projects) {
+export function useProjectFormatting (projects) {
 
   const statusColorMap = {
     'Active': 'project-active',
     'Completed': 'project-completed',
     'On Hold': 'project-onhold',
-    'Cancelled': 'error'
+    'Cancelled': 'error',
   }
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     if (!date) return ''
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     })
   }
 
-  const formatCurrency = (amount) => {
+  const formatCurrency = amount => {
     if (!amount) return ''
     return `$${amount.toLocaleString('en-US')}`
   }
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     return statusColorMap[status] || 'grey'
   }
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     const iconMap = {
       'Active': 'mdi-play-circle',
       'Completed': 'mdi-check-circle',
       'On Hold': 'mdi-pause-circle',
-      'Cancelled': 'mdi-close-circle'
+      'Cancelled': 'mdi-close-circle',
     }
     return iconMap[status] || 'mdi-help-circle'
   }
@@ -89,6 +89,6 @@ export function useProjectFormatting(projects) {
     projectStats,
 
     // Constants
-    statusColorMap
+    statusColorMap,
   }
 }

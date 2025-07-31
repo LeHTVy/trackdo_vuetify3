@@ -1,10 +1,10 @@
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 
 /**
  * Task Completion Utilities
  * Handles task completion state and visual effects
  */
-export function useTaskCompletion(tasksStore) {
+export function useTaskCompletion (tasksStore) {
   // Loading state for completion toggle
   const completingTasks = ref(new Set())
 
@@ -12,7 +12,7 @@ export function useTaskCompletion(tasksStore) {
    * Toggle task completion status
    * @param {Object} task - Task object to toggle
    */
-  const toggleTaskCompletion = async (task) => {
+  const toggleTaskCompletion = async task => {
     const taskId = task.id || task._id
 
     // Prevent multiple simultaneous toggles
@@ -25,7 +25,7 @@ export function useTaskCompletion(tasksStore) {
       const updates = {
         status: newStatus,
         completed: newStatus === 'completed',
-        completedAt: newStatus === 'completed' ? new Date().toISOString() : null
+        completedAt: newStatus === 'completed' ? new Date().toISOString() : null,
       }
 
       await tasksStore.updateTask(taskId, updates)
@@ -42,7 +42,7 @@ export function useTaskCompletion(tasksStore) {
    * @param {Object} task - Task object to check
    * @returns {boolean} - True if task is being toggled
    */
-  const isTaskToggling = (task) => {
+  const isTaskToggling = task => {
     const taskId = task.id || task._id
     return completingTasks.value.has(taskId)
   }
@@ -52,7 +52,7 @@ export function useTaskCompletion(tasksStore) {
    * @param {Object} task - Task object
    * @returns {Array} - Array of CSS classes
    */
-  const getTaskCompletionClasses = (task) => {
+  const getTaskCompletionClasses = task => {
     const classes = []
 
     if (task.status === 'completed') {
@@ -71,7 +71,7 @@ export function useTaskCompletion(tasksStore) {
    * @param {Object} task - Task object
    * @returns {Object} - Style object
    */
-  const getTaskCompletionStyles = (task) => {
+  const getTaskCompletionStyles = task => {
     const styles = {}
 
     if (task.status === 'completed') {
@@ -88,7 +88,7 @@ export function useTaskCompletion(tasksStore) {
    * @param {Object} task - Task object
    * @returns {boolean} - True if task is completed
    */
-  const isTaskCompleted = (task) => {
+  const isTaskCompleted = task => {
     return task.status === 'completed'
   }
 
@@ -97,7 +97,7 @@ export function useTaskCompletion(tasksStore) {
    * @param {Array} tasks - Array of tasks
    * @returns {number} - Completion percentage (0-100)
    */
-  const getCompletionPercentage = (tasks) => {
+  const getCompletionPercentage = tasks => {
     if (!tasks || tasks.length === 0) return 0
 
     const completedTasks = tasks.filter(task => task.status === 'completed')
@@ -114,6 +114,6 @@ export function useTaskCompletion(tasksStore) {
     getTaskCompletionClasses,
     getTaskCompletionStyles,
     isTaskCompleted,
-    getCompletionPercentage
+    getCompletionPercentage,
   }
 }

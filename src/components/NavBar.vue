@@ -55,8 +55,8 @@
           <v-btn
             class="login-btn mx-2"
             color="accent-yellow"
-            variant="outlined"
             to="/auth"
+            variant="outlined"
           >
             <v-icon class="mr-2">mdi-login</v-icon>
             Login/Signup
@@ -154,11 +154,11 @@
       <!-- Login/SignUp button for mobile when not authenticated -->
       <v-list-item v-else class="px-4 py-6">
         <v-btn
+          block
           class="login-btn-mobile"
           color="primary"
-          variant="outlined"
-          block
           to="/auth"
+          variant="outlined"
           @click="drawer = false"
         >
           <v-icon class="mr-2">mdi-login</v-icon>
@@ -187,7 +187,7 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue'
+  import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useTheme } from 'vuetify'
   import { useAuthStore } from '@/stores/auth'

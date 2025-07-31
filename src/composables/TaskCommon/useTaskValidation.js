@@ -1,42 +1,42 @@
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 
 /**
  * Task Form Validation Utilities
  * @param {Object} formData - Reactive form data object
  * @returns {Object} Validation utilities and computed properties
  */
-export function useTaskValidation(formData) {
+export function useTaskValidation (formData) {
   // Validation rules
   const titleRules = [
     v => (v === null || v === undefined || v === '' || (typeof v === 'string' && v.trim() === '')) ? 'Title is required' : true,
     v => (v && v.length >= 3) ? true : 'Title must be at least 3 characters',
-    v => (v && v.length <= 100) ? true : 'Title must be less than 100 characters'
+    v => (v && v.length <= 100) ? true : 'Title must be less than 100 characters',
   ]
 
   const descriptionRules = [
-    v => !v || v.length <= 500 ? true : 'Description must be less than 500 characters'
+    v => !v || v.length <= 500 ? true : 'Description must be less than 500 characters',
   ]
 
   const dueDateRules = [
-    v => !v || isValidDate(v) ? true : 'Please enter a valid date'
+    v => !v || isValidDate(v) ? true : 'Please enter a valid date',
   ]
 
   const estimatedHoursRules = [
-    v => !v || (!isNaN(v) && v > 0 && v <= 1000) ? true : 'Estimated hours must be a positive number less than 1000'
+    v => !v || (!isNaN(v) && v > 0 && v <= 1000) ? true : 'Estimated hours must be a positive number less than 1000',
   ]
 
   const projectRules = [
-    v => !v || v.length <= 50 ? true : 'Project name must be less than 50 characters'
+    v => !v || v.length <= 50 ? true : 'Project name must be less than 50 characters',
   ]
 
   // Validation helper functions
-  const isValidDate = (dateString) => {
+  const isValidDate = dateString => {
     if (!dateString) return true
     const date = new Date(dateString)
     return date instanceof Date && !isNaN(date)
   }
 
-  const isValidEmail = (email) => {
+  const isValidEmail = email => {
     if (!email) return true
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
@@ -171,7 +171,7 @@ export function useTaskValidation(formData) {
 
     return {
       isValid: Object.keys(errors).length === 0,
-      errors
+      errors,
     }
   }
 
@@ -200,6 +200,6 @@ export function useTaskValidation(formData) {
 
     // Helper functions
     isValidDate,
-    isValidEmail
+    isValidEmail,
   }
 }

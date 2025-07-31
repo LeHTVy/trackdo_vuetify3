@@ -1,6 +1,6 @@
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
-export function useDayEvents(events, viewType = ref('monthly')) {
+export function useDayEvents (events, viewType = ref('monthly')) {
   /**
    * Get events for a specific day with enhanced metadata
    * @param {Date} date
@@ -42,7 +42,7 @@ export function useDayEvents(events, viewType = ref('monthly')) {
         isMultiDay,
         isContinuation: !isFirstDay && isMultiDay,
         dayIndex: Math.floor((targetDate.getTime() - eventStartDate.getTime()) / (1000 * 60 * 60 * 24)),
-        totalDays: Math.floor((eventEndDate.getTime() - eventStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+        totalDays: Math.floor((eventEndDate.getTime() - eventStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1,
       }
     }).sort((a, b) => {
       const aStart = new Date(a.start).getTime()
@@ -59,7 +59,7 @@ export function useDayEvents(events, viewType = ref('monthly')) {
    * Get events count for a specific day
    * @param {Date} date
    */
-  const getDayEventsCount = (date) => {
+  const getDayEventsCount = date => {
     return getDayEvents(date).length
   }
 
@@ -67,7 +67,7 @@ export function useDayEvents(events, viewType = ref('monthly')) {
    * Check if a day has events
    * @param {Date} date
    */
-  const hasEvents = (date) => {
+  const hasEvents = date => {
     return getDayEventsCount(date) > 0
   }
 
@@ -87,7 +87,7 @@ export function useDayEvents(events, viewType = ref('monthly')) {
       hidden: dayEvents.slice(maxVisible),
       hasMore: dayEvents.length > maxVisible,
       moreCount: Math.max(0, dayEvents.length - maxVisible),
-      totalCount: dayEvents.length
+      totalCount: dayEvents.length,
     }
   }
 
@@ -95,7 +95,7 @@ export function useDayEvents(events, viewType = ref('monthly')) {
    * Get events that start on a specific day
    * @param {Date} date
    */
-  const getEventsStartingOnDay = (date) => {
+  const getEventsStartingOnDay = date => {
     if (!date) return []
 
     const targetDate = new Date(date)
@@ -115,7 +115,7 @@ export function useDayEvents(events, viewType = ref('monthly')) {
    * Get events that end on a specific day
    * @param {Date} date
    */
-  const getEventsEndingOnDay = (date) => {
+  const getEventsEndingOnDay = date => {
     if (!date) return []
 
     const targetDate = new Date(date)
@@ -135,7 +135,7 @@ export function useDayEvents(events, viewType = ref('monthly')) {
    * Get multi-day events that span across a date
    * @param {Date} date
    */
-  const getMultiDayEvents = (date) => {
+  const getMultiDayEvents = date => {
     return getDayEvents(date).filter(event => event.isMultiDay)
   }
 
@@ -143,7 +143,7 @@ export function useDayEvents(events, viewType = ref('monthly')) {
    * Get single-day events for a date
    * @param {Date} date
    */
-  const getSingleDayEvents = (date) => {
+  const getSingleDayEvents = date => {
     return getDayEvents(date).filter(event => !event.isMultiDay)
   }
 
@@ -151,12 +151,12 @@ export function useDayEvents(events, viewType = ref('monthly')) {
    * Calculate event positioning for better visual layout
    * @param {Date} date
    */
-  const getEventLayout = (date) => {
+  const getEventLayout = date => {
     const dayEvents = getDayEvents(date)
     const layout = {
       multiDay: [],
       singleDay: [],
-      maxLayers: 0
+      maxLayers: 0,
     }
 
     // Separate multi-day and single-day events
@@ -187,7 +187,7 @@ export function useDayEvents(events, viewType = ref('monthly')) {
       multiDayEvents: 0,
       singleDayEvents: 0,
       daysWithEvents: 0,
-      averageEventsPerDay: 0
+      averageEventsPerDay: 0,
     }
 
     const currentDate = new Date(startDate)
@@ -252,6 +252,6 @@ export function useDayEvents(events, viewType = ref('monthly')) {
     // Layout and analysis
     getEventLayout,
     getEventStats,
-    searchEvents
+    searchEvents,
   }
 }

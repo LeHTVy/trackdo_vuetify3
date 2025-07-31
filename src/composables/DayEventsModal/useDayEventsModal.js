@@ -1,5 +1,4 @@
 import { computed } from 'vue'
-import { useEventTimeFormatter } from '@/composables/CalendarList/useEventTimeFormatter'
 import { formatDate as utilsFormatDate } from '@/utils/dateUtils'
 
 /**
@@ -9,11 +8,10 @@ import { formatDate as utilsFormatDate } from '@/utils/dateUtils'
  * @param {Function} emit - Component emit function
  * @returns {Object} Modal state and methods
  */
-export function useDayEventsModal(props, emit) {
-  const { formatEventTime: formatEventTimeComposable } = useEventTimeFormatter()
+export function useDayEventsModal (props, emit) {
   const isOpen = computed({
     get: () => props.modelValue,
-    set: (value) => emit('update:modelValue', value)
+    set: value => emit('update:modelValue', value),
   })
 
   /**
@@ -27,7 +25,7 @@ export function useDayEventsModal(props, emit) {
    * Handle event click - emit event and close modal
    * @param {Object} event - Event object
    */
-  const onEventClick = (event) => {
+  const onEventClick = event => {
     emit('event-click', event)
     closeModal()
   }
@@ -36,7 +34,7 @@ export function useDayEventsModal(props, emit) {
    * Handle event menu action
    * @param {Object} event - Event object
    */
-  const onEventMenu = (event) => {
+  const onEventMenu = event => {
     emit('event-menu', event)
   }
 
@@ -45,7 +43,7 @@ export function useDayEventsModal(props, emit) {
    * @param {Date} date - Date to format
    * @returns {string} Formatted date string
    */
-  const formatDate = (date) => {
+  const formatDate = date => {
     if (!date) return ''
     return utilsFormatDate(date, 'en-US')
   }
@@ -56,7 +54,7 @@ export function useDayEventsModal(props, emit) {
    * @param {Object} event - Event object
    * @returns {string} Formatted time string
    */
-  const formatEventTime = (event) => {
+  const formatEventTime = event => {
     if (!event.start) return ''
 
     const startDate = new Date(event.start)
@@ -64,13 +62,13 @@ export function useDayEventsModal(props, emit) {
 
     const startTime = startDate.toLocaleTimeString('en-US', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     })
 
     if (event.end && event.end !== event.start) {
       const endTime = endDate.toLocaleTimeString('en-US', {
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
       })
       return `${startTime} - ${endTime}`
     }
@@ -87,6 +85,6 @@ export function useDayEventsModal(props, emit) {
     onEventClick,
     onEventMenu,
     formatDate,
-    formatEventTime
+    formatEventTime,
   }
 }

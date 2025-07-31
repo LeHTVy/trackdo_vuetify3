@@ -1,22 +1,22 @@
 <template>
   <v-dialog
-    :model-value="showDialog"
-    @update:model-value="$emit('close')"
+    class="task-dialog"
     max-width="650px"
+    :model-value="showDialog"
     persistent
     transition="dialog-bottom-transition"
-    class="task-dialog"
+    @update:model-value="$emit('close')"
   >
     <v-card class="dialog-card" elevation="24">
       <!-- Header with gradient -->
       <v-card-title class="dialog-header pa-6">
         <div class="d-flex align-center">
           <v-avatar
+            class="mr-4 header-avatar"
             color="primary"
             size="40"
-            class="mr-4 header-avatar"
           >
-            <v-icon :icon="editingTask ? 'mdi-pencil' : 'mdi-plus'" color="white" size="20"></v-icon>
+            <v-icon color="white" :icon="editingTask ? 'mdi-pencil' : 'mdi-plus'" size="20" />
           </v-avatar>
           <div>
             <h2 class="text-h5 font-weight-bold text-white mb-1">
@@ -30,71 +30,71 @@
       </v-card-title>
 
       <v-card-text class="pa-6">
-        <v-container fluid class="pa-0">
+        <v-container class="pa-0" fluid>
           <v-form ref="form">
             <v-row>
               <!-- Task Title -->
               <v-col cols="12">
                 <v-text-field
                   v-model="formData.title"
-                  label="Task Title"
-                  variant="outlined"
+                  class="input-field"
                   color="primary"
+                  hide-details="auto"
+                  label="Task Title"
+                  placeholder="Enter task title..."
+                  prepend-inner-icon="mdi-format-title"
                   required
                   :rules="titleRules"
-                  prepend-inner-icon="mdi-format-title"
-                  class="input-field"
-                  hide-details="auto"
-                  placeholder="Enter task title..."
-                ></v-text-field>
+                  variant="outlined"
+                />
               </v-col>
 
               <!-- Task Description -->
               <v-col cols="12">
                 <v-textarea
                   v-model="formData.description"
-                  label="Task Description"
-                  variant="outlined"
-                  color="primary"
-                  rows="3"
                   auto-grow
-                  prepend-inner-icon="mdi-text"
                   class="input-field"
+                  color="primary"
                   hide-details="auto"
+                  label="Task Description"
                   placeholder="Describe your task..."
+                  prepend-inner-icon="mdi-text"
+                  rows="3"
                   :rules="descriptionRules"
-                ></v-textarea>
+                  variant="outlined"
+                />
               </v-col>
 
               <!-- Status & Priority -->
               <v-col cols="12" sm="6">
                 <v-select
                   v-model="formData.status"
-                  :items="statusOptions"
+                  class="input-field"
+                  color="primary"
+                  hide-details="auto"
                   item-title="title"
                   item-value="value"
+                  :items="statusOptions"
                   label="Status"
-                  variant="outlined"
-                  color="primary"
                   prepend-inner-icon="mdi-flag"
-                  class="input-field"
-                  hide-details="auto"
+                  variant="outlined"
                 >
-                  <template v-slot:item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template v-slot:prepend>
-                        <v-icon :icon="item.raw.icon" :color="item.raw.color"></v-icon>
+                  <template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
+                      <template #prepend>
+                        <v-icon :color="item.raw.color" :icon="item.raw.icon" />
                       </template>
                     </v-list-item>
                   </template>
-                  <template v-slot:selection="{ item }">
+                  <template #selection="{ item }">
                     <v-chip
+                      class="mr-2 status-chip"
                       :color="item.raw.color"
                       size="small"
-                      class="mr-2 status-chip"
                       variant="elevated"
                     >
-                      <v-icon :icon="item.raw.icon" size="12" class="mr-1"></v-icon>
+                      <v-icon class="mr-1" :icon="item.raw.icon" size="12" />
                       {{ item.raw.title }}
                     </v-chip>
                   </template>
@@ -104,31 +104,31 @@
               <v-col cols="12" sm="6">
                 <v-select
                   v-model="formData.priority"
-                  :items="priorityOptions"
+                  class="input-field"
+                  color="primary"
+                  hide-details="auto"
                   item-title="title"
                   item-value="value"
+                  :items="priorityOptions"
                   label="Priority"
-                  variant="outlined"
-                  color="primary"
                   prepend-inner-icon="mdi-alert"
-                  class="input-field"
-                  hide-details="auto"
+                  variant="outlined"
                 >
-                  <template v-slot:item="{ props, item }">
-                    <v-list-item v-bind="props">
-                      <template v-slot:prepend>
-                        <v-icon icon="mdi-alert" :color="item.raw.color"></v-icon>
+                  <template #item="{ props: itemProps, item }">
+                    <v-list-item v-bind="itemProps">
+                      <template #prepend>
+                        <v-icon :color="item.raw.color" icon="mdi-alert" />
                       </template>
                     </v-list-item>
                   </template>
-                  <template v-slot:selection="{ item }">
+                  <template #selection="{ item }">
                     <v-chip
+                      class="mr-2 priority-chip"
                       :color="item.raw.color"
                       size="small"
-                      class="mr-2 priority-chip"
                       variant="elevated"
                     >
-                      <v-icon icon="mdi-alert" size="12" class="mr-1"></v-icon>
+                      <v-icon class="mr-1" icon="mdi-alert" size="12" />
                       {{ item.raw.title }}
                     </v-chip>
                   </template>
@@ -139,64 +139,64 @@
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="formData.dueDate"
+                  class="input-field"
+                  color="primary"
+                  hide-details="auto"
                   label="Due Date"
+                  prepend-inner-icon="mdi-calendar"
+                  :rules="dueDateRules"
                   type="date"
                   variant="outlined"
-                  color="primary"
-                  prepend-inner-icon="mdi-calendar"
-                  class="input-field"
-                  hide-details="auto"
-                  :rules="dueDateRules"
-                ></v-text-field>
+                />
               </v-col>
 
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="formData.estimatedHours"
-                  label="Estimated Hours"
-                  type="number"
-                  min="0"
-                  step="0.5"
-                  variant="outlined"
-                  color="primary"
-                  prepend-inner-icon="mdi-clock-outline"
                   class="input-field"
+                  color="primary"
                   hide-details="auto"
+                  label="Estimated Hours"
+                  min="0"
+                  prepend-inner-icon="mdi-clock-outline"
                   :rules="estimatedHoursRules"
-                ></v-text-field>
+                  step="0.5"
+                  type="number"
+                  variant="outlined"
+                />
               </v-col>
 
               <!-- Project Assignment -->
               <v-col cols="12">
                 <v-autocomplete
                   v-model="formData.project"
-                  label="Project (Optional)"
-                  :items="projectOptions"
-                  variant="outlined"
-                  color="primary"
-                  clearable
-                  prepend-inner-icon="mdi-folder"
                   class="input-field"
+                  clearable
+                  color="primary"
                   hide-details="auto"
+                  :items="projectOptions"
+                  label="Project (Optional)"
+                  prepend-inner-icon="mdi-folder"
                   :rules="projectRules"
-                ></v-autocomplete>
+                  variant="outlined"
+                />
               </v-col>
 
               <!-- Tags -->
               <v-col cols="12">
                 <v-combobox
                   v-model="formData.tags"
-                  label="Tags"
-                  placeholder="Add tags..."
-                  variant="outlined"
-                  color="primary"
-                  multiple
                   chips
-                  closable-chips
-                  prepend-inner-icon="mdi-tag-multiple"
                   class="input-field"
+                  closable-chips
+                  color="primary"
                   hide-details="auto"
-                ></v-combobox>
+                  label="Tags"
+                  multiple
+                  placeholder="Add tags..."
+                  prepend-inner-icon="mdi-tag-multiple"
+                  variant="outlined"
+                />
               </v-col>
             </v-row>
           </v-form>
@@ -205,26 +205,26 @@
 
       <!-- Actions -->
       <v-card-actions class="pa-6 pt-0">
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn
+          class="action-btn mr-3"
           color="grey-darken-1"
+          size="large"
           variant="outlined"
           @click="$emit('close')"
-          class="action-btn mr-3"
-          size="large"
         >
-          <v-icon icon="mdi-close" class="mr-1"></v-icon>
+          <v-icon class="mr-1" icon="mdi-close" />
           Cancel
         </v-btn>
         <v-btn
+          class="action-btn"
           color="primary"
+          :disabled="!isFormValid"
+          size="large"
           variant="elevated"
           @click="saveTask"
-          :disabled="!isFormValid"
-          class="action-btn"
-          size="large"
         >
-          <v-icon :icon="editingTask ? 'mdi-content-save' : 'mdi-plus'" class="mr-1"></v-icon>
+          <v-icon class="mr-1" :icon="editingTask ? 'mdi-content-save' : 'mdi-plus'" />
           {{ editingTask ? 'Update Task' : 'Create Task' }}
         </v-btn>
       </v-card-actions>
@@ -233,143 +233,143 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useTaskColors, useTaskValidation } from '@/composables'
-import { useProjectsStore } from '@/stores/projects'
+  import { computed, ref, watch } from 'vue'
+  import { useTaskColors, useTaskValidation } from '@/composables'
+  import { useProjectsStore } from '@/stores/projects'
 
-const props = defineProps({
-  showDialog: {
-    type: Boolean,
-    default: false,
-  },
-  editingTask: {
-    type: Object,
-    default: null,
-  },
-  initialData: {
-    type: Object,
-    default: () => ({}),
-  },
-})
+  const props = defineProps({
+    showDialog: {
+      type: Boolean,
+      default: false,
+    },
+    editingTask: {
+      type: Object,
+      default: null,
+    },
+    initialData: {
+      type: Object,
+      default: () => ({}),
+    },
+  })
 
-const emit = defineEmits(['close', 'save'])
+  const emit = defineEmits(['close', 'save'])
 
-// Stores
-const projectsStore = useProjectsStore()
+  // Stores
+  const projectsStore = useProjectsStore()
 
-// Refs
-const form = ref(null)
+  // Refs
+  const form = ref(null)
 
-// Form data
-const formData = ref({
-  title: '',
-  description: '',
-  status: 'todo',
-  priority: 'medium',
-  dueDate: '',
-  estimatedHours: '',
-  project: '',
-  tags: [],
-})
+  // Form data
+  const formData = ref({
+    title: '',
+    description: '',
+    status: 'todo',
+    priority: 'medium',
+    dueDate: '',
+    estimatedHours: '',
+    project: '',
+    tags: [],
+  })
 
-// Use composables
-const { cssVars, applyCssVars } = useTaskColors('dialog')
-const {
-  titleRules,
-  descriptionRules,
-  dueDateRules,
-  estimatedHoursRules,
-  projectRules,
-  isFormValid
-} = useTaskValidation(formData)
+  // Use composables
+  const { applyCssVars } = useTaskColors('dialog')
+  const {
+    titleRules,
+    descriptionRules,
+    dueDateRules,
+    estimatedHoursRules,
+    projectRules,
+    isFormValid,
+  } = useTaskValidation(formData)
 
-// Apply CSS variables
-applyCssVars()
+  // Apply CSS variables
+  applyCssVars()
 
-// Options
-const statusOptions = computed(() => {
-  const baseOptions = [
-    { title: 'To Do', value: 'todo', icon: 'mdi-circle-outline', color: 'grey' },
-    { title: 'In Progress', value: 'in-progress', icon: 'mdi-progress-clock', color: 'blue' }
+  // Options
+  const statusOptions = computed(() => {
+    const baseOptions = [
+      { title: 'To Do', value: 'todo', icon: 'mdi-circle-outline', color: 'grey' },
+      { title: 'In Progress', value: 'in-progress', icon: 'mdi-progress-clock', color: 'blue' },
+    ]
+
+    // Only show "Completed" and "Cancelled" options when editing existing tasks
+    if (props.editingTask?.id || props.editingTask?._id) {
+      baseOptions.push(
+        { title: 'Completed', value: 'completed', icon: 'mdi-check-circle', color: 'green' },
+        { title: 'Cancelled', value: 'cancelled', icon: 'mdi-close-circle', color: 'red' }
+      )
+    }
+
+    return baseOptions
+  })
+
+  const priorityOptions = [
+    { title: 'Low', value: 'low', color: 'green' },
+    { title: 'Medium', value: 'medium', color: 'orange' },
+    { title: 'High', value: 'high', color: 'red' },
+    { title: 'Critical', value: 'critical', color: 'purple' },
   ]
 
-  // Only show "Completed" and "Cancelled" options when editing existing tasks
-  if (props.editingTask?.id || props.editingTask?._id) {
-    baseOptions.push(
-      { title: 'Completed', value: 'completed', icon: 'mdi-check-circle', color: 'green' },
-      { title: 'Cancelled', value: 'cancelled', icon: 'mdi-close-circle', color: 'red' }
-    )
-  }
+  const projectOptions = computed(() => {
+    return projectsStore.projects.map(project => ({
+      title: project.title || project.name,
+      value: project.title || project.name,
+    }))
+  })
 
-  return baseOptions
-})
-
-const priorityOptions = [
-  { title: 'Low', value: 'low', color: 'green' },
-  { title: 'Medium', value: 'medium', color: 'orange' },
-  { title: 'High', value: 'high', color: 'red' },
-  { title: 'Critical', value: 'critical', color: 'purple' }
-]
-
-const projectOptions = computed(() => {
-  return projectsStore.projects.map(project => ({
-    title: project.title || project.name,
-    value: project.title || project.name
-  }))
-})
-
-// Watch for dialog opening and reset form
-watch(() => props.showDialog, (newVal) => {
-  if (newVal) {
-    resetForm()
-  }
-})
-
-const resetForm = () => {
-  if (props.editingTask) {
-    formData.value = {
-      ...props.editingTask,
-      tags: props.editingTask.tags || []
+  // Watch for dialog opening and reset form
+  watch(() => props.showDialog, newVal => {
+    if (newVal) {
+      resetForm()
     }
-    // Format date for input
-    if (formData.value.dueDate) {
-      formData.value.dueDate = new Date(formData.value.dueDate).toISOString().split('T')[0]
-    }
-  } else {
-    formData.value = {
-      title: '',
-      description: '',
-      status: 'todo',
-      priority: 'medium',
-      dueDate: '',
-      estimatedHours: '',
-      project: '',
-      tags: [],
-      ...props.initialData,
-    }
-  }
-}
+  })
 
-const saveTask = async () => {
-  if (form.value) {
-    const { valid } = await form.value.validate()
-    if (valid) {
-      const taskData = { ...formData.value }
-
-      // Convert date string to Date object
-      if (taskData.dueDate) {
-        taskData.dueDate = new Date(taskData.dueDate)
+  const resetForm = () => {
+    if (props.editingTask) {
+      formData.value = {
+        ...props.editingTask,
+        tags: props.editingTask.tags || [],
       }
-
-      // Convert estimated hours to number
-      if (taskData.estimatedHours) {
-        taskData.estimatedHours = parseFloat(taskData.estimatedHours)
+      // Format date for input
+      if (formData.value.dueDate) {
+        formData.value.dueDate = new Date(formData.value.dueDate).toISOString().split('T')[0]
       }
-
-      emit('save', taskData)
+    } else {
+      formData.value = {
+        title: '',
+        description: '',
+        status: 'todo',
+        priority: 'medium',
+        dueDate: '',
+        estimatedHours: '',
+        project: '',
+        tags: [],
+        ...props.initialData,
+      }
     }
   }
-}
+
+  const saveTask = async () => {
+    if (form.value) {
+      const { valid } = await form.value.validate()
+      if (valid) {
+        const taskData = { ...formData.value }
+
+        // Convert date string to Date object
+        if (taskData.dueDate) {
+          taskData.dueDate = new Date(taskData.dueDate)
+        }
+
+        // Convert estimated hours to number
+        if (taskData.estimatedHours) {
+          taskData.estimatedHours = parseFloat(taskData.estimatedHours)
+        }
+
+        emit('save', taskData)
+      }
+    }
+  }
 </script>
 
 <style scoped>

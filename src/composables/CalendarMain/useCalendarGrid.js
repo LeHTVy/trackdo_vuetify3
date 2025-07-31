@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 
-export function useCalendarGrid(currentValue, viewType = 'monthly') {
+export function useCalendarGrid (currentValue, viewType = 'monthly') {
   const weekdayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
   const fullWeekdayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
@@ -21,7 +21,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
   /**
    * Generate monthly view grid
    */
-  const getMonthlyView = (currentDate) => {
+  const getMonthlyView = currentDate => {
     const year = currentDate.getFullYear()
     const month = currentDate.getMonth()
     const firstDay = new Date(year, month, 1)
@@ -35,7 +35,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
         date,
         isCurrentMonth: false,
         isPreviousMonth: true,
-        isNextMonth: false
+        isNextMonth: false,
       })
     }
 
@@ -45,7 +45,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
         date,
         isCurrentMonth: true,
         isPreviousMonth: false,
-        isNextMonth: false
+        isNextMonth: false,
       })
     }
 
@@ -56,7 +56,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
         date,
         isCurrentMonth: false,
         isPreviousMonth: false,
-        isNextMonth: true
+        isNextMonth: true,
       })
     }
 
@@ -66,7 +66,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
   /**
    * Generate weekly view grid
    */
-  const getWeeklyView = (currentDate) => {
+  const getWeeklyView = currentDate => {
     const startOfWeek = getStartOfWeek(currentDate)
     const days = []
 
@@ -77,7 +77,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
         date,
         isCurrentMonth: date.getMonth() === currentDate.getMonth(),
         isPreviousMonth: date.getMonth() < currentDate.getMonth(),
-        isNextMonth: date.getMonth() > currentDate.getMonth()
+        isNextMonth: date.getMonth() > currentDate.getMonth(),
       })
     }
 
@@ -85,22 +85,10 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
   }
 
   /**
-   * Generate daily view grid
-   */
-  const getDailyView = (currentDate) => {
-    return [{
-      date: new Date(currentDate),
-      isCurrentMonth: true,
-      isPreviousMonth: false,
-      isNextMonth: false
-    }]
-  }
-
-  /**
    * Check if a date is today
    * @param {Date} date
    */
-  const isToday = (date) => {
+  const isToday = date => {
     if (!date) return false
 
     const today = new Date()
@@ -114,7 +102,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
    * Check if a date is in the past
    * @param {Date} date
    */
-  const isPast = (date) => {
+  const isPast = date => {
     if (!date) return false
 
     const today = new Date()
@@ -128,7 +116,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
    * Check if a date is in the future
    * @param {Date} date
    */
-  const isFuture = (date) => {
+  const isFuture = date => {
     if (!date) return false
 
     const today = new Date()
@@ -142,7 +130,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
    * Check if a date is a weekend (Saturday or Sunday)
    * @param {Date} date
    */
-  const isWeekend = (date) => {
+  const isWeekend = date => {
     if (!date) return false
     const day = date.getDay()
     return day === 0 || day === 6
@@ -158,7 +146,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
 
     return date.toLocaleDateString(locale, {
       month: 'long',
-      year: 'numeric'
+      year: 'numeric',
     })
   }
 
@@ -174,7 +162,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     })
   }
 
@@ -188,7 +176,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
 
     return date.toLocaleDateString(locale, {
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     })
   }
 
@@ -196,7 +184,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
    * Get week number for a date
    * @param {Date} date
    */
-  const getWeekNumber = (date) => {
+  const getWeekNumber = date => {
     if (!date) return 0
 
     const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
@@ -210,7 +198,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
    * Get the start of week for a given date (Monday)
    * @param {Date} date
    */
-  const getStartOfWeek = (date) => {
+  const getStartOfWeek = date => {
     if (!date) return null
 
     const d = new Date(date)
@@ -223,7 +211,7 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
    * Get the end of week for a given date (Sunday)
    * @param {Date} date
    */
-  const getEndOfWeek = (date) => {
+  const getEndOfWeek = date => {
     if (!date) return null
 
     const startOfWeek = getStartOfWeek(date)
@@ -268,6 +256,6 @@ export function useCalendarGrid(currentValue, viewType = 'monthly') {
     getWeekNumber,
     getStartOfWeek,
     getEndOfWeek,
-    getDaysBetween
+    getDaysBetween,
   }
 }

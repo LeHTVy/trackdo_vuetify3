@@ -2,7 +2,7 @@ import { computed } from 'vue'
 import { useEventsStore } from '@/stores/events'
 import { useProjectsStore } from '@/stores/projects'
 
-export function useTaskInsights() {
+export function useTaskInsights () {
   const eventsStore = useEventsStore()
   const projectsStore = useProjectsStore()
 
@@ -38,15 +38,15 @@ export function useTaskInsights() {
   })
 
   // Format event time
-  const formatEventTime = (event) => {
+  const formatEventTime = event => {
     const start = new Date(event.start)
     const end = new Date(event.end || event.start)
 
-    const formatTime = (date) => {
+    const formatTime = date => {
       return date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hour12: false,
       })
     }
 
@@ -58,42 +58,42 @@ export function useTaskInsights() {
   }
 
   // Get event color based on category
-  const getEventColor = (event) => {
+  const getEventColor = event => {
     const colorMap = {
       'work': '#1976d2',
       'personal': '#388e3c',
       'meeting': '#f57c00',
       'deadline': '#d32f2f',
-      'default': '#6200ea'
+      'default': '#6200ea',
     }
     return colorMap[event.category] || colorMap.default
   }
 
   // Get project status color
-  const getProjectStatusColor = (status) => {
+  const getProjectStatusColor = status => {
     const colorMap = {
       'Active': '#4caf50',
       'Planning': '#2196f3',
       'On Hold': '#ff9800',
       'Completed': '#9c27b0',
-      'default': '#757575'
+      'default': '#757575',
     }
     return colorMap[status] || colorMap.default
   }
 
   // Get priority color
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = priority => {
     const colorMap = {
       'High': '#f44336',
       'Medium': '#ff9800',
       'Low': '#4caf50',
-      'default': '#757575'
+      'default': '#757575',
     }
     return colorMap[priority] || colorMap.default
   }
 
   // Format relative time
-  const formatRelativeTime = (date) => {
+  const formatRelativeTime = date => {
     const now = new Date()
     const targetDate = new Date(date)
     const diffInMs = targetDate - now
@@ -133,6 +133,6 @@ export function useTaskInsights() {
     // Colors
     getEventColor,
     getProjectStatusColor,
-    getPriorityColor
+    getPriorityColor,
   }
 }

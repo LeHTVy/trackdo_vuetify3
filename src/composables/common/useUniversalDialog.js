@@ -1,4 +1,4 @@
-import { ref, reactive, computed, nextTick } from 'vue'
+import { computed, nextTick, reactive } from 'vue'
 import logger from '@/services/logger'
 
 const dialogLogger = logger.createLogger('DialogManager')
@@ -6,7 +6,7 @@ const dialogLogger = logger.createLogger('DialogManager')
 // Global dialog registry
 const dialogRegistry = reactive(new Map())
 
-export function useUniversalDialog(dialogName = null) {
+export function useUniversalDialog (dialogName = null) {
   const uniqueDialogName = dialogName || `dialog_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
   if (!dialogRegistry.has(uniqueDialogName)) {
@@ -15,7 +15,7 @@ export function useUniversalDialog(dialogName = null) {
       loading: false,
       data: null,
       options: {},
-      history: []
+      history: [],
     })
   }
 
@@ -36,7 +36,7 @@ export function useUniversalDialog(dialogName = null) {
         action: 'open',
         timestamp: new Date(),
         data,
-        options
+        options,
       })
 
       state.data = data
@@ -66,7 +66,7 @@ export function useUniversalDialog(dialogName = null) {
       state.history.push({
         action: 'close',
         timestamp: new Date(),
-        clearData
+        clearData,
       })
 
       state.isOpen = false
@@ -146,7 +146,7 @@ export function useUniversalDialog(dialogName = null) {
    * @param {boolean} loading - Loading state
    * @returns {void}
    */
-  const setDialogLoading = (loading) => {
+  const setDialogLoading = loading => {
     const state = dialogRegistry.get(uniqueDialogName)
     state.loading = loading
 
@@ -218,14 +218,14 @@ export function useUniversalDialog(dialogName = null) {
 
     // History
     getDialogHistory,
-    clearDialogHistory
+    clearDialogHistory,
   }
 }
 
 /**
  * Global dialog manager for managing multiple dialogs
  */
-export function useGlobalDialogManager() {
+export function useGlobalDialogManager () {
   /**
    * Get all active dialogs
    * @returns {Array} Array of active dialog names
@@ -246,7 +246,7 @@ export function useGlobalDialogManager() {
 
     dialogLogger.info(`Closing ${activeDialogs.length} active dialogs`, activeDialogs)
 
-    const promises = activeDialogs.map(async (dialogName) => {
+    const promises = activeDialogs.map(async dialogName => {
       const { closeDialog } = useUniversalDialog(dialogName)
       return closeDialog(clearData)
     })
@@ -267,7 +267,7 @@ export function useGlobalDialogManager() {
    * @param {string} dialogName - Dialog name
    * @returns {Object|null} Dialog state or null if not found
    */
-  const getDialog = (dialogName) => {
+  const getDialog = dialogName => {
     return dialogRegistry.get(dialogName) || null
   }
 
@@ -276,7 +276,7 @@ export function useGlobalDialogManager() {
    * @param {string} dialogName - Dialog name to remove
    * @returns {boolean} Success state
    */
-  const removeDialog = (dialogName) => {
+  const removeDialog = dialogName => {
     const success = dialogRegistry.delete(dialogName)
 
     if (success) {
@@ -317,7 +317,7 @@ export function useGlobalDialogManager() {
 
     // Getters
     getActiveDialogs,
-    getAllDialogs
+    getAllDialogs,
   }
 }
 
@@ -332,17 +332,17 @@ export const DialogTypes = {
   EDIT: 'edit',
   CREATE: 'create',
   DELETE: 'delete',
-  LOADING: 'loading'
+  LOADING: 'loading',
 }
 
 /**
  * Create typed dialog composables for common patterns
  */
-export function useConfirmDialog(dialogName = 'confirm-dialog') {
+export function useConfirmDialog (dialogName = 'confirm-dialog') {
   const dialog = useUniversalDialog(dialogName)
 
   const confirm = async (message, title = 'Confirm Action', options = {}) => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       dialog.openDialog({
         type: DialogTypes.CONFIRM,
         message,
@@ -354,47 +354,47 @@ export function useConfirmDialog(dialogName = 'confirm-dialog') {
         onCancel: () => {
           dialog.closeDialog()
           resolve(false)
-        }
+        },
       }, options)
     })
   }
 
   return {
     ...dialog,
-    confirm
+    confirm,
   }
 }
 
-export function useFormDialog(dialogName = 'form-dialog') {
+export function useFormDialog (dialogName = 'form-dialog') {
   const dialog = useUniversalDialog(dialogName)
 
   const openForm = async (formData = {}, options = {}) => {
     return dialog.openDialog({
       type: DialogTypes.FORM,
       formData,
-      ...options
+      ...options,
     }, options)
   }
 
   return {
     ...dialog,
-    openForm
+    openForm,
   }
 }
 
-export function useDetailsDialog(dialogName = 'details-dialog') {
+export function useDetailsDialog (dialogName = 'details-dialog') {
   const dialog = useUniversalDialog(dialogName)
 
   const showDetails = async (item, options = {}) => {
     return dialog.openDialog({
       type: DialogTypes.DETAILS,
       item,
-      ...options
+      ...options,
     }, options)
   }
 
   return {
     ...dialog,
-    showDetails
+    showDetails,
   }
 }

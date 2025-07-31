@@ -9,7 +9,7 @@ import { computed } from 'vue'
  * @param {Array} projects - Array of projects for statistics calculation
  * @returns {Object} Statistics data and computed values
  */
-export function useProjectStats(projects) {
+export function useProjectStats (projects) {
 
   // Basic project counts
   const totalProjects = computed(() => projects.value?.length || 0)
@@ -34,7 +34,7 @@ export function useProjectStats(projects) {
       icon: 'mdi-folder-multiple',
       color: 'primary',
       type: 'total',
-      progress: 100
+      progress: 100,
     },
     {
       label: 'Active Projects',
@@ -42,7 +42,7 @@ export function useProjectStats(projects) {
       icon: 'mdi-play-circle',
       color: 'project-active',
       type: 'active',
-      progress: totalProjects.value > 0 ? Math.round((activeProjects.value / totalProjects.value) * 100) : 0
+      progress: totalProjects.value > 0 ? Math.round((activeProjects.value / totalProjects.value) * 100) : 0,
     },
     {
       label: 'Completed',
@@ -50,7 +50,7 @@ export function useProjectStats(projects) {
       icon: 'mdi-check-circle',
       color: 'project-completed',
       type: 'completed',
-      progress: totalProjects.value > 0 ? Math.round((completedProjects.value / totalProjects.value) * 100) : 0
+      progress: totalProjects.value > 0 ? Math.round((completedProjects.value / totalProjects.value) * 100) : 0,
     },
     {
       label: 'On Hold',
@@ -58,8 +58,8 @@ export function useProjectStats(projects) {
       icon: 'mdi-pause-circle',
       color: 'project-onhold',
       type: 'onhold',
-      progress: totalProjects.value > 0 ? Math.round((onHoldProjects.value / totalProjects.value) * 100) : 0
-    }
+      progress: totalProjects.value > 0 ? Math.round((onHoldProjects.value / totalProjects.value) * 100) : 0,
+    },
   ])
 
   // Overall progress calculation
@@ -108,7 +108,7 @@ export function useProjectStats(projects) {
     return {
       active: Math.round((activeProjects.value / totalProjects.value) * 100),
       completed: Math.round((completedProjects.value / totalProjects.value) * 100),
-      onHold: Math.round((onHoldProjects.value / totalProjects.value) * 100)
+      onHold: Math.round((onHoldProjects.value / totalProjects.value) * 100),
     }
   })
 
@@ -124,6 +124,6 @@ export function useProjectStats(projects) {
     overallProgress,
     progressDistribution,
     budgetStats,
-    statusDistribution
+    statusDistribution,
   }
 }

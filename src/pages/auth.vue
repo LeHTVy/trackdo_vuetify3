@@ -27,28 +27,28 @@
     <!-- Enhanced Snackbar with better visibility -->
     <v-snackbar
       v-model="snackbar.show"
-      :color="snackbar.color"
-      :timeout="snackbar.color === 'error' ? 8000 : snackbar.color === 'warning' ? 6000 : 4000"
-      location="top center"
-      elevation="6"
-      rounded="lg"
       class="auth-snackbar"
+      :color="snackbar.color"
+      elevation="6"
+      location="top center"
+      rounded="lg"
+      :timeout="snackbar.color === 'error' ? 8000 : snackbar.color === 'warning' ? 6000 : 4000"
     >
       <div class="d-flex align-center">
         <v-icon
-          :icon="getSnackbarIcon(snackbar.color)"
           class="me-2"
+          :icon="getSnackbarIcon(snackbar.color)"
           size="20"
         />
         <span class="font-weight-medium">{{ snackbar.message }}</span>
       </div>
 
-      <template v-slot:actions>
+      <template #actions>
         <v-btn
-          variant="text"
-          size="small"
-          @click="hideMessage"
           icon="mdi-close"
+          size="small"
+          variant="text"
+          @click="hideMessage"
         />
       </template>
     </v-snackbar>
@@ -56,39 +56,39 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
-import { useSnackbarStore } from '@/stores/snackbar'
-import AuthCard from '@/components/auth/AuthCard.vue'
-import AppPreview from '@/components/auth/AppPreview.vue'
+  import { computed, onMounted } from 'vue'
+  import { useSnackbarStore } from '@/stores/snackbar'
+  import AuthCard from '@/components/auth/AuthCard.vue'
+  import AppPreview from '@/components/auth/AppPreview.vue'
 
-// Use snackbar store
-const snackbarStore = useSnackbarStore()
-const snackbar = computed(() => snackbarStore.snackbar)
+  // Use snackbar store
+  const snackbarStore = useSnackbarStore()
+  const snackbar = computed(() => snackbarStore.snackbar)
 
-const hideMessage = () => {
-  snackbarStore.hideMessage()
-}
-
-// Method to get appropriate icon for snackbar
-const getSnackbarIcon = (color) => {
-  switch (color) {
-    case 'success':
-      return 'mdi-check-circle'
-    case 'error':
-      return 'mdi-alert-circle'
-    case 'warning':
-      return 'mdi-alert'
-    case 'info':
-      return 'mdi-information'
-    default:
-      return 'mdi-information'
+  const hideMessage = () => {
+    snackbarStore.hideMessage()
   }
-}
 
-// Check authentication on mount
-onMounted(() => {
-  console.log('🔧 Auth page mounted, snackbar state:', snackbar.value)
-})
+  // Method to get appropriate icon for snackbar
+  const getSnackbarIcon = color => {
+    switch (color) {
+      case 'success':
+        return 'mdi-check-circle'
+      case 'error':
+        return 'mdi-alert-circle'
+      case 'warning':
+        return 'mdi-alert'
+      case 'info':
+        return 'mdi-information'
+      default:
+        return 'mdi-information'
+    }
+  }
+
+  // Check authentication on mount
+  onMounted(() => {
+    console.log('🔧 Auth page mounted, snackbar state:', snackbar.value)
+  })
 </script>
 
 <style scoped>
@@ -206,7 +206,6 @@ onMounted(() => {
   color: rgb(var(--v-theme-subtitle-text));
   line-height: 1.6;
 }
-
 
 
 /* Responsive Design */

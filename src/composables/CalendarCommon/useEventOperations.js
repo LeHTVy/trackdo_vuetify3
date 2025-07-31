@@ -4,7 +4,7 @@ import logger from '@/services/logger'
 
 const eventLogger = logger.createLogger('EventOperations')
 
-export function useEventOperations(eventsStore) {
+export function useEventOperations (eventsStore) {
   const baseOps = useBaseOperations(eventsStore, 'event')
   const eventHandler = useEventHandler('EventOperations')
 
@@ -13,7 +13,7 @@ export function useEventOperations(eventsStore) {
    * @param {Object} event - Event object
    * @returns {string} - Event title
    */
-  const getEventTitle = (event) => {
+  const getEventTitle = event => {
     return event?.title || event?.name || 'Untitled Event'
   }
 
@@ -22,14 +22,14 @@ export function useEventOperations(eventsStore) {
    * @param {Object} event - Original event
    * @returns {Object} - Duplicated event data
    */
-  const createDuplicatedEventData = (event) => {
+  const createDuplicatedEventData = event => {
     const eventTitle = getEventTitle(event)
     return {
       ...event,
       title: `${eventTitle} (Copy)`,
       name: `${eventTitle} (Copy)`,
       id: undefined,
-      _id: undefined
+      _id: undefined,
     }
   }
 
@@ -38,7 +38,7 @@ export function useEventOperations(eventsStore) {
    * @param {Object} eventData - Event data to validate
    * @returns {Object} - Validation result
    */
-  const validateEventData = (eventData) => {
+  const validateEventData = eventData => {
     const errors = []
 
     const eventTitle = eventData.title || eventData.name
@@ -61,7 +61,7 @@ export function useEventOperations(eventsStore) {
     return {
       isValid: errors.length === 0,
       errors,
-      error: errors.join(', ')
+      error: errors.join(', '),
     }
   }
 
@@ -70,7 +70,7 @@ export function useEventOperations(eventsStore) {
    * @param {Object} eventData - Event data to normalize
    * @returns {Object} - Normalized event data
    */
-  const normalizeEventData = (eventData) => {
+  const normalizeEventData = eventData => {
     const normalized = { ...eventData }
 
     // Ensure both title and name are set
@@ -119,7 +119,7 @@ export function useEventOperations(eventsStore) {
         const eventToUpdate = {
           ...normalizedData,
           id: eventId,
-          _id: eventId
+          _id: eventId,
         }
 
         // Call the store's updateEvent method directly with the full event object
@@ -127,18 +127,18 @@ export function useEventOperations(eventsStore) {
         return {
           success: true,
           data: result,
-          message: 'Event updated successfully'
+          message: 'Event updated successfully',
         }
       } else {
         return baseOps.createItem(normalizedData, {
           createMethod: 'addEvent',
           successMessage: 'Event created successfully',
-          errorMessage: 'Unable to create event'
+          errorMessage: 'Unable to create event',
         })
       }
     }, {
       actionName: isEdit ? 'update_event' : 'create_event',
-      itemName: 'Event'
+      itemName: 'Event',
     })
   }
 
@@ -147,18 +147,18 @@ export function useEventOperations(eventsStore) {
    * @param {Object} event - Event to delete
    * @returns {Promise<Object>} - Operation result
    */
-  const deleteEvent = async (event) => {
+  const deleteEvent = async event => {
     const eventTitle = getEventTitle(event)
 
     return eventHandler.handleDelete(async () => {
       return baseOps.deleteItem(event, {
         deleteMethod: 'deleteEvent',
         successMessage: 'Event deleted successfully',
-        errorMessage: 'Unable to delete event'
+        errorMessage: 'Unable to delete event',
       })
     }, {
       itemName: eventTitle,
-      confirmMessage: `Are you sure you want to delete "${eventTitle}"? This action cannot be undone.`
+      confirmMessage: `Are you sure you want to delete "${eventTitle}"? This action cannot be undone.`,
     })
   }
 
@@ -167,16 +167,16 @@ export function useEventOperations(eventsStore) {
    * @param {Object} event - Event to delete
    * @returns {Promise<Object>} - Operation result
    */
-  const deleteEventWithoutConfirm = async (event) => {
+  const deleteEventWithoutConfirm = async event => {
     return eventHandler.handleAsyncEvent(async () => {
       return baseOps.deleteItem(event, {
         deleteMethod: 'deleteEvent',
         successMessage: 'Event deleted successfully',
-        errorMessage: 'Unable to delete event'
+        errorMessage: 'Unable to delete event',
       })
     }, {
       actionName: 'delete_event',
-      itemName: getEventTitle(event)
+      itemName: getEventTitle(event),
     })
   }
 
@@ -185,16 +185,16 @@ export function useEventOperations(eventsStore) {
    * @param {Object} event - Event to duplicate
    * @returns {Promise<Object>} - Operation result
    */
-  const duplicateEvent = async (event) => {
+  const duplicateEvent = async event => {
     return eventHandler.handleDuplicate(async () => {
       return baseOps.duplicateItem(event, {
         createMethod: 'addEvent',
         duplicateTransform: createDuplicatedEventData,
         successMessage: 'Event duplicated successfully',
-        errorMessage: 'Unable to duplicate event'
+        errorMessage: 'Unable to duplicate event',
       })
     }, {
-      itemName: getEventTitle(event)
+      itemName: getEventTitle(event),
     })
   }
 
@@ -203,16 +203,16 @@ export function useEventOperations(eventsStore) {
    * @param {Array} eventIds - Array of event IDs
    * @returns {Promise<Object>} - Operation result
    */
-  const deleteMultipleEvents = async (eventIds) => {
+  const deleteMultipleEvents = async eventIds => {
     return eventHandler.handleAsyncEvent(async () => {
       return baseOps.deleteMultipleItems(eventIds, {
         deleteMethod: 'deleteEvent',
         successMessage: `${eventIds.length} events deleted successfully`,
-        errorMessage: 'Unable to delete selected events'
+        errorMessage: 'Unable to delete selected events',
       })
     }, {
       actionName: 'delete_multiple_events',
-      confirmBefore: () => window.confirm(`Are you sure you want to delete ${eventIds.length} events? This action cannot be undone.`)
+      confirmBefore: () => window.confirm(`Are you sure you want to delete ${eventIds.length} events? This action cannot be undone.`),
     })
   }
 
@@ -225,10 +225,10 @@ export function useEventOperations(eventsStore) {
       return baseOps.refreshItems({
         refreshMethod: 'initializeStore',
         successMessage: 'Events refreshed successfully',
-        errorMessage: 'Unable to refresh events'
+        errorMessage: 'Unable to refresh events',
       })
     }, {
-      actionName: 'refresh_events'
+      actionName: 'refresh_events',
     })
   }
 
@@ -277,6 +277,6 @@ export function useEventOperations(eventsStore) {
     getEventTitle,
     createDuplicatedEventData,
     validateEventData,
-    normalizeEventData
+    normalizeEventData,
   }
 }
