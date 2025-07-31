@@ -462,7 +462,7 @@ npm run dev:full
 ## 📈 Future Enhancements
 
 ### 🚀 Planned Features
-- **User Authentication** - Login/logout with JWT tokens
+- **Enhanced Authentication** - Upgrade to JWT-based authentication (currently using basic tokens)
 - **Real-time Notifications** - WebSocket-based live updates
 - **File Attachments** - Upload and manage files for projects/tasks
 - **Team Collaboration** - Multi-user support with role-based permissions

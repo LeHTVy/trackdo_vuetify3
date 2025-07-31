@@ -9,7 +9,7 @@ TrackDo is a comprehensive project management and task tracking application buil
 - **Frontend**: Vue.js 3 with Vuetify (Port 5173)
 - **Backend**: Node.js with Express.js (Port 3000)
 - **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT-based authentication system
+- **Authentication**: Basic token-based authentication system (Note: JWT implementation pending)
 
 ## Prerequisites
 
