@@ -112,7 +112,7 @@ To provide a comprehensive, user-friendly platform that streamlines project mana
 <table>
   <tr>
     <td align="center">
-      <img src="public/dashboard.png" alt="Dashboard Light Mode" width="400">
+      <img src="public/homelightmode.png" alt="Dashboard Light Mode" width="400">
       <br>
       <strong>📊 Dashboard - Light Mode</strong>
     </td>
@@ -125,7 +125,7 @@ To provide a comprehensive, user-friendly platform that streamlines project mana
 </table>
 
 ### 🎯 Application Preview
-<img src="public/hero.gif" alt="TrackDo Application Preview" width="800">
+<img src="public/preview.mp4" alt="TrackDo Application Preview" width="800">
 
 </div>
 
