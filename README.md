@@ -127,6 +127,8 @@ To provide a comprehensive, user-friendly platform that streamlines project mana
 ### 🎯 Application Preview
 <img src="public/preview.mp4" alt="TrackDo Application Preview" width="800">
 
+https://github.com/user-attachments/assets/8c849249-1248-4ed4-8bd7-a615e89aa62e
+
 </div>
 
 ---
