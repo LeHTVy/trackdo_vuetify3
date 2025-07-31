@@ -12,9 +12,12 @@
     "backend:dev": "cd backend && npm run dev",
     "backend:dev:lan": "cd backend && npm run dev:lan",
     "backend:install": "cd backend && npm install",
+    "backend:start": "cd backend && npm start",
     "dev:full": "concurrently \"npm run backend:dev\" \"npm run dev\"",
     "dev:full:lan": "concurrently \"npm run backend:dev:lan\" \"npm run dev:lan\"",
-    "install:all": "npm install && npm run backend:install"
+    "install:all": "npm install && npm run backend:install",
+    "db:setup": "node backend/migrations/setup-database.js",
+    "db:migrate": "node backend/migrations/setup-database.js"
   },
   "dependencies": {
     "@fontsource/roboto": "5.2.5",
