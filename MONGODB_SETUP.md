@@ -62,18 +62,10 @@ MONGODB_URI=mongodb://localhost:27017/trackdo
 PORT=3000
 NODE_ENV=development
 
-# JWT Configuration (for authentication)
-JWT_SECRET=your-super-secret-jwt-key-here
-JWT_EXPIRES_IN=7d
-
 # CORS Configuration
 FRONTEND_URL=http://localhost:5173
 ```
 
-**For MongoDB Atlas (Cloud):**
-```env
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/trackdo?retryWrites=true&w=majority
-```
 
 ## Backend Architecture
 
