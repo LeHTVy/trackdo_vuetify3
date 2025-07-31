@@ -155,13 +155,14 @@ trackdo/
 │   ├── 📁 plugins/                # Vue plugins and configurations
 │   └── 📁 utils/                  # Utility functions
 ├── 📁 backend/                     # Backend API server
-│   ├── 📁 models/                 # MongoDB models
-│   ├── 📁 routes/                 # Express routes
-│   ├── 📁 middleware/             # Custom middleware
-│   └── 📄 server.js               # Main server file
+│   ├── 📁 migrations/             # Database migration scripts
+│   │   └── 📄 setup-database.js   # MongoDB setup script
+│   ├── 📄 package.json            # Backend dependencies
+│   └── 📄 server.js               # Main server file (includes models, routes, middleware)
 ├── 📁 public/                     # Static assets
 ├── 📄 package.json                # Frontend dependencies & scripts
 ├── 📄 vite.config.mjs             # Vite configuration
+├── 📄 MONGODB_SETUP.md            # MongoDB setup documentation
 └── 📄 README.md                   # This file
 ```
 
