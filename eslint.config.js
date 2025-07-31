@@ -1,3 +1,2 @@
-import vuetify from 'eslint-config-vuetify'
-
-export default vuetify()
+import vuetify from 'eslint-config-vuetify';
+export default vuetify;
