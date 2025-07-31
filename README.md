@@ -1,10 +1,10 @@
 <div align="center">
   <img src="public/logo.gif" alt="TrackDo Logo" width="120" height="120">
   
-  # 🚀 TrackDo - Task Management Application
+  # 🚀 TrackDo - Modern Task Management Application
   
   <p align="center">
-    <strong>A comprehensive task management application built with Vue.js 3, Vuetify, and MongoDB</strong>
+    <strong>A comprehensive full-stack task management solution built with Vue.js 3, Vuetify, and MongoDB</strong>
   </p>
   
   <p align="center">
@@ -15,9 +15,9 @@
   </p>
   
   <p align="center">
-    <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="License">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome">
-    <img src="https://img.shields.io/badge/Maintained-Yes-green.svg?style=for-the-badge" alt="Maintained">
+    <img src="https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge" alt="Status">
+    <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge" alt="PRs Welcome">
+    <img src="https://img.shields.io/badge/Maintained-Yes-green?style=for-the-badge" alt="Maintained">
   </p>
 </div>
 
@@ -26,140 +26,165 @@
 ## 📚 Table of Contents
 
 - [📖 About TrackDo](#-about-trackdo)
-- [🚀 What Has Been Accomplished](#-what-has-been-accomplished)
+- [✨ Key Features](#-key-features)
+- [🖼️ Screenshots](#️-screenshots)
 - [📁 Project Structure](#-project-structure)
 - [🛠 System Requirements](#-system-requirements)
 - [📦 Installation & Setup](#-installation--setup)
 - [🚀 Running the Application](#-running-the-application)
 - [🔌 API Endpoints](#-api-endpoints)
-- [✨ Features Implemented](#-features-implemented)
 - [🛠 Technologies Used](#-technologies-used)
 - [🔧 Development Commands](#-development-commands)
-- [🎯 Recent Improvements & Fixes](#-recent-improvements--fixes)
 - [🚨 Troubleshooting](#-troubleshooting)
 - [📈 Future Enhancements](#-future-enhancements)
 - [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
 
 ---
 
 ## 📖 About TrackDo
 
-TrackDo is a modern, full-stack task management application that helps you organize your projects, tasks, and events efficiently. Built with cutting-edge technologies, it offers a beautiful, responsive user interface that works seamlessly across all devices.
+TrackDo is a modern, full-stack task management application designed to help individuals and teams organize their projects, tasks, and events efficiently. Built with cutting-edge technologies, it offers a beautiful, responsive user interface that works seamlessly across all devices.
+
+### 🎯 Mission
+To provide a comprehensive, user-friendly platform that streamlines project management, task tracking, and event scheduling in one unified application.
 
 ### ✨ Key Highlights
 - 🎯 **Complete Project Management** - From planning to completion
-- ✅ **Advanced Task System** - Priority-based task organization
-- 📅 **Integrated Calendar** - Schedule and track events
-- 🎨 **Modern UI/UX** - Clean, intuitive interface with dark/light themes
-- 📱 **Fully Responsive** - Works perfectly on desktop, tablet, and mobile
+- ✅ **Advanced Task System** - Priority-based task organization with status tracking
+- 📅 **Integrated Calendar** - Schedule and manage events with visual calendar interface
+- 🎨 **Modern UI/UX** - Clean, intuitive interface with dark/light theme support
+- 📱 **Fully Responsive** - Works perfectly on desktop, tablet, and mobile devices
 - 🔄 **Real-time Updates** - Dynamic state management with Pinia
+- 🚀 **Fast Performance** - Built with Vite for lightning-fast development and builds
 
-## 🚀 What Has Been Accomplished
+---
+
+## ✨ Key Features
+
+### 📊 Dashboard & Analytics
+- **Quick Stats Overview** - Real-time statistics for projects, tasks, and events
+- **Progress Tracking** - Visual progress indicators and completion rates
+- **Status Management** - Comprehensive status tracking across all entities
+- **Activity Summary** - Recent activities and upcoming deadlines
+
+### 📋 Project Management
+- **Full CRUD Operations** - Create, read, update, and delete projects
+- **Progress Tracking** - Visual progress bars with percentage completion
+- **Status Management** - Active, completed, on-hold, and cancelled states
+- **Priority Levels** - High, medium, and low priority classification
+- **Advanced Filtering** - Filter by status, priority, and search functionality
+- **Project Details** - Rich descriptions, deadlines, and metadata
+
+### ✅ Task Management
+- **Comprehensive Task System** - Complete task lifecycle management
+- **Priority System** - High, medium, low priority tasks with color coding
+- **Status Tracking** - Todo, in-progress, completed, and cancelled states
+- **Due Date Management** - Date-based task scheduling with reminders
+- **Tag System** - Categorize tasks with custom tags for better organization
+- **Advanced Filtering** - Multi-criteria filtering and search capabilities
+- **Task Dependencies** - Link related tasks and manage dependencies
+
+### 📅 Event & Calendar Management
+- **Interactive Calendar** - Beautiful calendar interface with multiple views
+- **Event Scheduling** - Create and manage events with dates and times
+- **Event Categories** - Different event types and classifications
+- **Recurring Events** - Support for repeating events and patterns
+- **Event Details** - Rich event descriptions, locations, and attendees
+- **Calendar Integration** - Seamless integration with task deadlines
+
+### 🎨 User Interface & Experience
+- **Responsive Design** - Mobile-first design that adapts to all screen sizes
+- **Modern Material Design** - Clean, professional interface using Vuetify components
+- **Dark/Light Theme** - Automatic theme detection and manual switching
+- **Custom Scrollbars** - Hidden scrollbars for cleaner appearance
+- **Floating Action Buttons** - Quick access to create new items
+- **Loading States** - Smooth loading indicators and skeleton screens
+- **Error Handling** - User-friendly error messages and validation
+- **Accessibility** - WCAG compliant design for better accessibility
+
+---
+
+## 🖼️ Screenshots
 
 <div align="center">
-  
-### 🖼️ Application Screenshots
 
+### 📊 Dashboard Overview
 <table>
   <tr>
     <td align="center">
-      <img src="public/dashboard.png" alt="Dashboard" width="400">
+      <img src="public/dashboard.png" alt="Dashboard Light Mode" width="400">
       <br>
-      <strong>📊 Dashboard Overview</strong>
+      <strong>📊 Dashboard - Light Mode</strong>
     </td>
     <td align="center">
-      <img src="public/homedarkmode.png" alt="Dashboard Overview with Dark Mode on" width="400">
+      <img src="public/homedarkmode.png" alt="Dashboard Dark Mode" width="400">
       <br>
-      <strong>📊 Dashboard Overview with Dark Mode on</strong>
+      <strong>🌙 Dashboard - Dark Mode</strong>
     </td>
   </tr>
 </table>
 
-### 🎯 Quick Demo
-> **Live Demo**: [TrackDo Application](http://localhost:5174) *(when running locally)*
+### 🎯 Application Preview
+<img src="public/hero.gif" alt="TrackDo Application Preview" width="800">
 
 </div>
 
 ---
 
-### ✅ Complete Full-Stack Application
-- **Frontend**: Modern Vue.js 3 application with Vuetify UI framework
-- **Backend**: RESTful API server built with Node.js and Express
-- **Database**: MongoDB integration with Mongoose ODM
-- **State Management**: Pinia stores for centralized data management
-- **Routing**: Vue Router for single-page application navigation
-
-### ✅ Core Features Implemented
-- **Project Management**: Create, read, update, delete projects with progress tracking
-- **Task Management**: Comprehensive task system with priorities, statuses, and filtering
-- **Event Management**: Calendar-based event system with scheduling capabilities
-- **Responsive Design**: Mobile-first design that works on all devices
-- **Real-time Updates**: Dynamic UI updates with reactive state management
-
-### ✅ UI/UX Enhancements
-- **Modern Interface**: Clean, professional design with Vuetify components
-- **Dark/Light Theme**: Automatic theme switching support
-- **Hidden Scrollbars**: Custom scrollbar styling for cleaner appearance
-- **Floating Action Buttons**: Intuitive FAB buttons for quick actions
-- **Responsive Layout**: Optimized layouts for desktop, tablet, and mobile
-
-### ✅ Technical Architecture
-- **Component-Based**: Modular Vue components for maintainability
-- **Store Pattern**: Centralized state management with Pinia
-- **API Integration**: Axios-based HTTP client for backend communication
-- **Validation**: Form validation and error handling
-- **Security**: CORS, Helmet, and other security middleware
-
 ## 📁 Project Structure
 
 ```
 trackdo/
-├── src/                          # Frontend source code
-│   ├── components/              # Reusable Vue components
-│   │   ├── calendar/           # Calendar-specific components
-│   │   ├── projects/           # Project management components
-│   │   ├── tasks/              # Task management components
-│   │   └── common/             # Shared components
-│   ├── pages/                  # Main application pages
-│   ├── stores/                 # Pinia state management
-│   ├── services/               # API and external services
-│   ├── router/                 # Vue Router configuration
-│   ├── styles/                 # Global CSS and SCSS
-│   └── plugins/                # Vue plugins and configurations
-├── backend/                     # Backend API server
-│   ├── models/                 # MongoDB models
-│   ├── routes/                 # Express routes
-│   ├── middleware/             # Custom middleware
-│   └── server.js               # Main server file
-├── public/                     # Static assets
-├── package.json                # Frontend dependencies & scripts
-└── README.md                   # This file
+├── 📁 src/                          # Frontend source code
+│   ├── 📁 components/              # Reusable Vue components
+│   │   ├── 📁 calendar/           # Calendar-specific components
+│   │   ├── 📁 projects/           # Project management components
+│   │   ├── 📁 tasks/              # Task management components
+│   │   ├── 📁 auth/               # Authentication components
+│   │   └── 📁 common/             # Shared components
+│   ├── 📁 pages/                  # Main application pages
+│   │   ├── 📄 index.vue           # Dashboard page
+│   │   ├── 📄 projects.vue        # Projects management
+│   │   ├── 📄 tasks.vue           # Tasks management
+│   │   ├── 📄 calendar.vue        # Calendar & events
+│   │   └── 📄 auth.vue            # Authentication page
+│   ├── 📁 stores/                 # Pinia state management
+│   ├── 📁 services/               # API and external services
+│   ├── 📁 router/                 # Vue Router configuration
+│   ├── 📁 styles/                 # Global CSS and SCSS
+│   ├── 📁 plugins/                # Vue plugins and configurations
+│   └── 📁 utils/                  # Utility functions
+├── 📁 backend/                     # Backend API server
+│   ├── 📁 models/                 # MongoDB models
+│   ├── 📁 routes/                 # Express routes
+│   ├── 📁 middleware/             # Custom middleware
+│   └── 📄 server.js               # Main server file
+├── 📁 public/                     # Static assets
+├── 📄 package.json                # Frontend dependencies & scripts
+├── 📄 vite.config.mjs             # Vite configuration
+└── 📄 README.md                   # This file
 ```
 
+---
+
 ## 🛠 System Requirements
-
-- **Node.js** (v16 or higher)
-- **MongoDB** (v4.4 or higher)
-- **npm** or **yarn**
-- **Modern Web Browser** (Chrome, Firefox, Safari, Edge)
-
-## 📦 Installation & Setup
 
 <div align="center">
   <img src="https://img.shields.io/badge/Setup_Time-5_minutes-brightgreen?style=for-the-badge" alt="Setup Time">
   <img src="https://img.shields.io/badge/Difficulty-Easy-green?style=for-the-badge" alt="Difficulty">
 </div>
 
-### 🔧 Prerequisites
-
-Before you begin, ensure you have the following installed:
+### 📋 Prerequisites
 
 | Requirement | Version | Download Link |
 |-------------|---------|---------------|
 | ![Node.js](https://img.shields.io/badge/Node.js-v16+-339933?logo=node.js&logoColor=white) | 16.0+ | [Download Node.js](https://nodejs.org/) |
 | ![MongoDB](https://img.shields.io/badge/MongoDB-v4.4+-47A248?logo=mongodb&logoColor=white) | 4.4+ | [Download MongoDB](https://www.mongodb.com/try/download/community) |
 | ![Git](https://img.shields.io/badge/Git-Latest-F05032?logo=git&logoColor=white) | Latest | [Download Git](https://git-scm.com/) |
+
+---
+
+## 📦 Installation & Setup
 
 ### 🚀 Quick Start
 
@@ -189,9 +214,10 @@ npm run backend:install
 
 #### Step 3: Environment Setup
 
-1. **Copy environment template:**
+1. **Create environment file:**
    ```bash
-   cp .env.example .env
+   # Create .env file in the root directory
+   touch .env
    ```
 
 2. **Configure your `.env` file:**
@@ -238,210 +264,219 @@ Your application should now be running:
   <img src="https://img.shields.io/badge/Status-Ready_to_Go!-success?style=for-the-badge" alt="Ready">
 </div>
 
+---
+
 ## 🚀 Running the Application
 
-### Run Both Frontend and Backend (Recommended)
+### 🔥 Development Mode (Recommended)
 
 ```bash
+# Run both frontend and backend concurrently
 npm run dev:full
 ```
 
-This command starts both servers concurrently:
-- Frontend: `http://localhost:5173` (or `http://localhost:5174` if 5173 is busy)
-- Backend: `http://localhost:3000`
+This command starts both servers:
+- **Frontend**: `http://localhost:5173` (Vite dev server)
+- **Backend**: `http://localhost:3000` (Express API server)
 
-### Run Separately
+### 🌐 LAN Access (Network Development)
 
 ```bash
-# Frontend only (port 5173/5174)
+# Run with LAN access for testing on other devices
+npm run dev:full:lan
+```
+
+### 🔧 Run Separately
+
+```bash
+# Frontend only
 npm run dev
 
-# Backend only (port 3000)
+# Backend only
 npm run backend:dev
+
+# Frontend with LAN access
+npm run dev:lan
+
+# Backend with LAN access
+npm run backend:dev:lan
 ```
+
+### 🏗️ Production Build
+
+```bash
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+---
 
 ## 🔌 API Endpoints
 
 Backend API runs on `http://localhost:3000/api`
 
-### Health Check
-- `GET /api/health` - Check API status and connectivity
+### 🏥 Health Check
+- `GET /api/health` - Check API status and database connectivity
 
-### Projects API
+### 📋 Projects API
 - `GET /api/projects` - Get all projects
 - `POST /api/projects` - Create new project
 - `PUT /api/projects/:id` - Update existing project
 - `DELETE /api/projects/:id` - Delete project
 
-### Tasks API
+### ✅ Tasks API
 - `GET /api/tasks` - Get all tasks
 - `POST /api/tasks` - Create new task
 - `PUT /api/tasks/:id` - Update existing task
 - `DELETE /api/tasks/:id` - Delete task
 
-### Events API
+### 📅 Events API
 - `GET /api/events` - Get all events
 - `POST /api/events` - Create new event
 - `PUT /api/events/:id` - Update existing event
 - `DELETE /api/events/:id` - Delete event
 
-## ✨ Features Implemented
-
-### 📊 Dashboard & Analytics
-- **Quick Stats**: Overview of projects, tasks, and events
-- **Progress Tracking**: Visual progress indicators for projects
-- **Status Management**: Track completion status across all entities
-
-### 📋 Project Management
-- **CRUD Operations**: Create, read, update, delete projects
-- **Progress Tracking**: Visual progress bars and percentage completion
-- **Status Management**: Active, completed, on-hold project states
-- **Priority Levels**: High, medium, low priority classification
-- **Filtering & Search**: Advanced filtering by status, priority, and search terms
-
-### ✅ Task Management
-- **Comprehensive Task System**: Full task lifecycle management
-- **Priority System**: High, medium, low priority tasks
-- **Status Tracking**: Todo, in-progress, completed, cancelled states
-- **Due Date Management**: Date-based task scheduling
-- **Tag System**: Categorize tasks with custom tags
-- **Advanced Filtering**: Filter by status, priority, tags, and search
-
-### 📅 Event Management
-- **Calendar Integration**: Visual calendar interface
-- **Event Scheduling**: Create and manage events with dates and times
-- **Event Types**: Different event categories and classifications
-- **Recurring Events**: Support for repeating events
-- **Event Details**: Rich event descriptions and metadata
-
-### 🎨 User Interface
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
-- **Modern UI**: Clean, professional interface with Vuetify components
-- **Dark/Light Theme**: Automatic theme detection and switching
-- **Hidden Scrollbars**: Custom scrollbar styling for cleaner appearance
-- **Floating Action Buttons**: Quick access to create new items
-- **Loading States**: Smooth loading indicators and transitions
-- **Error Handling**: User-friendly error messages and validation
+---
 
 ## 🛠 Technologies Used
 
-### Frontend Stack
-- **Vue.js 3** - Progressive JavaScript framework
+### 🎨 Frontend Stack
+- **Vue.js 3** - Progressive JavaScript framework with Composition API
 - **Vuetify 3** - Material Design component framework
-- **Pinia** - State management library
-- **Vue Router** - Client-side routing
-- **Axios** - HTTP client for API communication
-- **Vite** - Fast build tool and development server
+- **Pinia** - Intuitive state management library
+- **Vue Router** - Official router for Vue.js
+- **Axios** - Promise-based HTTP client
+- **Vite** - Next generation frontend tooling
 - **SCSS/CSS** - Styling with preprocessor support
+- **Schedule-X** - Modern calendar component
 
-### Backend Stack
+### ⚙️ Backend Stack
 - **Node.js** - JavaScript runtime environment
-- **Express.js** - Web application framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB object modeling
-- **CORS** - Cross-origin resource sharing
-- **Helmet** - Security middleware
-- **Morgan** - HTTP request logger
+- **Express.js** - Fast, unopinionated web framework
+- **MongoDB** - NoSQL document database
+- **Mongoose** - Elegant MongoDB object modeling
+- **CORS** - Cross-origin resource sharing middleware
+- **Helmet** - Security middleware for Express
+- **Morgan** - HTTP request logger middleware
 - **dotenv** - Environment variable management
 
-### Development Tools
+### 🔧 Development Tools
 - **ESLint** - Code linting and formatting
 - **Concurrently** - Run multiple commands simultaneously
 - **Nodemon** - Auto-restart development server
 - **Unplugin** - Auto-import and component registration
+- **Vite Plugins** - Enhanced development experience
+
+---
 
 ## 🔧 Development Commands
 
-### Linting & Code Quality
+### 🧹 Code Quality
 
 ```bash
 # Run ESLint to check and fix code issues
 npm run lint
 ```
 
-### Building for Production
+### 🏗️ Building
 
 ```bash
-# Build the frontend application
+# Build the frontend application for production
 npm run build
-```
 
-### Preview Production Build
-
-```bash
-# Preview the built application
+# Preview the production build
 npm run preview
 ```
 
-### Backend Development
+### 🔄 Backend Development
 
 ```bash
 # Start backend in development mode with auto-restart
 npm run backend:dev
 
-# Start backend in production mode
-cd backend && npm start
+# Start backend with LAN access
+npm run backend:dev:lan
 ```
 
-## 🎯 Recent Improvements & Fixes
+### 📦 Dependency Management
 
-### Layout Optimizations
-- **Fixed ProjectsList Display**: Resolved width issues to ensure full container utilization
-- **Responsive Grid System**: Improved Vuetify grid layout with proper flex properties
-- **Column Alignment**: Fixed stats and projects column alignment issues
+```bash
+# Install all dependencies (frontend + backend)
+npm run install:all
 
-### UI/UX Enhancements
-- **FAB Button Styling**: Removed unwanted borders and outlines from floating action buttons
-- **Scrollbar Customization**: Implemented global scrollbar hiding for cleaner appearance
-- **Theme Consistency**: Ensured consistent styling across light and dark themes
+# Install frontend dependencies only
+npm install
 
-### Performance Improvements
-- **Global CSS**: Centralized styling for better maintainability
-- **Component Optimization**: Improved component structure and prop handling
-- **State Management**: Enhanced Pinia store organization and data flow
+# Install backend dependencies only
+npm run backend:install
+```
+
+---
 
 ## 🚨 Troubleshooting
 
-### MongoDB Connection Issues
-- Ensure MongoDB service is running
-- Check connection string in `.env` file
-- Verify firewall settings for port 27017
-- Check MongoDB logs for connection errors
+### 🔌 MongoDB Connection Issues
+- ✅ Ensure MongoDB service is running
+- ✅ Check connection string in `.env` file
+- ✅ Verify firewall settings for port 27017
+- ✅ Check MongoDB logs for connection errors
 
-### API 404 Errors
-- Ensure backend server is running on port 3000
-- Check CORS configuration in backend
-- Verify API endpoints in browser DevTools
-- Check network requests and responses
+### 🌐 API 404 Errors
+- ✅ Ensure backend server is running on port 3000
+- ✅ Check CORS configuration in backend
+- ✅ Verify API endpoints in browser DevTools
+- ✅ Check network requests and responses
 
-### Port Conflicts
+### 🔌 Port Conflicts
 - **Frontend**: Default port 5173, fallback to 5174
 - **Backend**: Default port 3000
 - **MongoDB**: Default port 27017
 - Modify port configurations in respective config files if needed
 
-### Build Issues
-- Clear node_modules and reinstall dependencies
-- Check Node.js version compatibility
-- Verify all environment variables are set
-- Check for syntax errors in code
+### 🏗️ Build Issues
+- ✅ Clear `node_modules` and reinstall dependencies
+- ✅ Check Node.js version compatibility (v16+)
+- ✅ Verify all environment variables are set
+- ✅ Check for syntax errors in code
+
+### 🔧 Common Solutions
+
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
+npm run install:all
+
+# Reset development environment
+npm run dev:full
+```
+
+---
 
 ## 📈 Future Enhancements
 
-### Planned Features
-- **User Authentication**: Login/logout functionality
-- **Real-time Notifications**: WebSocket-based notifications
-- **File Attachments**: Upload and manage files for projects/tasks
-- **Team Collaboration**: Multi-user support and permissions
-- **Advanced Analytics**: Detailed reporting and analytics dashboard
-- **Mobile App**: React Native or Flutter mobile application
+### 🚀 Planned Features
+- **User Authentication** - Login/logout with JWT tokens
+- **Real-time Notifications** - WebSocket-based live updates
+- **File Attachments** - Upload and manage files for projects/tasks
+- **Team Collaboration** - Multi-user support with role-based permissions
+- **Advanced Analytics** - Detailed reporting and analytics dashboard
+- **Mobile App** - Native mobile application
+- **Email Integration** - Email notifications and reminders
+- **API Documentation** - Interactive API documentation with Swagger
 
-### Technical Improvements
-- **Testing**: Unit and integration test coverage
-- **CI/CD**: Automated deployment pipeline
-- **Docker**: Containerization for easier deployment
-- **Performance**: Code splitting and lazy loading
-- **PWA**: Progressive Web App capabilities
+### 🔧 Technical Improvements
+- **Testing Suite** - Unit and integration test coverage
+- **CI/CD Pipeline** - Automated deployment and testing
+- **Docker Support** - Containerization for easier deployment
+- **Performance Optimization** - Code splitting and lazy loading
+- **PWA Features** - Progressive Web App capabilities
+- **Internationalization** - Multi-language support
+
+---
 
 ## 🤝 Contributing
 
@@ -449,11 +484,11 @@ We welcome contributions to TrackDo! Here's how you can help:
 
 ### 🌟 Ways to Contribute
 
-- 🐛 **Report Bugs**: Found a bug? [Open an issue](https://github.com/your-username/trackdo/issues)
-- 💡 **Suggest Features**: Have an idea? [Create a feature request](https://github.com/your-username/trackdo/issues)
-- 🔧 **Submit Pull Requests**: Ready to code? Fork and submit a PR
-- 📖 **Improve Documentation**: Help make our docs better
-- 🎨 **Design Improvements**: Enhance the UI/UX
+- 🐛 **Report Bugs** - Found a bug? Open an issue
+- 💡 **Suggest Features** - Have an idea? Create a feature request
+- 🔧 **Submit Pull Requests** - Ready to code? Fork and submit a PR
+- 📖 **Improve Documentation** - Help make our docs better
+- 🎨 **Design Improvements** - Enhance the UI/UX
 
 ### 📋 Development Workflow
 
@@ -465,32 +500,16 @@ We welcome contributions to TrackDo! Here's how you can help:
 6. **Push to branch**: `git push origin feature/amazing-feature`
 7. **Open a Pull Request**
 
-### 📝 Code Style
+### 📝 Code Style Guidelines
 
-- Follow the existing code style
+- Follow the existing code style and conventions
 - Use meaningful commit messages
 - Add comments for complex logic
 - Update documentation when needed
+- Ensure all tests pass before submitting
 
 <div align="center">
   <img src="https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=for-the-badge" alt="Contributions Welcome">
-</div>
-
-## 📄 License
-
-<div align="center">
-  
-### MIT License
-
-**TrackDo** is open source software licensed under the [MIT License](LICENSE).
-
-```
-Copyright (c) 2025 VyLH
-
-```
-
-<img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="MIT License">
-
 </div>
 
 ---
@@ -509,6 +528,11 @@ Copyright (c) 2025 VyLH
 
 ---
 
-<sub>Built with ❤️ by Vy</sub>
+<div align="center">
+  <img src="https://img.shields.io/badge/Made_with-❤️-red?style=for-the-badge" alt="Made with Love">
+  <img src="https://img.shields.io/badge/Created_by-VyLe-blue?style=for-the-badge" alt="Created by VyLe">
+</div>
+
+<sub>Built with passion and dedication by **VyLe** 🚀</sub>
 
 </div>
