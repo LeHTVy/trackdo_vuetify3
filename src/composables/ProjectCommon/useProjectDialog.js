@@ -204,7 +204,7 @@ export function useProjectDialog (editingProject = ref(null)) {
             typeof member === 'string' ? member : (member.title || member.value || member.name || String(member))
           ).filter(member => member && member.trim() !== '')
           : [],
-        id: projectToEdit._id || projectToEdit.id, // Keep the ID for editing (MongoDB uses _id)
+        id: projectToEdit._id || projectToEdit.id,
       }
 
       // Format dates for input fields
@@ -224,7 +224,6 @@ export function useProjectDialog (editingProject = ref(null)) {
       console.log('Form data after reset:', formData.value)
     } else {
       console.log('Creating new project')
-      // Reset to default values for new project
       formData.value = {
         title: '',
         description: '',
@@ -287,7 +286,6 @@ export function useProjectDialog (editingProject = ref(null)) {
           }
 
           console.log('Calling onSave with projectData:', projectData)
-          // Call the save callback
           await onSave(projectData)
         } catch (error) {
           console.error('Error in validateAndSubmit:', error)
